@@ -23,6 +23,7 @@ a:hover {
 }
 
 .header-content {
+    margin: 0;
     padding-top: 120px;
 }
 
@@ -120,5 +121,5 @@ a:hover {
 .footer-content {
     color: #fff;
     padding-top: 400px;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
 }
