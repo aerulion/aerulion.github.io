@@ -1,0 +1,26 @@
+<svg width="1920.2" height="1075.6" version="1.1" viewBox="0 0 1920.2 1075.6" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="linear-gradient" x1=".5" x2=".5" y2="1">
+            <stop stop-color="#361cc1" offset="0"/>
+            <stop stop-color="#2e82ef" offset="1"/>
+        </linearGradient>
+        <clipPath id="clip-path">
+            <path transform="translate(533 329)"
+                  d="m-533.03 278.52s95.269 204.19 401.21 161.15 419.66-32.1 544.19 96.892 343.98 107.54 572.91 67.066 360.19 68.158 401.79 142.97c0.041-2.4-0.074-1075.6-0.074-1075.6l-1920 0.011z"
+                  fill="url(#linear-gradient)"/>
+        </clipPath>
+    </defs>
+    <g transform="translate(.089 .042)">
+        <path transform="translate(533 329)"
+              d="m-533.09 278.36s100.43 239.94 401.21 191.48 442.07 9.577 537.63 114.94 352.09 94.329 580.99 52.374 363.17 41.794 400.36 109.44c0.016 0.016-0.373-1075.6-0.373-1075.6l-1919.8-0.027z"
+              fill="url(#linear-gradient)" opacity=".11"/>
+        <path transform="translate(533 329)"
+              d="m-533.03 278.52s95.269 204.19 401.21 161.15 419.66-32.1 544.19 96.892 343.98 107.54 572.91 67.066 360.19 68.158 401.79 142.97c0.041-2.4-0.074-1075.6-0.074-1075.6l-1920 0.011z"
+              fill="url(#linear-gradient)"/>
+        <g clip-path="url(#clip-path)">
+            <path transform="translate(522 366.42)"
+                  d="m-496.37 321.28s174.24-392.05 817.43-255.03 869.42 77.467 1056.2-463.98" fill="none" opacity=".14"
+                  stroke="#361cc1" stroke-width="128"/>
+        </g>
+    </g>
+</svg>
