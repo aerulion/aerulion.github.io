@@ -3,101 +3,194 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <meta name="theme-color" content="#3439CD">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>aerulion.net</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/logo-dark.svg" sizes="any">
     <link rel="icon" href="/favicon.ico">
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-<header class="header-section">
-    <div class="header-background" style="background-image: url(assets/images/header-background.svg)">
-        <div class="header-content row justify-content-center align-items-center">
-            <div class="col-lg-4">
-                <img class="header-logo" src="assets/images/logo-light.svg" alt="">
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"></circle>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+    </svg>
+    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+</button>
+
+<div class="gradient-background">
+    <div class="gradient-blob blob-1"></div>
+    <div class="gradient-blob blob-2"></div>
+    <div class="gradient-blob blob-3"></div>
+    <div class="gradient-blob blob-4"></div>
+    <div class="gradient-blob blob-5"></div>
+    <div class="gradient-blob blob-6"></div>
+    <div class="gradient-blob blob-7"></div>
+</div>
+
+<header class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-logo">
+                <img src="assets/images/logo-dark.svg" alt="aerulion" class="logo-light">
+                <img src="assets/images/logo-light.svg" alt="aerulion" class="logo-dark">
             </div>
-            <div class="col-lg-4">
-                <div class="header-text">
-                    <h1>Hello there, I’m aerulion.</h1>
-                    <h2><i>Java Developer</i></h2>
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="greeting">Hello there,</span>
+                    <span class="name">I'm aerulion</span>
+                </h1>
+                <p class="hero-subtitle">Java Developer & Minecraft Plugin Creator</p>
+                <div class="hero-skills">
+                    <div class="skills-intro">Technologies I specialize in:</div>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <span class="skill-icon">☕</span>
+                            <span class="skill-name">Java Development</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">🗄️</span>
+                            <span class="skill-name">Database Design</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">🎮</span>
+                            <span class="skill-name">Paper & Bukkit</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">🇩🇪</span>
+                            <span class="skill-name">Based in Germany</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<section class="about-me-section">
-    <div class="container">
-        <div class="row justify-content-center align-items-center">
-            <div class="col-md-4 text-center">
-                <h3>ABOUT ME</h3>
-                <p>My name is aerulion, I’m 26 years old and a java developer from Germany. I love working with Java and
-                    SQL, and I’m very interested in Minecraft / Spigot plugin development.<br><br>I’m currently a
-                    developer at a small German Minecraft server called <a href="https://corpium.net/">Corpium</a>.
-                    My main project is the development of a custom item system which introduces many new gameplay
-                    elements to the game, as well as an advanced storage system to keep up with large amounts of items.
-                </p>
-            </div>
-            <div class="col-md-5 text-center">
-                <img src="assets/images/aerulion.webp" alt="">
+<main class="main-content">
+    <section class="about-section">
+        <div class="container">
+            <div class="about-wrapper">
+                <div class="section-header">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img src="assets/images/aerulion.webp" alt="aerulion" class="avatar-img">
+                            <div class="avatar-ring"></div>
+                        </div>
+                        <h2 class="section-title">About Me</h2>
+                    </div>
+                    <div class="section-line"></div>
+                </div>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>My name is aerulion, I'm a 26-year-old Java developer from Germany with a passion for
+                            creating innovative Minecraft experiences. I specialize in developing custom gameplay
+                            systems that push the boundaries of what's possible in Minecraft.</p>
+                        <p>As the <strong>lead developer</strong> at <a href="https://corpium.net/" class="modern-link">Corpium</a>,
+                            one of the oldest German Minecraft servers, I design and maintain sophisticated plugin
+                            ecosystems that manage many new features and complex game mechanics. My work focuses on
+                            creating seamless, performance-optimized solutions that enhance player experience while
+                            maintaining the vanilla look and feel.</p>
+                        <p>My expertise ranges from low-level Java optimization to high-level system design, with
+                            particular strengths in database architecture and scalable plugin development. I am
+                            committed to writing clean, maintainable code that will withstand the test of time and the
+                            growth of player bases.</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="plugin-section">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="text-center">
-                    <h3>WHAT I HAVE DONE SO FAR</h3>
+    <section class="projects-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">What I've Built</h2>
+                <p class="section-subtitle">A showcase of my latest projects and creations</p>
+                <div class="section-line"></div>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-icon">
+                        <img src="assets/images/erenos-icon.svg" alt="Erenos">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Erenos</h3>
+                        <p class="project-description">Erenos is the core gameplay engine powering the Corpium Minecraft
+                            server. It was developed as a large-scale custom Paper plugin. Constructed from the ground
+                            up, it introduces a fully dynamic item system, a reworked damage and attribute model, and
+                            extensive support for custom mechanics that go far beyond the original. Erenos offers a
+                            comprehensive suite of features to enhance gameplay, including custom enchantments,
+                            interactive blocks, advanced chat handling, and internal messaging systems. It serves as the
+                            foundation for the server's unique identity, enabling deep customization and tight
+                            integration between features. With over 80,000 lines of meticulously crafted code, Erenos is
+                            more than a plugin; it is a comprehensive platform designed to create sophisticated,
+                            immersive Minecraft experiences tailored specifically for Corpium.</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-icon">
+                        <img src="assets/images/cloudstorage-icon.svg" alt="CloudStorage">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">CloudStorage</h3>
+                        <p class="project-description">CloudStorage is a fully integrated virtual storage system for
+                            Minecraft, designed to manage massive quantities of items and experience with ease. Inspired
+                            by systems like Applied Energistics and Refined Storage, it brings a server-friendly,
+                            survival-balanced take on cloud-based inventory—built specifically for Corpium. The system
+                            also supports virtual XP storage, automatic import/export via buses, and full inventory
+                            syncing with powerful interfaces. Every item is handled with precision—stacking logic,
+                            permissions, filters, and upgrade tiers all ensure performance and flexibility at scale.
+                            Cloud Storage offers deep gameplay integration and a user-friendly interface, acting as a
+                            central logistics backbone for the server. It simplifies inventory management without
+                            removing the challenge of resource handling.</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-4 col-md-7 col-sm-8">
-                <div class="plugin-showcase text-center">
-                    <img class="plugin-icon" src="assets/images/nucleus-icon.svg" alt="">
-                    <div class="plugin-description">
-                        <h4>Nucleus</h4>
-                        <p>The core of all my plugins, an easy-to-use library to simplify the development of new plugins
-                            and provide many useful features.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-7 col-sm-8">
-                <div class="plugin-showcase text-center">
-                    <img class="plugin-icon" src="assets/images/erenos-icon.svg" alt="">
-                    <div class="plugin-description">
-                        <h4>Erenos</h4>
-                        <p>A system to dynamically create and manage custom items and implement many new gameplay
-                            elements such as a completely new attribute and damage system, rare drops, custom mobs and
-                            many more features to the game.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-7 col-sm-8">
-                <div class="plugin-showcase text-center">
-                    <img class="plugin-icon" src="assets/images/cloudstorage-icon.svg" alt="shape">
-                    <div class="plugin-description">
-                        <h4>CloudStorage</h4>
-                        <p>An advanced storage system which helps to store and manage mass amounts of items and
-                            experience.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
+</main>
 
-<footer class="footer-section text-center">
-    <div class="footer-content">
-        <p>© 2022-2024 aerulion.net</p>
+<footer class="footer-section">
+    <div class="container">
+        <div class="footer-content">
+            <p>&copy; 2022-2025 aerulion.net</p>
+        </div>
     </div>
 </footer>
+
+<script>
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', currentTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Parallax effect for gradient blobs
+    window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY;
+        const blobs = document.querySelectorAll('.gradient-blob');
+
+        blobs.forEach((blob, index) => {
+            const speed = 0.3 + (index * 0.1);
+            blob.style.transform = `translate3d(0, ${scrolled * speed}px, 0)`;
+        });
+    });
+</script>
+
 </body>
 
 </html>
