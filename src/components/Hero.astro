@@ -28,3 +28,129 @@ import {skills} from '../data/skills';
         </div>
     </div>
 </header>
+
+<style>
+    .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: var(--spacing-5xl) 0;
+    }
+
+    .hero-content {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .hero-logo {
+        margin-bottom: var(--spacing-3xl);
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+
+    .hero-logo img {
+        height: 120px;
+        width: auto;
+        transition: all var(--transition-base);
+        filter: drop-shadow(0 10px 30px rgba(255, 159, 0, 0.3));
+    }
+
+    .logo-light {
+        display: block;
+    }
+
+    .logo-dark {
+        display: none;
+    }
+
+    :global([data-theme="dark"]) .logo-light {
+        display: none;
+    }
+
+    :global([data-theme="dark"]) .logo-dark {
+        display: block;
+    }
+
+    .hero-text {
+        margin-top: var(--spacing-3xl);
+    }
+
+    .hero-title {
+        font-size: var(--font-size-7xl);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: var(--spacing-xl);
+        background: var(--heading-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-title .greeting {
+        display: block;
+        font-size: var(--font-size-3xl);
+        font-weight: 400;
+        color: var(--text-secondary);
+        -webkit-text-fill-color: var(--text-secondary);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .hero-subtitle {
+        font-size: var(--font-size-2xl);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-3xl);
+        font-weight: 300;
+    }
+
+    .hero-skills {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        align-items: center;
+    }
+
+    .skills-intro {
+        font-size: var(--font-size-lg);
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+        width: 100%;
+        max-width: 600px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: var(--font-size-5xl);
+        }
+
+        .hero-title .greeting {
+            font-size: var(--font-size-2xl);
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-xl);
+        }
+
+        .skills-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: var(--font-size-4xl);
+        }
+    }
+</style>

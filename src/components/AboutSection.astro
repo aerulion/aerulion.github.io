@@ -52,3 +52,93 @@ import {age} from '../utils/dates';
         </div>
     </div>
 </section>
+
+<style>
+    .about-section {
+        padding: var(--spacing-5xl) 0;
+    }
+
+    .about-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--glass-bg-strong);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-3xl);
+        padding: var(--spacing-4xl);
+        box-shadow: 0 20px 60px var(--shadow-color);
+        transition: all var(--transition-base);
+    }
+
+    .about-wrapper:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 30px 80px var(--shadow-color);
+        border-color: #FF9F00;
+    }
+
+    .profile-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .profile-avatar {
+        position: relative;
+        display: inline-block;
+    }
+
+    .avatar-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--glass-border);
+        box-shadow: 0 15px 40px var(--shadow-color);
+        transition: all var(--transition-base);
+        display: block;
+        position: relative;
+        z-index: 1;
+    }
+
+    .avatar-ring {
+        position: absolute;
+        top: -6px;
+        left: -6px;
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        z-index: 0;
+        opacity: 0.4;
+        animation: pulse 3s infinite;
+    }
+
+    .about-content {
+        text-align: center;
+    }
+
+    .about-text p {
+        font-size: var(--font-size-xl);
+        line-height: 1.8;
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .about-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+        .about-wrapper {
+            padding: var(--spacing-2xl);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .about-wrapper {
+            padding: var(--spacing-xl);
+        }
+    }
+</style>

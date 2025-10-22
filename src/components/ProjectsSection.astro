@@ -22,3 +22,29 @@ import {projects} from '../data/projects';
         </div>
     </div>
 </section>
+
+<style>
+    .projects-section {
+        padding: var(--spacing-5xl) 0;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: var(--spacing-3xl);
+        margin-top: var(--spacing-4xl);
+    }
+
+    @media (max-width: 1200px) {
+        .projects-grid {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-2xl);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

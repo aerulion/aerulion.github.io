@@ -11,3 +11,50 @@ const {icon, name} = Astro.props;
     <span class="skill-icon" aria-hidden="true">{icon}</span>
     <span class="skill-name">{name}</span>
 </div>
+
+<style>
+    .skill-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-lg) var(--spacing-xl);
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-2xl);
+        transition: all var(--transition-base);
+        box-shadow: 0 10px 40px var(--shadow-color);
+    }
+
+    .skill-item:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 50px var(--shadow-color);
+        background: var(--glass-bg-strong);
+        border-color: #FF9F00;
+    }
+
+    .skill-icon {
+        font-size: var(--font-size-2xl);
+        line-height: 1;
+    }
+
+    .skill-name {
+        font-size: var(--font-size-lg);
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+        .skill-item {
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .skill-item {
+            flex-direction: column;
+            text-align: center;
+            gap: var(--spacing-sm);
+        }
+    }
+</style>

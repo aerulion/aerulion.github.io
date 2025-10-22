@@ -8,6 +8,235 @@
     <div class="gradient-blob blob-7"></div>
 </div>
 
+<style>
+    .gradient-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .gradient-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.8;
+        mix-blend-mode: multiply;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    :global([data-theme="dark"]) .gradient-blob {
+        mix-blend-mode: lighten;
+        opacity: 0.5;
+        filter: blur(70px);
+    }
+
+    .blob-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--primary-gradient);
+        top: -15%;
+        left: -15%;
+        animation-delay: 0s;
+        animation-duration: 25s;
+    }
+
+    .blob-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--secondary-gradient);
+        top: 15%;
+        right: -10%;
+        animation-delay: -8s;
+        animation-duration: 30s;
+    }
+
+    .blob-3 {
+        width: 350px;
+        height: 350px;
+        background: var(--accent-gradient);
+        bottom: -20%;
+        left: 15%;
+        animation-delay: -15s;
+        animation-duration: 35s;
+    }
+
+    .blob-4 {
+        width: 250px;
+        height: 250px;
+        background: var(--tertiary-gradient);
+        top: 50%;
+        left: 50%;
+        animation-delay: -22s;
+        animation-duration: 28s;
+    }
+
+    .blob-5 {
+        width: 320px;
+        height: 320px;
+        background: var(--quaternary-gradient);
+        bottom: 30%;
+        right: 20%;
+        animation-delay: -30s;
+        animation-duration: 40s;
+    }
+
+    .blob-6 {
+        width: 280px;
+        height: 280px;
+        background: var(--extra-gradient-1);
+        top: 30%;
+        left: 25%;
+        animation-delay: -12s;
+        animation-duration: 33s;
+    }
+
+    .blob-7 {
+        width: 300px;
+        height: 300px;
+        background: var(--extra-gradient-2);
+        bottom: 60%;
+        right: 40%;
+        animation-delay: -25s;
+        animation-duration: 38s;
+    }
+
+    @media (min-width: 768px) {
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+        }
+
+        .blob-3 {
+            width: 450px;
+            height: 450px;
+        }
+
+        .blob-4 {
+            width: 350px;
+            height: 350px;
+        }
+
+        .blob-5 {
+            width: 420px;
+            height: 420px;
+        }
+
+        .blob-6 {
+            width: 380px;
+            height: 380px;
+        }
+
+        .blob-7 {
+            width: 400px;
+            height: 400px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+        }
+
+        .blob-2 {
+            width: 450px;
+            height: 450px;
+        }
+
+        .blob-3 {
+            width: 520px;
+            height: 520px;
+        }
+
+        .blob-4 {
+            width: 400px;
+            height: 400px;
+        }
+
+        .blob-5 {
+            width: 480px;
+            height: 480px;
+        }
+
+        .blob-6 {
+            width: 420px;
+            height: 420px;
+        }
+
+        .blob-7 {
+            width: 450px;
+            height: 450px;
+        }
+    }
+
+    @media (min-width: 1920px) {
+        .blob-1 {
+            width: 800px;
+            height: 800px;
+        }
+
+        .blob-2 {
+            width: 600px;
+            height: 600px;
+        }
+
+        .blob-3 {
+            width: 700px;
+            height: 700px;
+        }
+
+        .blob-4 {
+            width: 550px;
+            height: 550px;
+        }
+
+        .blob-5 {
+            width: 650px;
+            height: 650px;
+        }
+
+        .blob-6 {
+            width: 580px;
+            height: 580px;
+        }
+
+        .blob-7 {
+            width: 620px;
+            height: 620px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .gradient-blob {
+            opacity: 0.5;
+        }
+
+        :global([data-theme="dark"]) .gradient-blob {
+            opacity: 0.3;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .gradient-blob {
+            opacity: 0.4;
+        }
+
+        :global([data-theme="dark"]) .gradient-blob {
+            opacity: 0.25;
+        }
+    }
+</style>
+
 <script>
     window.addEventListener('scroll', () => {
         const scrolled = window.scrollY;
