@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import GradientBackground from '../components/GradientBackground.astro';
+import Hero from '../components/Hero.astro';
+import AboutSection from '../components/AboutSection.astro';
+import ProjectsSection from '../components/ProjectsSection.astro';
+import Footer from '../components/Footer.astro';
+
+const title = "aerulion - Java Developer & Minecraft Plugin Creator";
+const description = "Professional Java developer specializing in Minecraft plugin development. Creator of Erenos and CloudStorage systems for Corpium server.";
+---
+
+<Layout title={title} description={description}>
+    <ThemeToggle/>
+    <GradientBackground/>
+    <Hero/>
+    <main class="main-content">
+        <AboutSection/>
+        <ProjectsSection/>
+    </main>
+    <Footer/>
+</Layout>

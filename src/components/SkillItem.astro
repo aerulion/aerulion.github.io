@@ -1,0 +1,13 @@
+---
+interface Props {
+    icon: string;
+    name: string;
+}
+
+const {icon, name} = Astro.props;
+---
+
+<div class="skill-item">
+    <span class="skill-icon" aria-hidden="true">{icon}</span>
+    <span class="skill-name">{name}</span>
+</div>

@@ -1,0 +1,21 @@
+<div class="gradient-background" aria-hidden="true">
+    <div class="gradient-blob blob-1"></div>
+    <div class="gradient-blob blob-2"></div>
+    <div class="gradient-blob blob-3"></div>
+    <div class="gradient-blob blob-4"></div>
+    <div class="gradient-blob blob-5"></div>
+    <div class="gradient-blob blob-6"></div>
+    <div class="gradient-blob blob-7"></div>
+</div>
+
+<script>
+    window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY;
+        const blobs = document.querySelectorAll('.gradient-blob');
+
+        blobs.forEach((blob, index) => {
+            const speed = 0.3 + (index * 0.1);
+            (blob as HTMLElement).style.transform = `translate3d(0, ${scrolled * speed}px, 0)`;
+        });
+    });
+</script>

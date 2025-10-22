@@ -1,0 +1,30 @@
+---
+import SkillItem from './SkillItem.astro';
+import {skills} from '../data/skills';
+---
+
+<header class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-logo">
+                <img src="/assets/images/logo-dark.svg" alt="aerulion logo" class="logo-light" width="200" height="60">
+                <img src="/assets/images/logo-light.svg" alt="aerulion logo" class="logo-dark" width="200" height="60">
+            </div>
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="greeting">Hello there,</span>
+                    <span class="name">I'm aerulion</span>
+                </h1>
+                <p class="hero-subtitle">Professional Java Developer & Minecraft Plugin Creator</p>
+                <div class="hero-skills">
+                    <div class="skills-intro">Technologies I specialize in:</div>
+                    <div class="skills-grid">
+                        {skills.map((skill) => (
+                                <SkillItem icon={skill.icon} name={skill.name}/>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,126 @@
+---
+interface Props {
+    title: string;
+    description: string;
+}
+
+const {title, description} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{title}</title>
+    <meta name="description" content={description}>
+    <meta name="keywords"
+          content="Java developer, Minecraft plugins, Paper development, Bukkit, custom server development, Minecraft programming, game development, aerulion">
+    <meta name="author" content="aerulion">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://aerulion.net/">
+    <meta property="og:title" content={title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content="https://aerulion.net/assets/images/aerulion.webp">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="aerulion">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://aerulion.net/">
+    <meta property="twitter:title" content={title}>
+    <meta property="twitter:description" content={description}>
+    <meta property="twitter:image" content="https://aerulion.net/assets/images/aerulion.webp">
+
+    <!-- Additional SEO -->
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="https://aerulion.net/">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" is:inline>
+        {
+            "@context"
+        :
+            "https://schema.org",
+                "@type"
+        :
+            "Person",
+                "name"
+        :
+            "aerulion",
+                "jobTitle"
+        :
+            "Java Developer & Minecraft Plugin Creator",
+                "description"
+        :
+            "Professional Java developer specializing in Minecraft plugin development and custom server systems",
+                "url"
+        :
+            "https://aerulion.net",
+                "image"
+        :
+            "https://aerulion.net/assets/images/aerulion.webp",
+                "knowsAbout"
+        :
+            [
+                "Java Development",
+                "Minecraft Plugin Development",
+                "Paper API",
+                "Bukkit API",
+                "Database Design",
+                "Game Development"
+            ],
+                "worksFor"
+        :
+            {
+                "@type"
+            :
+                "Organization",
+                    "name"
+            :
+                "Corpium",
+                    "url"
+            :
+                "https://corpium.net"
+            }
+        ,
+            "nationality"
+        :
+            {
+                "@type"
+            :
+                "Country",
+                    "name"
+            :
+                "Germany"
+            }
+        ,
+            "sameAs"
+        :
+            [
+                "https://github.com/aerulion"
+            ]
+        }
+    </script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+<slot/>
+
+<script is:inline>
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', currentTheme);
+</script>
+</body>
+</html>
+
+<style is:global>
+    @import '../styles/global.css';
+</style>
