@@ -4,8 +4,6 @@
     <div class="gradient-blob blob-3"></div>
     <div class="gradient-blob blob-4"></div>
     <div class="gradient-blob blob-5"></div>
-    <div class="gradient-blob blob-6"></div>
-    <div class="gradient-blob blob-7"></div>
 </div>
 
 <style>
@@ -18,233 +16,243 @@
         pointer-events: none;
         z-index: -1;
         overflow: hidden;
+        background: var(--bg-primary);
     }
 
     .gradient-blob {
         position: absolute;
         border-radius: 50%;
-        filter: blur(60px);
-        opacity: 0.8;
-        mix-blend-mode: multiply;
-        animation: float 20s infinite ease-in-out;
+        filter: blur(80px);
+        animation: drift 25s infinite ease-in-out, blobPulse 8s infinite ease-in-out;
+        will-change: transform, opacity;
     }
 
     :global([data-theme="dark"]) .gradient-blob {
-        mix-blend-mode: lighten;
-        opacity: 0.5;
-        filter: blur(70px);
+        filter: blur(100px);
     }
 
     .blob-1 {
-        width: 400px;
-        height: 400px;
-        background: var(--primary-gradient);
-        top: -15%;
-        left: -15%;
-        animation-delay: 0s;
-        animation-duration: 25s;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 95, 109, 0.9) 0%, rgba(255, 195, 113, 0.7) 30%, rgba(247, 183, 51, 0.4) 60%, transparent 100%);
+        top: -10%;
+        left: -10%;
+        animation-delay: 0s, 0s;
+        animation-duration: 25s, 8s;
     }
 
     .blob-2 {
-        width: 300px;
-        height: 300px;
-        background: var(--secondary-gradient);
-        top: 15%;
-        right: -10%;
-        animation-delay: -8s;
-        animation-duration: 30s;
+        width: 550px;
+        height: 550px;
+        background: radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.85) 0%, rgba(168, 85, 247, 0.65) 35%, rgba(236, 72, 153, 0.4) 65%, transparent 100%);
+        top: 20%;
+        right: -5%;
+        animation-delay: -8s, -2.5s;
+        animation-duration: 30s, 10s;
     }
 
     .blob-3 {
-        width: 350px;
-        height: 350px;
-        background: var(--accent-gradient);
-        bottom: -20%;
-        left: 15%;
-        animation-delay: -15s;
-        animation-duration: 35s;
+        width: 650px;
+        height: 650px;
+        background: radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.9) 0%, rgba(99, 102, 241, 0.7) 30%, rgba(14, 165, 233, 0.45) 60%, transparent 100%);
+        bottom: -15%;
+        left: 10%;
+        animation-delay: -15s, -5s;
+        animation-duration: 35s, 9s;
     }
 
     .blob-4 {
-        width: 250px;
-        height: 250px;
-        background: var(--tertiary-gradient);
-        top: 50%;
-        left: 50%;
-        animation-delay: -22s;
-        animation-duration: 28s;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.85) 0%, rgba(251, 113, 133, 0.65) 35%, rgba(253, 164, 175, 0.4) 65%, transparent 100%);
+        top: 40%;
+        left: 40%;
+        animation-delay: -22s, -6.5s;
+        animation-duration: 28s, 11s;
     }
 
     .blob-5 {
-        width: 320px;
-        height: 320px;
-        background: var(--quaternary-gradient);
-        bottom: 30%;
-        right: 20%;
-        animation-delay: -30s;
-        animation-duration: 40s;
+        width: 580px;
+        height: 580px;
+        background: radial-gradient(circle at 45% 45%, rgba(34, 211, 238, 0.9) 0%, rgba(59, 130, 246, 0.7) 30%, rgba(99, 102, 241, 0.45) 60%, transparent 100%);
+        bottom: 20%;
+        right: 15%;
+        animation-delay: -30s, -3.5s;
+        animation-duration: 40s, 7s;
     }
 
-    .blob-6 {
-        width: 280px;
-        height: 280px;
-        background: var(--extra-gradient-1);
-        top: 30%;
-        left: 25%;
-        animation-delay: -12s;
-        animation-duration: 33s;
+    :global([data-theme="dark"]) .blob-1 {
+        background: radial-gradient(circle at 30% 30%, rgba(255, 95, 109, 0.65) 0%, rgba(255, 195, 113, 0.5) 30%, rgba(247, 183, 51, 0.3) 60%, transparent 100%);
     }
 
-    .blob-7 {
-        width: 300px;
-        height: 300px;
-        background: var(--extra-gradient-2);
-        bottom: 60%;
-        right: 40%;
-        animation-delay: -25s;
-        animation-duration: 38s;
+    :global([data-theme="dark"]) .blob-2 {
+        background: radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.6) 0%, rgba(168, 85, 247, 0.45) 35%, rgba(236, 72, 153, 0.28) 65%, transparent 100%);
+    }
+
+    :global([data-theme="dark"]) .blob-3 {
+        background: radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.65) 0%, rgba(99, 102, 241, 0.5) 30%, rgba(14, 165, 233, 0.32) 60%, transparent 100%);
+    }
+
+    :global([data-theme="dark"]) .blob-4 {
+        background: radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.6) 0%, rgba(251, 113, 133, 0.45) 35%, rgba(253, 164, 175, 0.28) 65%, transparent 100%);
+    }
+
+    :global([data-theme="dark"]) .blob-5 {
+        background: radial-gradient(circle at 45% 45%, rgba(34, 211, 238, 0.65) 0%, rgba(59, 130, 246, 0.5) 30%, rgba(99, 102, 241, 0.32) 60%, transparent 100%);
     }
 
     @media (min-width: 768px) {
         .blob-1 {
-            width: 500px;
-            height: 500px;
+            width: 750px;
+            height: 750px;
         }
 
         .blob-2 {
-            width: 400px;
-            height: 400px;
-        }
-
-        .blob-3 {
-            width: 450px;
-            height: 450px;
-        }
-
-        .blob-4 {
-            width: 350px;
-            height: 350px;
-        }
-
-        .blob-5 {
-            width: 420px;
-            height: 420px;
-        }
-
-        .blob-6 {
-            width: 380px;
-            height: 380px;
-        }
-
-        .blob-7 {
-            width: 400px;
-            height: 400px;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .blob-1 {
-            width: 600px;
-            height: 600px;
-        }
-
-        .blob-2 {
-            width: 450px;
-            height: 450px;
-        }
-
-        .blob-3 {
-            width: 520px;
-            height: 520px;
-        }
-
-        .blob-4 {
-            width: 400px;
-            height: 400px;
-        }
-
-        .blob-5 {
-            width: 480px;
-            height: 480px;
-        }
-
-        .blob-6 {
-            width: 420px;
-            height: 420px;
-        }
-
-        .blob-7 {
-            width: 450px;
-            height: 450px;
-        }
-    }
-
-    @media (min-width: 1920px) {
-        .blob-1 {
-            width: 800px;
-            height: 800px;
-        }
-
-        .blob-2 {
-            width: 600px;
-            height: 600px;
-        }
-
-        .blob-3 {
-            width: 700px;
-            height: 700px;
-        }
-
-        .blob-4 {
-            width: 550px;
-            height: 550px;
-        }
-
-        .blob-5 {
             width: 650px;
             height: 650px;
         }
 
-        .blob-6 {
-            width: 580px;
-            height: 580px;
+        .blob-3 {
+            width: 800px;
+            height: 800px;
         }
 
-        .blob-7 {
-            width: 620px;
-            height: 620px;
+        .blob-4 {
+            width: 600px;
+            height: 600px;
+        }
+
+        .blob-5 {
+            width: 700px;
+            height: 700px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .gradient-blob {
+            filter: blur(100px);
+        }
+
+        :global([data-theme="dark"]) .gradient-blob {
+            filter: blur(120px);
+        }
+
+        .blob-1 {
+            width: 900px;
+            height: 900px;
+        }
+
+        .blob-2 {
+            width: 750px;
+            height: 750px;
+        }
+
+        .blob-3 {
+            width: 950px;
+            height: 950px;
+        }
+
+        .blob-4 {
+            width: 700px;
+            height: 700px;
+        }
+
+        .blob-5 {
+            width: 850px;
+            height: 850px;
+        }
+    }
+
+    @media (min-width: 1920px) {
+        .gradient-blob {
+            filter: blur(120px);
+        }
+
+        :global([data-theme="dark"]) .gradient-blob {
+            filter: blur(140px);
+        }
+
+        .blob-1 {
+            width: 1100px;
+            height: 1100px;
+        }
+
+        .blob-2 {
+            width: 900px;
+            height: 900px;
+        }
+
+        .blob-3 {
+            width: 1200px;
+            height: 1200px;
+        }
+
+        .blob-4 {
+            width: 850px;
+            height: 850px;
+        }
+
+        .blob-5 {
+            width: 1000px;
+            height: 1000px;
         }
     }
 
     @media (max-width: 768px) {
         .gradient-blob {
-            opacity: 0.5;
+            filter: blur(60px);
         }
 
         :global([data-theme="dark"]) .gradient-blob {
-            opacity: 0.3;
+            filter: blur(80px);
         }
     }
 
     @media (max-width: 480px) {
         .gradient-blob {
-            opacity: 0.4;
+            filter: blur(50px);
         }
 
         :global([data-theme="dark"]) .gradient-blob {
-            opacity: 0.25;
+            filter: blur(70px);
         }
     }
+
+    @keyframes drift {
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        25% {
+            transform: translate(100px, -100px) scale(1.1);
+        }
+        50% {
+            transform: translate(-50px, -80px) scale(0.9);
+        }
+        75% {
+            transform: translate(-100px, 60px) scale(1.05);
+        }
+    }
+
+    @keyframes blobPulse {
+        0%, 100% {
+            opacity: 0.8;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+
+    :global([data-theme="dark"]) .gradient-blob {
+        animation: drift 25s infinite ease-in-out, blobPulseDark 8s infinite ease-in-out;
+    }
+
+    @keyframes blobPulseDark {
+        0%, 100% {
+            opacity: 0.6;
+        }
+        50% {
+            opacity: 0.8;
+        }
+    }
+
 </style>
-
-<script>
-    window.addEventListener('scroll', () => {
-        const scrolled = window.scrollY;
-        const blobs = document.querySelectorAll('.gradient-blob');
-
-        blobs.forEach((blob, index) => {
-            const speed = 0.3 + (index * 0.1);
-            (blob as HTMLElement).style.transform = `translate3d(0, ${scrolled * speed}px, 0)`;
-        });
-    });
-</script>

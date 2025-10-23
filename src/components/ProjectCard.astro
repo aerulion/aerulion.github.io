@@ -31,6 +31,19 @@ const {title, description, iconUrl, iconAlt} = Astro.props;
         cursor: pointer;
         overflow: hidden;
         box-shadow: 0 15px 50px var(--shadow-color);
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .project-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .project-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .project-card:nth-child(3) {
+        animation-delay: 0.3s;
     }
 
     .project-card::before {
@@ -62,7 +75,7 @@ const {title, description, iconUrl, iconAlt} = Astro.props;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+        background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
         border-radius: var(--radius-2xl);
         transition: all var(--transition-base);
         box-shadow: 0 10px 30px var(--shadow-color);

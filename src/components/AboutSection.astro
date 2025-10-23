@@ -12,8 +12,8 @@ import {age} from '../utils/dates';
                                 src="/assets/images/aerulion.webp"
                                 alt="aerulion profile picture"
                                 class="avatar-img"
-                                width="120"
-                                height="120"
+                                width="250"
+                                height="250"
                                 loading="lazy"
                         >
                         <div class="avatar-ring" aria-hidden="true"></div>
@@ -56,6 +56,7 @@ import {age} from '../utils/dates';
 <style>
     .about-section {
         padding: var(--spacing-5xl) 0;
+        animation: fadeInUp 0.8s ease-out;
     }
 
     .about-wrapper {
@@ -90,8 +91,8 @@ import {age} from '../utils/dates';
     }
 
     .avatar-img {
-        width: 100px;
-        height: 100px;
+        width: 250px;
+        height: 250px;
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid var(--glass-border);
@@ -104,10 +105,10 @@ import {age} from '../utils/dates';
 
     .avatar-ring {
         position: absolute;
-        top: -6px;
-        left: -6px;
-        width: 112px;
-        height: 112px;
+        top: -5px;
+        left: -5px;
+        width: 260px;
+        height: 260px;
         border-radius: 50%;
         background: var(--primary-gradient);
         z-index: 0;
