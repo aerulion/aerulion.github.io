@@ -6,6 +6,20 @@ interface Props {
 
 const {title, description} = Astro.props;
 import '../styles/global.css';
+
+const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "aerulion",
+    "jobTitle": "Java Developer & Minecraft Plugin Creator",
+    "description": "Professional Java developer specializing in Minecraft plugin development and custom server systems",
+    "url": "https://aerulion.net",
+    "image": "https://aerulion.net/assets/images/aerulion.webp",
+    "knowsAbout": ["Java Development", "Minecraft Plugin Development", "Paper API", "Bukkit API", "Database Design", "Game Development"],
+    "worksFor": {"@type": "Organization", "name": "Corpium", "url": "https://corpium.net"},
+    "nationality": {"@type": "Country", "name": "Germany"},
+    "sameAs": ["https://github.com/aerulion"]
+}
 ---
 
 <html lang="en">
@@ -40,71 +54,7 @@ import '../styles/global.css';
     <link rel="canonical" href="https://aerulion.net/">
 
     <!-- Structured Data -->
-    <script type="application/ld+json" is:inline>
-        {
-            "@context"
-        :
-            "https://schema.org",
-                "@type"
-        :
-            "Person",
-                "name"
-        :
-            "aerulion",
-                "jobTitle"
-        :
-            "Java Developer & Minecraft Plugin Creator",
-                "description"
-        :
-            "Professional Java developer specializing in Minecraft plugin development and custom server systems",
-                "url"
-        :
-            "https://aerulion.net",
-                "image"
-        :
-            "https://aerulion.net/assets/images/aerulion.webp",
-                "knowsAbout"
-        :
-            [
-                "Java Development",
-                "Minecraft Plugin Development",
-                "Paper API",
-                "Bukkit API",
-                "Database Design",
-                "Game Development"
-            ],
-                "worksFor"
-        :
-            {
-                "@type"
-            :
-                "Organization",
-                    "name"
-            :
-                "Corpium",
-                    "url"
-            :
-                "https://corpium.net"
-            }
-        ,
-            "nationality"
-        :
-            {
-                "@type"
-            :
-                "Country",
-                    "name"
-            :
-                "Germany"
-            }
-        ,
-            "sameAs"
-        :
-            [
-                "https://github.com/aerulion"
-            ]
-        }
-    </script>
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}/>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
