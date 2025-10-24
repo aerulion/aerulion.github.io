@@ -69,12 +69,14 @@ import {skills} from '../data/skills';
         display: none;
     }
 
-    :global([data-theme="dark"]) .logo-light {
-        display: none;
-    }
+    @media (prefers-color-scheme: dark) {
+        .logo-light {
+            display: none;
+        }
 
-    :global([data-theme="dark"]) .logo-dark {
-        display: block;
+        .logo-dark {
+            display: block;
+        }
     }
 
     .hero-text {

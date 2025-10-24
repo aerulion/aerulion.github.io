@@ -27,10 +27,6 @@
         will-change: transform, opacity;
     }
 
-    :global([data-theme="dark"]) .gradient-blob {
-        filter: blur(100px);
-    }
-
     .blob-1 {
         width: 600px;
         height: 600px;
@@ -81,24 +77,31 @@
         animation-duration: 40s, 7s;
     }
 
-    :global([data-theme="dark"]) .blob-1 {
-        background: radial-gradient(circle at 30% 30%, rgba(255, 95, 109, 0.65) 0%, rgba(255, 195, 113, 0.5) 30%, rgba(247, 183, 51, 0.3) 60%, transparent 100%);
-    }
+    @media (prefers-color-scheme: dark) {
+        .gradient-blob {
+            filter: blur(100px);
+            animation: drift 25s infinite ease-in-out, blobPulseDark 8s infinite ease-in-out;
+        }
 
-    :global([data-theme="dark"]) .blob-2 {
-        background: radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.6) 0%, rgba(168, 85, 247, 0.45) 35%, rgba(236, 72, 153, 0.28) 65%, transparent 100%);
-    }
+        .blob-1 {
+            background: radial-gradient(circle at 30% 30%, rgba(255, 95, 109, 0.65) 0%, rgba(255, 195, 113, 0.5) 30%, rgba(247, 183, 51, 0.3) 60%, transparent 100%);
+        }
 
-    :global([data-theme="dark"]) .blob-3 {
-        background: radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.65) 0%, rgba(99, 102, 241, 0.5) 30%, rgba(14, 165, 233, 0.32) 60%, transparent 100%);
-    }
+        .blob-2 {
+            background: radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.6) 0%, rgba(168, 85, 247, 0.45) 35%, rgba(236, 72, 153, 0.28) 65%, transparent 100%);
+        }
 
-    :global([data-theme="dark"]) .blob-4 {
-        background: radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.6) 0%, rgba(251, 113, 133, 0.45) 35%, rgba(253, 164, 175, 0.28) 65%, transparent 100%);
-    }
+        .blob-3 {
+            background: radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.65) 0%, rgba(99, 102, 241, 0.5) 30%, rgba(14, 165, 233, 0.32) 60%, transparent 100%);
+        }
 
-    :global([data-theme="dark"]) .blob-5 {
-        background: radial-gradient(circle at 45% 45%, rgba(34, 211, 238, 0.65) 0%, rgba(59, 130, 246, 0.5) 30%, rgba(99, 102, 241, 0.32) 60%, transparent 100%);
+        .blob-4 {
+            background: radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.6) 0%, rgba(251, 113, 133, 0.45) 35%, rgba(253, 164, 175, 0.28) 65%, transparent 100%);
+        }
+
+        .blob-5 {
+            background: radial-gradient(circle at 45% 45%, rgba(34, 211, 238, 0.65) 0%, rgba(59, 130, 246, 0.5) 30%, rgba(99, 102, 241, 0.32) 60%, transparent 100%);
+        }
     }
 
     @media (min-width: 768px) {
@@ -133,8 +136,10 @@
             filter: blur(100px);
         }
 
-        :global([data-theme="dark"]) .gradient-blob {
-            filter: blur(120px);
+        @media (prefers-color-scheme: dark) {
+            .gradient-blob {
+                filter: blur(120px);
+            }
         }
 
         .blob-1 {
@@ -168,8 +173,10 @@
             filter: blur(120px);
         }
 
-        :global([data-theme="dark"]) .gradient-blob {
-            filter: blur(140px);
+        @media (prefers-color-scheme: dark) {
+            .gradient-blob {
+                filter: blur(140px);
+            }
         }
 
         .blob-1 {
@@ -203,8 +210,10 @@
             filter: blur(60px);
         }
 
-        :global([data-theme="dark"]) .gradient-blob {
-            filter: blur(80px);
+        @media (prefers-color-scheme: dark) {
+            .gradient-blob {
+                filter: blur(80px);
+            }
         }
     }
 
@@ -213,8 +222,10 @@
             filter: blur(50px);
         }
 
-        :global([data-theme="dark"]) .gradient-blob {
-            filter: blur(70px);
+        @media (prefers-color-scheme: dark) {
+            .gradient-blob {
+                filter: blur(70px);
+            }
         }
     }
 
@@ -223,13 +234,13 @@
             transform: translate(0, 0) scale(1);
         }
         25% {
-            transform: translate(100px, -100px) scale(1.1);
+            transform: translate(150px, -150px) scale(1.1);
         }
         50% {
             transform: translate(-50px, -80px) scale(0.9);
         }
         75% {
-            transform: translate(-100px, 60px) scale(1.05);
+            transform: translate(-150px, 60px) scale(1.05);
         }
     }
 
@@ -242,16 +253,12 @@
         }
     }
 
-    :global([data-theme="dark"]) .gradient-blob {
-        animation: drift 25s infinite ease-in-out, blobPulseDark 8s infinite ease-in-out;
-    }
-
     @keyframes blobPulseDark {
         0%, 100% {
-            opacity: 0.6;
+            opacity: 0.55;
         }
         50% {
-            opacity: 0.8;
+            opacity: 0.85;
         }
     }
 

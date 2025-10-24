@@ -65,29 +65,30 @@
     --transition-slow: 0.5s ease-out;
 }
 
-/* Dark theme colors */
-[data-theme="dark"] {
-    --primary-gradient: linear-gradient(135deg, #FF9F00 0%, #FFB347 100%);
-    --secondary-gradient: linear-gradient(135deg, #FF6B35 0%, #FF8A80 100%);
-    --accent-gradient: linear-gradient(135deg, #FDCB6E 0%, #FFD93D 100%);
-    --tertiary-gradient: linear-gradient(135deg, #74B9FF 0%, #0984E3 100%);
-    --quaternary-gradient: linear-gradient(135deg, #00B894 0%, #55EFC4 100%);
-    --extra-gradient-1: linear-gradient(135deg, #A29BFE 0%, #6C5CE7 100%);
-    --extra-gradient-2: linear-gradient(135deg, #FD79A8 0%, #FDCB6E 100%);
-    --heading-gradient: linear-gradient(135deg, #FFB347 0%, #FDCB6E 100%);
-    --heading-gradient-alt: linear-gradient(135deg, #FF9F00 0%, #FF6B35 100%);
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-gradient: linear-gradient(135deg, #FF9F00 0%, #FFB347 100%);
+        --secondary-gradient: linear-gradient(135deg, #FF6B35 0%, #FF8A80 100%);
+        --accent-gradient: linear-gradient(135deg, #FDCB6E 0%, #FFD93D 100%);
+        --tertiary-gradient: linear-gradient(135deg, #74B9FF 0%, #0984E3 100%);
+        --quaternary-gradient: linear-gradient(135deg, #00B894 0%, #55EFC4 100%);
+        --extra-gradient-1: linear-gradient(135deg, #A29BFE 0%, #6C5CE7 100%);
+        --extra-gradient-2: linear-gradient(135deg, #FD79A8 0%, #FDCB6E 100%);
+        --heading-gradient: linear-gradient(135deg, #FFB347 0%, #FDCB6E 100%);
+        --heading-gradient-alt: linear-gradient(135deg, #FF9F00 0%, #FF6B35 100%);
 
-    --bg-primary: #010104;
-    --bg-secondary: #04040f;
-    --bg-tertiary: #0c0c2e;
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-muted: #65658c;
-    --border-color: #323254;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --glass-bg: rgba(4, 4, 15, 0.4);
-    --glass-border: rgba(122, 122, 204, 0.2);
-    --glass-bg-strong: rgba(4, 4, 15, 0.6);
+        --bg-primary: #010104;
+        --bg-secondary: #04040f;
+        --bg-tertiary: #0c0c2e;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #65658c;
+        --border-color: #323254;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --glass-bg: rgba(4, 4, 15, 0.4);
+        --glass-border: rgba(122, 122, 204, 0.2);
+        --glass-bg-strong: rgba(4, 4, 15, 0.6);
+    }
 }
 
 * {

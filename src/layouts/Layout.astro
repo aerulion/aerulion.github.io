@@ -113,10 +113,5 @@ import '../styles/global.css';
 </head>
 <body>
 <slot/>
-
-<script is:inline>
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', currentTheme);
-</script>
 </body>
 </html>
