@@ -5,6 +5,7 @@ interface Props {
 }
 
 const {title, description} = Astro.props;
+import {Font} from 'astro:assets';
 import '../styles/global.css';
 
 const structuredData = {
@@ -21,6 +22,11 @@ const structuredData = {
     "sameAs": ["https://github.com/aerulion"]
 }
 ---
+
+<Font cssVariable="--font-family" preload/>
+<Font cssVariable="--font-family-accent" preload/>
+<Font cssVariable="--font-family-display" preload/>
+<Font cssVariable="--font-family-mono" preload/>
 
 <html lang="en">
 <head>

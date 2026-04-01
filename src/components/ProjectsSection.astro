@@ -6,13 +6,16 @@ import {projects} from '../data/projects';
 <section class="projects-section">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">What I've Built</h2>
-            <p class="section-subtitle">A showcase of my latest Minecraft plugin projects and creations</p>
+            <p class="section-eyebrow">SELECTED SYSTEMS / 02</p>
+            <h2 class="section-title">Two large-scale builds shaped around progression, storage and control.</h2>
+            <p class="section-subtitle">Core systems built for live gameplay, long sessions and server-side
+                reliability.</p>
             <div class="section-line" aria-hidden="true"></div>
         </div>
         <div class="projects-grid">
-            {projects.map((project) => (
+            {projects.map((project, index) => (
                     <ProjectCard
+                            position={index + 1}
                             title={project.title}
                             description={project.description}
                             iconUrl={project.iconUrl}
@@ -25,20 +28,18 @@ import {projects} from '../data/projects';
 
 <style>
     .projects-section {
-        padding: var(--spacing-5xl) 0;
+        padding: 0 0 var(--spacing-5xl);
     }
 
     .projects-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-        gap: var(--spacing-3xl);
-        margin-top: var(--spacing-4xl);
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: var(--spacing-xl);
     }
 
     @media (max-width: 1200px) {
         .projects-grid {
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: var(--spacing-2xl);
+            grid-template-columns: 1fr;
         }
     }
 

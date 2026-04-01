@@ -1,28 +1,81 @@
 ---
-import SkillItem from './SkillItem.astro';
 import {skills} from '../data/skills';
 ---
 
 <header class="hero-section">
     <div class="container">
-        <div class="hero-content">
-            <div class="hero-logo">
-                <img src="/assets/images/logo-dark.svg" alt="aerulion logo" class="logo-light" width="200" height="60">
-                <img src="/assets/images/logo-light.svg" alt="aerulion logo" class="logo-dark" width="200" height="60">
+        <div class="poster-shell panel-cut">
+            <div class="poster-annotation annotation-left">JAVA / SYSTEMS / PLUGIN ARCHITECTURE</div>
+            <div class="poster-annotation annotation-right">EU CENTRAL / DE / ONLINE</div>
+            <div class="poster-index" aria-hidden="true">
+                <span>NODE / 001</span>
+                <span>STATUS / ACTIVE</span>
+                <span>ROUTE / PRIMARY</span>
             </div>
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <span class="greeting">Hello there,</span>
-                    <span class="name">I'm aerulion</span>
-                </h1>
-                <p class="hero-subtitle">Professional Java Developer & Minecraft Plugin Creator</p>
-                <div class="hero-skills">
-                    <div class="skills-intro">Technologies I specialize in:</div>
-                    <div class="skills-grid">
-                        {skills.map((skill) => (
-                                <SkillItem icon={skill.icon} name={skill.name}/>
-                        ))}
+            <div class="poster-barcode" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="hero-content">
+                <div class="hero-stage">
+                    <div class="logo-construct">
+                        <span class="logo-facet logo-facet-a"></span>
+                        <span class="logo-facet logo-facet-b"></span>
+                        <span class="logo-facet logo-facet-c"></span>
+                        <span class="logo-edge logo-edge-a"></span>
+                        <span class="logo-edge logo-edge-b"></span>
+                        <span class="target-ring target-ring-a"></span>
+                        <span class="target-ring target-ring-b"></span>
+                        <span class="target-axis target-axis-x"></span>
+                        <span class="target-axis target-axis-y"></span>
+                        <span class="construct-line construct-line-a"></span>
+                        <span class="construct-line construct-line-b"></span>
+                        <span class="construct-line construct-line-c"></span>
+                        <span class="construct-label construct-label-a">CORE / AERULION</span>
+                        <span class="construct-label construct-label-b">VECTOR / LOCK / -32°</span>
+                        <img src="/assets/images/logo.svg" alt="aerulion logo" class="hero-logo" width="520"
+                             height="520">
                     </div>
+                </div>
+
+                <div class="hero-copy">
+                    <p class="hero-kicker">PROFESSIONAL JAVA DEVELOPER / MINECRAFT SYSTEM DESIGN</p>
+                    <h1 class="hero-title">aerulion</h1>
+                    <p class="hero-subtitle">
+                        Professional Java development for custom Minecraft systems, performance-focused plugins and
+                        long-term server architecture.
+                    </p>
+                    <div class="hero-meta-grid" aria-hidden="true">
+                        <span>JAVA RUNTIME</span>
+                        <span>SYSTEMS DESIGN</span>
+                        <span>GAMEPLAY LOGIC</span>
+                        <span>DATA LAYER</span>
+                    </div>
+                </div>
+
+                <ul class="skill-strip" aria-label="Core specialties">
+                    {skills.map((skill, index) => (
+                            <li class="skill-chip">
+                                <span class="skill-index">0{index + 1}</span>
+                                <span class="skill-name">{skill.name}</span>
+                            </li>
+                    ))}
+                </ul>
+
+                <div class="hero-footer-note">
+                    <span>ACTIVE SINCE / 2014</span>
+                    <span>SELECTED WORK / BELOW</span>
                 </div>
             </div>
         </div>
@@ -32,127 +85,531 @@ import {skills} from '../data/skills';
 <style>
     .hero-section {
         min-height: 100vh;
-        display: flex;
-        align-items: center;
         justify-content: center;
         position: relative;
-        padding: var(--spacing-5xl) 0;
+        padding: clamp(1rem, 2vw, 2rem) 0 var(--spacing-4xl);
+    }
+
+    .poster-shell {
+        min-height: calc(100vh - clamp(2rem, 4vw, 4rem));
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.024)),
+        radial-gradient(circle at 50% 36%, rgba(255, 255, 255, 0.09), transparent 34%);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .poster-shell::before,
+    .poster-shell::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+
+    .poster-shell::before {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.07), transparent 24%),
+        linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+        mix-blend-mode: screen;
+        animation: metaDrift 18s ease-in-out infinite;
+    }
+
+    .poster-shell::after {
+        background-image: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 4px);
+        opacity: 0.09;
+        animation: scanPulse 9s ease-in-out infinite;
+    }
+
+    .poster-annotation {
+        position: absolute;
+        top: clamp(1.2rem, 2vw, 1.8rem);
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-xs);
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        white-space: nowrap;
+        z-index: 2;
+        animation: softBreath 12s ease-in-out infinite;
+    }
+
+    .annotation-left {
+        left: clamp(1.25rem, 2vw, 2rem);
+    }
+
+    .annotation-right {
+        right: clamp(1.25rem, 2vw, 2rem);
+        animation-delay: -5s;
+    }
+
+    .poster-index {
+        position: absolute;
+        left: clamp(1.25rem, 2vw, 2rem);
+        bottom: calc(clamp(1.35rem, 2vw, 1.8rem) + 6.2rem);
+        display: grid;
+        gap: 0.25rem;
+        font-family: var(--font-family-mono), monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        z-index: 2;
+        animation: softBreath 13s ease-in-out infinite;
+    }
+
+    .poster-barcode {
+        position: absolute;
+        top: clamp(1.3rem, 2vw, 1.9rem);
+        left: 50%;
+        display: flex;
+        align-items: stretch;
+        gap: 0.28rem;
+        height: 3.6rem;
+        transform: translateX(-50%);
+        opacity: 0.74;
+        z-index: 2;
+        animation: scanPulse 6.5s ease-in-out infinite;
+    }
+
+    .poster-barcode span {
+        display: block;
+        width: 1px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.46);
+        animation: lineFlicker 9s linear infinite;
+    }
+
+    .poster-barcode span:nth-child(2n) {
+        animation-delay: -1.2s;
+    }
+
+    .poster-barcode span:nth-child(3n) {
+        animation-delay: -2.8s;
+    }
+
+    .poster-barcode span:nth-child(3n) {
+        height: 72%;
+        align-self: end;
+    }
+
+    .poster-barcode span:nth-child(4n) {
+        height: 48%;
+        align-self: center;
+    }
+
+    .poster-barcode span:nth-child(5n) {
+        width: 2px;
+        background: rgba(255, 255, 255, 0.62);
     }
 
     .hero-content {
-        text-align: center;
         position: relative;
-        z-index: 2;
-        max-width: 900px;
-        margin: 0 auto;
+        z-index: 1;
+        min-height: inherit;
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        gap: clamp(2rem, 5vw, 5rem);
+        align-items: center;
+        padding: clamp(4.5rem, 8vw, 6.5rem) clamp(1.3rem, 3vw, 2.5rem) clamp(2rem, 4vw, 2.5rem);
+    }
+
+    .hero-stage {
+        min-width: 0;
+    }
+
+    .logo-construct {
+        position: relative;
+        min-height: min(68vh, 760px);
+        display: grid;
+        place-items: center;
+        isolation: isolate;
     }
 
     .hero-logo {
-        margin-bottom: var(--spacing-3xl);
+        width: min(44vw, 520px);
+        height: auto;
+        filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.14));
         position: relative;
-        display: flex;
-        justify-content: center;
+        z-index: 2;
+        animation: logoHover 8.5s ease-in-out infinite;
     }
 
-    .hero-logo img {
-        height: 180px;
-        width: auto;
-        transition: all var(--transition-base);
-        filter: drop-shadow(0 10px 30px rgba(255, 159, 0, 0.3));
+    .logo-facet,
+    .logo-edge {
+        position: absolute;
+        pointer-events: none;
     }
 
-    .logo-light {
+    .logo-facet {
+        z-index: 0;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 58%);
+        box-shadow: 0 0 36px rgba(255, 255, 255, 0.06);
+        animation: angleSweep 6.8s ease-in-out infinite;
+    }
+
+    .logo-facet-a {
+        width: min(26vw, 280px);
+        aspect-ratio: 1.1;
+        top: 14%;
+        left: 16%;
+        clip-path: polygon(18% 0, 100% 0, 78% 100%, 0 100%);
+        transform: rotate(var(--angle-primary));
+    }
+
+    .logo-facet-b {
+        width: min(18vw, 220px);
+        aspect-ratio: 0.95;
+        right: 18%;
+        top: 26%;
+        clip-path: polygon(0 0, 100% 20%, 84% 100%, 12% 78%);
+        transform: rotate(-18deg);
+        animation-delay: -2.2s;
+    }
+
+    .logo-facet-c {
+        width: min(30vw, 340px);
+        height: min(10vw, 92px);
+        bottom: 17%;
+        left: 12%;
+        clip-path: polygon(0 38%, 82% 0, 100% 56%, 18% 100%);
+        transform: rotate(var(--angle-primary));
+        animation-delay: -4.1s;
+    }
+
+    .logo-edge {
+        z-index: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+        opacity: 0.72;
+        animation: angleSweep 5.4s ease-in-out infinite;
+    }
+
+    .logo-edge-a {
+        width: min(48vw, 540px);
+        top: 30%;
+        left: 6%;
+        transform: rotate(var(--angle-primary));
+    }
+
+    .logo-edge-b {
+        width: min(36vw, 420px);
+        right: 4%;
+        bottom: 27%;
+        transform: rotate(-58deg);
+        animation-delay: -2.6s;
+    }
+
+    .target-ring,
+    .target-axis {
+        position: absolute;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .target-ring {
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 50%;
+        animation: angleSweep 7.5s ease-in-out infinite;
+    }
+
+    .target-ring-a {
+        width: min(34vw, 420px);
+        aspect-ratio: 1;
+    }
+
+    .target-ring-b {
+        width: min(50vw, 620px);
+        aspect-ratio: 1;
+        opacity: 0.5;
+        animation-delay: -3.2s;
+    }
+
+    .target-axis {
+        background: rgba(255, 255, 255, 0.22);
+        animation: axisPulse 6.6s ease-in-out infinite;
+    }
+
+    .target-axis-x {
+        width: min(70vw, 760px);
+        height: 1px;
+    }
+
+    .target-axis-y {
+        width: 1px;
+        height: min(70vh, 720px);
+    }
+
+    .construct-line {
+        position: absolute;
         display: block;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+        opacity: 0.52;
+        animation: angleSweep 6.2s ease-in-out infinite;
     }
 
-    .logo-dark {
-        display: none;
+    .construct-line-a {
+        width: min(60vw, 680px);
+        top: 18%;
+        left: -2%;
+        transform: rotate(var(--angle-primary));
     }
 
-    @media (prefers-color-scheme: dark) {
-        .logo-light {
-            display: none;
-        }
-
-        .logo-dark {
-            display: block;
-        }
+    .construct-line-b {
+        width: min(42vw, 460px);
+        bottom: 20%;
+        right: -3%;
+        transform: rotate(-58deg);
+        animation-delay: -2.3s;
     }
 
-    .hero-text {
-        margin-top: var(--spacing-3xl);
+    .construct-line-c {
+        width: 100%;
+        bottom: 10%;
+        left: 0;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.72), transparent 64%);
+        animation-delay: -4.5s;
+    }
+
+    .construct-label {
+        position: absolute;
+        font-family: var(--font-family-mono), monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.68);
+        z-index: 1;
+        white-space: nowrap;
+        animation: softBreath 12s ease-in-out infinite;
+    }
+
+    .construct-label-a {
+        top: 24%;
+        right: 9%;
+    }
+
+    .construct-label-b {
+        bottom: 18%;
+        left: 8%;
+    }
+
+    .hero-copy {
+        display: grid;
+        gap: var(--spacing-lg);
+        align-content: center;
+        width: min(100%, 35rem);
+        min-width: 0;
+        justify-self: end;
+    }
+
+    .hero-kicker {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-xs);
+        letter-spacing: 0.26em;
+        color: rgba(255, 255, 255, 0.68);
+        text-transform: uppercase;
+        animation: softBreath 12s ease-in-out infinite;
     }
 
     .hero-title {
-        font-size: var(--font-size-7xl);
+        font-family: var(--font-family-accent), sans-serif;
+        font-size: clamp(3rem, 5.15vw, 6.75rem);
         font-weight: 700;
-        line-height: 1.1;
-        margin-bottom: var(--spacing-xl);
-        background: var(--heading-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .hero-title .greeting {
-        display: block;
-        font-size: var(--font-size-3xl);
-        font-weight: 400;
-        color: var(--text-secondary);
-        -webkit-text-fill-color: var(--text-secondary);
-        margin-bottom: var(--spacing-md);
+        line-height: 0.9;
+        letter-spacing: clamp(-0.03em, 0.08vw, 0.01em);
+        text-transform: none;
+        display: inline-block;
+        width: max-content;
+        max-width: 100%;
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
+        text-shadow: 0 0 18px rgba(255, 255, 255, 0.04);
     }
 
     .hero-subtitle {
-        font-size: var(--font-size-2xl);
+        font-size: clamp(1rem, 1.4vw, var(--font-size-xl));
         color: var(--text-secondary);
-        margin-bottom: var(--spacing-3xl);
-        font-weight: 300;
+        max-width: 42ch;
     }
 
-    .hero-skills {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-lg);
-        align-items: center;
-    }
-
-    .skills-intro {
-        font-size: var(--font-size-lg);
-        color: var(--text-secondary);
-        font-weight: 500;
-    }
-
-    .skills-grid {
+    .hero-meta-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-lg);
-        width: 100%;
-        max-width: 600px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.45rem 0.9rem;
+        padding-top: 0.35rem;
+        border-top: 1px solid var(--line);
+        font-family: var(--font-family-mono), monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .hero-meta-grid span {
+        padding: 0.45rem 0.55rem;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+        animation: softBreath 14s ease-in-out infinite;
+    }
+
+    .hero-meta-grid span:nth-child(2n) {
+        animation-delay: -1.5s;
+    }
+
+    .hero-meta-grid span:nth-child(3n) {
+        animation-delay: -3.4s;
+    }
+
+    .skill-strip {
+        position: absolute;
+        left: clamp(1.3rem, 3vw, 2.5rem);
+        right: clamp(1.3rem, 3vw, 2.5rem);
+        bottom: clamp(1.35rem, 2vw, 1.8rem);
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--spacing-sm);
+        list-style: none;
+        z-index: 2;
+    }
+
+    .skill-chip {
+        min-height: 4.75rem;
+        display: grid;
+        align-content: end;
+        gap: 0.35rem;
+        padding: 0.85rem 0.95rem;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+        animation: softBreath 16s ease-in-out infinite;
+    }
+
+    .skill-chip:nth-child(2n) {
+        animation-delay: -2s;
+    }
+
+    .skill-chip:nth-child(3n) {
+        animation-delay: -4.2s;
+    }
+
+    .skill-index {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-xs);
+        color: rgba(255, 255, 255, 0.7);
+        letter-spacing: 0.16em;
+    }
+
+    .skill-name {
+        font-size: var(--font-size-sm);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.92);
+    }
+
+    .hero-footer-note {
+        position: absolute;
+        right: clamp(1.3rem, 3vw, 2.5rem);
+        bottom: calc(clamp(1.35rem, 2vw, 1.8rem) + 6.2rem);
+        display: grid;
+        gap: 0.3rem;
+        text-align: right;
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-xs);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        animation: softBreath 15s ease-in-out infinite;
     }
 
     @media (max-width: 768px) {
-        .hero-title {
-            font-size: var(--font-size-5xl);
+        .poster-shell {
+            min-height: auto;
         }
 
-        .hero-title .greeting {
-            font-size: var(--font-size-2xl);
+        .poster-annotation {
+            position: static;
+            padding: 1rem 1.25rem 0;
         }
 
-        .hero-subtitle {
-            font-size: var(--font-size-xl);
+        .poster-index,
+        .poster-barcode {
+            display: none;
         }
 
-        .skills-grid {
+        .hero-content {
             grid-template-columns: 1fr;
-            gap: var(--spacing-md);
+            padding-top: 1.2rem;
+            padding-bottom: 7rem;
+        }
+
+        .hero-copy {
+            justify-self: stretch;
+        }
+
+        .hero-title {
+            font-size: clamp(2.7rem, 13.8vw, 4.85rem);
+            letter-spacing: -0.02em;
+            word-break: normal;
+            overflow-wrap: normal;
+            text-shadow: none;
+            white-space: nowrap;
+        }
+
+        .hero-logo {
+            width: min(74vw, 360px);
+        }
+
+        .target-ring-b,
+        .construct-label,
+        .target-axis-y,
+        .logo-facet-b,
+        .logo-edge-b {
+            display: none;
+        }
+
+        .hero-meta-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .skill-strip {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hero-footer-note {
+            display: none;
         }
     }
 
     @media (max-width: 480px) {
-        .hero-title {
-            font-size: var(--font-size-4xl);
+        .skill-strip {
+            grid-template-columns: 1fr;
+        }
+
+        .skill-chip {
+            min-height: auto;
+        }
+
+        .target-ring-a {
+            width: min(72vw, 320px);
+        }
+
+        .target-axis-x {
+            width: min(88vw, 420px);
+        }
+    }
+
+    @media print {
+        .hero-section {
+            padding: 0;
+        }
+
+        .poster-shell {
+            min-height: 100vh;
+            box-shadow: none;
+            break-after: page;
         }
     }
 </style>
