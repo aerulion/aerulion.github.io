@@ -529,11 +529,7 @@ import {skills} from '../data/skills';
             min-height: auto;
         }
 
-        .poster-annotation {
-            position: static;
-            padding: 1rem 1.25rem 0;
-        }
-
+        .poster-annotation,
         .poster-index,
         .poster-barcode {
             display: none;
@@ -541,41 +537,58 @@ import {skills} from '../data/skills';
 
         .hero-content {
             grid-template-columns: 1fr;
-            padding-top: 1.2rem;
-            padding-bottom: 7rem;
+            padding: 2rem clamp(1rem, 4vw, 1.5rem) 2rem;
+            gap: var(--spacing-lg);
+        }
+
+        .hero-stage {
+            order: -1;
+        }
+
+        .logo-construct {
+            min-height: min(55vw, 280px);
+        }
+
+        .hero-logo {
+            width: min(52vw, 240px);
+        }
+
+        .logo-facet,
+        .logo-edge,
+        .target-ring,
+        .target-axis,
+        .construct-line,
+        .construct-label {
+            display: none;
         }
 
         .hero-copy {
             justify-self: stretch;
+            width: 100%;
         }
 
         .hero-title {
-            font-size: clamp(2.7rem, 13.8vw, 4.85rem);
+            font-size: clamp(2.5rem, 12vw, 4.5rem);
             letter-spacing: -0.02em;
-            word-break: normal;
-            overflow-wrap: normal;
-            text-shadow: none;
             white-space: nowrap;
-        }
-
-        .hero-logo {
-            width: min(74vw, 360px);
-        }
-
-        .target-ring-b,
-        .construct-label,
-        .target-axis-y,
-        .logo-facet-b,
-        .logo-edge-b {
-            display: none;
+            text-shadow: none;
         }
 
         .hero-meta-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .skill-strip {
+            position: static;
+            left: auto;
+            right: auto;
+            bottom: auto;
+            grid-column: 1 / -1;
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .skill-chip {
+            min-height: 4rem;
         }
 
         .hero-footer-note {
@@ -585,19 +598,11 @@ import {skills} from '../data/skills';
 
     @media (max-width: 480px) {
         .skill-strip {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .skill-chip {
             min-height: auto;
-        }
-
-        .target-ring-a {
-            width: min(72vw, 320px);
-        }
-
-        .target-axis-x {
-            width: min(88vw, 420px);
         }
     }
 
