@@ -18,7 +18,7 @@ const {position, title, description, iconUrl, iconAlt} = Astro.props;
     </div>
     <div class="project-head">
         <div class="project-icon">
-            <img src={iconUrl} alt={iconAlt} width="64" height="64">
+            <img src={iconUrl} alt={iconAlt} width="64" height="64" loading="lazy">
         </div>
         <h3 class="project-title">{title}</h3>
     </div>
