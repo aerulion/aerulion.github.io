@@ -1,4 +1,8 @@
 ---
+interface Props {
+    href: string;
+}
+
 const {href} = Astro.props;
 ---
 
@@ -16,7 +20,7 @@ const {href} = Astro.props;
         color: var(--text-primary);
         padding: 0.9rem 1.2rem;
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.02);
+        background: var(--surface);
         font-family: var(--font-family-mono), monospace;
         font-size: var(--font-size-xs);
         letter-spacing: 0.2em;
@@ -26,7 +30,7 @@ const {href} = Astro.props;
 
     a:hover {
         border-color: var(--line-strong);
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--surface-strong);
         transform: translateY(-1px);
     }
 
