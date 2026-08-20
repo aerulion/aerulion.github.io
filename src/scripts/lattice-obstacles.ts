@@ -1,28 +1,28 @@
-import {boundsOf, centroid, type Point, type Polygon, type Rect, type Segment} from './geometry';
+import {boundsOf, type Point, type Segment} from './geometry';
+import {emptyObstacles, type Obstacles} from './distance-field';
 import {LOGO_HULL} from './logo-shape';
 
-const BOX_PAD = 5;
-const TEXT_PAD_X = 4;
-const TEXT_PAD_Y = 2;
-export const LINE_PAD = 6;
-const OFF_SCREEN = 80;
+const PAD_SURFACE = 10;
+const PAD_BORDER = 9;
+const PAD_TEXT_X = 11;
+const PAD_TEXT_Y = 7;
+const PAD_LINE = 9;
+const PAD_HULL = 10;
 
-const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'CANVAS', 'BR']);
+const MEASURE_MARGIN = 1200;
+export const REMEASURE_STEP = 600;
+
+const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'CANVAS', 'BR', 'NOSCRIPT']);
 
 interface Spec {
     el: Element;
+    pinned: boolean;
     surface: boolean;
     borders: [number, number, number, number] | null;
-    hull: Point[] | null;
+    hull: boolean;
     segments: Segment[] | null;
     panel: boolean;
     text: Text[];
-}
-
-export interface Obstacles {
-    rects: Rect[];
-    polygons: Polygon[];
-    lines: Segment[];
 }
 
 const range = document.createRange();
@@ -55,16 +55,97 @@ const parseSegments = (raw: string | undefined): Segment[] | null => {
     }
 };
 
-const specOf = (el: Element): Spec | null => {
-    if ((el as SVGElement).ownerSVGElement) return null;
-    if (SKIP_TAGS.has(el.tagName.toUpperCase())) return null;
+export class ObstacleIndex {
+    readonly flow: Obstacles = emptyObstacles();
+    readonly pinned: Obstacles = emptyObstacles();
 
-    const cs = getComputedStyle(el);
+    scrollX = 0;
+    scrollY = 0;
+
+    private specs: Spec[] = [];
+    private readonly probe = new CutProbe();
+
+    scan() {
+        this.probe.measure();
+        this.specs = [];
+
+        const pinnedBy = new Map<Element, boolean>();
+
+        for (const el of document.querySelectorAll('body *')) {
+            const parent = el.parentElement;
+            const inherited = parent ? pinnedBy.get(parent) === true : false;
+
+            if ((el as SVGElement).ownerSVGElement) {
+                pinnedBy.set(el, inherited);
+                continue;
+            }
+
+            const cs = getComputedStyle(el);
+            const pinned = inherited || cs.position === 'fixed' || cs.position === 'sticky';
+            pinnedBy.set(el, pinned);
+
+            const spec = specOf(el, cs, pinned);
+            if (spec) this.specs.push(spec);
+        }
+    }
+
+    measure() {
+        const sx = window.scrollX, sy = window.scrollY;
+        this.scrollX = sx;
+        this.scrollY = sy;
+
+        reset(this.flow);
+        reset(this.pinned);
+
+        const top = -MEASURE_MARGIN;
+        const bottom = window.innerHeight + MEASURE_MARGIN;
+
+        for (const spec of this.specs) {
+            const r = spec.el.getBoundingClientRect();
+            if (r.width <= 0 || r.height <= 0) continue;
+            if (!spec.pinned && (r.bottom < top || r.top > bottom)) continue;
+
+            const out = spec.pinned ? this.pinned : this.flow;
+            const dx = spec.pinned ? 0 : sx;
+            const dy = spec.pinned ? 0 : sy;
+
+            if (spec.hull) out.hulls.push(mapHull(r, dx, dy));
+            if (spec.segments) mapSegments(spec.segments, r, dx, dy, out);
+            if (spec.panel) panelOutline(r, dx, dy, this.probe.x, this.probe.y, out);
+            if (spec.surface) {
+                out.boxes.push([r.left + dx, r.top + dy, r.right + dx, r.bottom + dy, PAD_SURFACE]);
+            }
+            if (spec.borders) borderBands(r, dx, dy, spec.borders, out);
+
+            for (const node of spec.text) {
+                range.selectNodeContents(node);
+                for (const line of range.getClientRects()) {
+                    if (line.width <= 0 || line.bottom < top || line.top > bottom) continue;
+                    const bleed = PAD_TEXT_X - PAD_TEXT_Y;
+                    out.boxes.push([
+                        line.left + dx - bleed, line.top + dy,
+                        line.right + dx + bleed, line.bottom + dy, PAD_TEXT_Y
+                    ]);
+                }
+            }
+        }
+    }
+}
+
+const reset = (o: Obstacles) => {
+    o.boxes.length = 0;
+    o.capsules.length = 0;
+    o.hulls.length = 0;
+};
+
+const specOf = (el: Element, cs: CSSStyleDeclaration, pinned: boolean): Spec | null => {
+    if (SKIP_TAGS.has(el.tagName.toUpperCase())) return null;
     if (cs.display === 'none' || cs.visibility === 'hidden') return null;
+    if (parseFloat(cs.opacity) < 0.06) return null;
 
     const data = (el as HTMLElement).dataset;
     const segments = data?.collide === 'lines' ? parseSegments(data.segments) : null;
-    const hull = data?.collide === 'logo' ? LOGO_HULL : null;
+    const hull = data?.collide === 'logo';
     const panel = el.classList.contains('panel-cut');
 
     const text: Text[] = [];
@@ -85,99 +166,45 @@ const specOf = (el: Element): Spec | null => {
     const borders = widths.some((v) => v > 0) ? widths : null;
 
     if (!surface && !borders && !hull && !segments && !panel && !text.length) return null;
-    return {el, surface, borders, hull, segments, panel, text};
+    return {el, pinned, surface, borders, hull, segments, panel, text};
 };
 
-export class ObstacleIndex {
-    private specs: Spec[] = [];
-    private readonly probe = new CutProbe();
-
-    /** Costly; layout-shift events only. */
-    survey() {
-        this.probe.measure();
-        this.specs = [];
-        for (const el of document.querySelectorAll('body *')) {
-            const spec = specOf(el);
-            if (spec) this.specs.push(spec);
-        }
-    }
-
-    /** Runs on every scroll. */
-    collect(viewportHeight: number, viewportWidth: number): Obstacles {
-        const rects: Rect[] = [];
-        const polygons: Polygon[] = [];
-        const lines: Segment[] = [];
-
-        const visible = (r: DOMRect) =>
-            r.width > 0 && r.height > 0 &&
-            r.bottom > -OFF_SCREEN && r.top < viewportHeight + OFF_SCREEN &&
-            r.right > -OFF_SCREEN && r.left < viewportWidth + OFF_SCREEN;
-
-        for (const spec of this.specs) {
-            const r = spec.el.getBoundingClientRect();
-            if (!visible(r)) continue;
-
-            if (spec.hull) polygons.push(inflatedHull(spec.hull, r));
-            if (spec.segments) lines.push(...mapSegments(spec.segments, r));
-            if (spec.panel) lines.push(...panelOutline(r, this.probe.x, this.probe.y));
-            if (spec.surface) rects.push([r.left - BOX_PAD, r.top - BOX_PAD, r.right + BOX_PAD, r.bottom + BOX_PAD]);
-            if (spec.borders) rects.push(...borderBands(r, spec.borders));
-
-            for (const node of spec.text) {
-                range.selectNodeContents(node);
-                for (const line of range.getClientRects()) {
-                    if (!visible(line)) continue;
-                    rects.push([
-                        line.left - TEXT_PAD_X, line.top - TEXT_PAD_Y,
-                        line.right + TEXT_PAD_X, line.bottom + TEXT_PAD_Y
-                    ]);
-                }
-            }
-        }
-
-        return {rects, polygons, lines};
-    }
-}
-
-const inflatedHull = (hull: Point[], r: DOMRect): Polygon => {
-    const points: Point[] = hull.map(([nx, ny]) => [r.left + nx * r.width, r.top + ny * r.height]);
-    const [gx, gy] = centroid(points);
-
-    for (const p of points) {
-        const dx = p[0] - gx, dy = p[1] - gy;
-        const d = Math.hypot(dx, dy) || 1;
-        p[0] = gx + dx * (1 + BOX_PAD / d);
-        p[1] = gy + dy * (1 + BOX_PAD / d);
-    }
-    return {bbox: boundsOf(points), points};
+const mapHull = (r: DOMRect, dx: number, dy: number) => {
+    const points: Point[] = LOGO_HULL.map(([nx, ny]) => [r.left + dx + nx * r.width, r.top + dy + ny * r.height]);
+    return {points, bbox: boundsOf(points), pad: PAD_HULL};
 };
 
-const mapSegments = (segments: Segment[], r: DOMRect): Segment[] => {
+const mapSegments = (segments: Segment[], r: DOMRect, dx: number, dy: number, out: Obstacles) => {
     const sx = r.width / 100, sy = r.height / 100;
-    return segments.map(([x0, y0, x1, y1]) => [
-        r.left + x0 * sx, r.top + y0 * sy,
-        r.left + x1 * sx, r.top + y1 * sy
-    ]);
+    for (const [x0, y0, x1, y1] of segments) {
+        out.capsules.push([
+            r.left + dx + x0 * sx, r.top + dy + y0 * sy,
+            r.left + dx + x1 * sx, r.top + dy + y1 * sy, PAD_LINE
+        ]);
+    }
 };
 
-const panelOutline = (r: DOMRect, cutX: number, cutY: number): Segment[] => {
-    if (cutX <= 0 || cutY <= 0) return [];
-    const {left: l, top: t, right: rt, bottom: b} = r;
-    return [
-        [l + cutX, t, rt, t],
-        [rt, t, rt, b - cutY],
-        [rt - cutX, b, l, b],
-        [l, b, l, t + cutY],
-        [l + cutX, t, l, t + cutY],
-        [rt - cutX, b, rt, b - cutY]
-    ];
+const panelOutline = (r: DOMRect, dx: number, dy: number, cutX: number, cutY: number, out: Obstacles) => {
+    if (cutX <= 0 || cutY <= 0) return;
+    const l = r.left + dx, t = r.top + dy, rt = r.right + dx, b = r.bottom + dy;
+    out.capsules.push(
+        [l + cutX, t, rt, t, PAD_LINE],
+        [rt, t, rt, b - cutY, PAD_LINE],
+        [rt - cutX, b, l, b, PAD_LINE],
+        [l, b, l, t + cutY, PAD_LINE],
+        [l + cutX, t, l, t + cutY, PAD_LINE],
+        [rt - cutX, b, rt, b - cutY, PAD_LINE]
+    );
 };
 
-const borderBands = (r: DOMRect, [top, right, bottom, left]: [number, number, number, number]): Rect[] => {
-    const bands: Rect[] = [];
-    if (top > 0) bands.push([r.left - BOX_PAD, r.top - BOX_PAD, r.right + BOX_PAD, r.top + top + BOX_PAD]);
-    if (bottom > 0) bands.push([r.left - BOX_PAD, r.bottom - bottom - BOX_PAD, r.right + BOX_PAD, r.bottom + BOX_PAD]);
-    if (left > 0) bands.push([r.left - BOX_PAD, r.top - BOX_PAD, r.left + left + BOX_PAD, r.bottom + BOX_PAD]);
-    if (right > 0) bands.push([r.right - right - BOX_PAD, r.top - BOX_PAD, r.right + BOX_PAD, r.bottom + BOX_PAD]);
-    return bands;
+const borderBands = (
+    r: DOMRect, dx: number, dy: number,
+    [top, right, bottom, left]: [number, number, number, number],
+    out: Obstacles
+) => {
+    const l = r.left + dx, t = r.top + dy, rt = r.right + dx, b = r.bottom + dy;
+    if (top > 0) out.boxes.push([l, t, rt, t + top, PAD_BORDER]);
+    if (bottom > 0) out.boxes.push([l, b - bottom, rt, b, PAD_BORDER]);
+    if (left > 0) out.boxes.push([l, t, l + left, b, PAD_BORDER]);
+    if (right > 0) out.boxes.push([rt - right, t, rt, b, PAD_BORDER]);
 };
