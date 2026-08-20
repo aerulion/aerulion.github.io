@@ -12,6 +12,11 @@ const OFF_POINTER = -9999;
 const MAX_DPR = 2;
 const RESURVEY_DELAY = 2200;
 
+const BURST_MS = 1150;
+const RING_WIDTH = 0.42;
+const RING_PUSH = 1.25;
+const TAP_SLOP = 12;
+
 const MAX_PUSH = 26;
 const CLEAR = 2;
 const FADE = 30;
@@ -37,6 +42,7 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
     let frame = 0;
 
     let needScan = true, needMeasure = true, fieldStale = true;
+    let front = 0, burstAt = 0, tapX = 0, tapY = 0;
     let fieldX = NaN, fieldY = NaN, fieldScrollX = NaN, fieldScrollY = NaN;
 
     const resize = () => {
@@ -139,10 +145,17 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
 
     const wellAt = (u: number) => 6.75 * u * (1 - u) * (1 - u);
 
-    const influenceAt = (u: number) => {
+    const discAt = (u: number) => {
         if (u > 1) return 0;
         const t = 1 - u;
-        return t * t * (3 - 2 * t) * strength;
+        return t * t * (3 - 2 * t);
+    };
+
+    const ringAt = (u: number) => {
+        const d = Math.abs(u - front) / RING_WIDTH;
+        if (d >= 1) return 0;
+        const t = 1 - d;
+        return t * t * (3 - 2 * t);
     };
 
     const fadeAt = (clearance: number) => {
@@ -194,7 +207,8 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
                 const dist = Math.sqrt(dist2);
                 const u = dist / (RADIUS * logoReach(Math.atan2(-dy, -dx)));
 
-                const inf = influenceAt(u);
+                const profile = burstAt ? ringAt(u) : discAt(u);
+                const inf = profile * strength;
                 influence[i] = inf;
 
                 if (inf <= 0.02) {
@@ -203,8 +217,10 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
                 }
 
                 let x = baseX, y = baseY;
-                if (dist > 0.001 && u <= 1) {
-                    const amount = wellAt(u) * PULL * strength;
+                if (dist > 0.001) {
+                    const amount = burstAt
+                        ? -profile * PULL * RING_PUSH * strength
+                        : wellAt(u) * PULL * strength;
                     x += (dx / dist) * amount;
                     y += (dy / dist) * amount;
                 }
@@ -254,12 +270,26 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         }
     };
 
-    let drawnX = NaN, drawnY = NaN, drawnStrength = NaN;
+    let drawnX = NaN, drawnY = NaN, drawnStrength = NaN, drawnFront = NaN;
 
-    const tick = () => {
-        pointerX += (targetX - pointerX) * EASE;
-        pointerY += (targetY - pointerY) * EASE;
-        strength += (targetStrength - strength) * EASE;
+    const tick = (now: number) => {
+        if (burstAt) {
+            const p = (now - burstAt) / BURST_MS;
+            if (p >= 1) {
+                burstAt = 0;
+                front = 0;
+                strength = 0;
+                targetStrength = 0;
+            } else {
+                front = p * (1 + RING_WIDTH);
+                const t = p < 0.15 ? p / 0.15 : 1 - (p - 0.15) / 0.85;
+                strength = t * t * (3 - 2 * t);
+            }
+        } else {
+            pointerX += (targetX - pointerX) * EASE;
+            pointerY += (targetY - pointerY) * EASE;
+            strength += (targetStrength - strength) * EASE;
+        }
 
         ctx.clearRect(0, 0, width, height);
 
@@ -269,19 +299,31 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
             if (rebuilt ||
                 Math.abs(pointerX - drawnX) > 0.25 ||
                 Math.abs(pointerY - drawnY) > 0.25 ||
-                Math.abs(strength - drawnStrength) > 0.002) {
+                Math.abs(strength - drawnStrength) > 0.002 ||
+                Math.abs(front - drawnFront) > 0.002) {
                 buildPath();
                 drawnX = pointerX;
                 drawnY = pointerY;
                 drawnStrength = strength;
+                drawnFront = front;
             }
 
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 1;
             ctx.stroke(path);
+            frame = requestAnimationFrame(tick);
+            return;
         }
 
-        frame = requestAnimationFrame(tick);
+        if (targetStrength > 0 || burstAt) {
+            frame = requestAnimationFrame(tick);
+            return;
+        }
+        frame = 0;
+    };
+
+    const start = () => {
+        if (!frame && !document.hidden) frame = requestAnimationFrame(tick);
     };
 
     let sighted = false;
@@ -295,6 +337,28 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         targetX = e.clientX;
         targetY = e.clientY;
         targetStrength = 1;
+        start();
+    };
+
+    const onTap = (e: PointerEvent) => {
+        tapX = e.clientX;
+        tapY = e.clientY;
+        pointerX = targetX = e.clientX;
+        pointerY = targetY = e.clientY;
+        strength = 0;
+        targetStrength = 0;
+        front = 0;
+        burstAt = performance.now();
+        fieldStale = true;
+        start();
+    };
+
+    const onTapMove = (e: PointerEvent) => {
+        if (!burstAt) return;
+        if (Math.abs(e.clientX - tapX) + Math.abs(e.clientY - tapY) < TAP_SLOP) return;
+        burstAt = 0;
+        front = 0;
+        targetStrength = 0;
     };
 
     const retreat = () => {
@@ -306,8 +370,16 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         drawnStrength = NaN;
     };
 
-    window.addEventListener('pointermove', onPointer, {passive: true});
-    window.addEventListener('pointerdown', onPointer, {passive: true});
+    window.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'touch') onTapMove(e);
+        else onPointer(e);
+    }, {passive: true});
+
+    window.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') onTap(e);
+        else onPointer(e);
+    }, {passive: true});
+
     document.addEventListener('pointerleave', retreat);
     window.addEventListener('blur', retreat);
 
@@ -330,9 +402,9 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         if (document.hidden) {
             cancelAnimationFrame(frame);
             frame = 0;
-        } else if (!frame) {
+        } else {
             markDirty();
-            frame = requestAnimationFrame(tick);
+            start();
         }
     });
 
@@ -340,5 +412,4 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
     window.setTimeout(markDirty, RESURVEY_DELAY);
 
     resize();
-    frame = requestAnimationFrame(tick);
 }

@@ -16,8 +16,7 @@
     import {mountLatticeField} from '../scripts/lattice-field';
 
     const canvas = document.querySelector<HTMLCanvasElement>('.lattice-field');
-    const wanted = window.matchMedia('(pointer: fine)').matches
-        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wanted = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (canvas && wanted) mountLatticeField(canvas);
 </script>

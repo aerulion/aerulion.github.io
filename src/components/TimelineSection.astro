@@ -25,20 +25,25 @@ const MARK_STAGGER = 90;
         </div>
 
         <ol class="timeline" data-reveal>
-            {timeline.map((milestone, index) => (
-                    <li class="milestone" style={`--mark-delay:${index * MARK_STAGGER}ms`}>
-                        <p class="milestone-year">{milestone.year}</p>
-                        <span class="milestone-mark" aria-hidden="true">
-                            <span class="mark-line"></span>
-                            <span class:list={['mark-node', index === timeline.length - 1 && 'mark-node-now']}></span>
-                        </span>
-                        <div class="milestone-body">
-                            <h3 class="milestone-title">{milestone.title}</h3>
-                            <p class="milestone-note">{milestone.note}</p>
-                        </div>
-                        <p class="milestone-track">{milestone.track}</p>
-                    </li>
-            ))}
+            {timeline.map((milestone, index) => {
+                const isNow = index === timeline.length - 1;
+                return (
+                        <li class="milestone" style={`--mark-delay:${index * MARK_STAGGER}ms`}>
+                            <p class="milestone-year">{milestone.year}</p>
+                            <span class="milestone-mark" aria-hidden="true">
+                                <span class="mark-line"></span>
+                                <span class:list={['mark-node', isNow && 'mark-node-now']}>
+                                    {isNow && <span class="node-face"></span>}
+                                </span>
+                            </span>
+                            <div class="milestone-body">
+                                <h3 class="milestone-title">{milestone.title}</h3>
+                                <p class="milestone-note">{milestone.note}</p>
+                            </div>
+                            <p class="milestone-track">{milestone.track}</p>
+                        </li>
+                );
+            })}
         </ol>
     </div>
 </section>
@@ -100,8 +105,7 @@ const MARK_STAGGER = 90;
         transform: translateX(-50%);
     }
 
-    .mark-node-now::before {
-        content: '';
+    .node-face {
         position: absolute;
         inset: 0;
         background: var(--white);
