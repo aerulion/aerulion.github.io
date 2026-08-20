@@ -9,6 +9,8 @@ const PAD_TEXT_Y = 7;
 const PAD_LINE = 9;
 const PAD_HULL = 10;
 
+const MIN_OPACITY = 0.06;
+
 const MEASURE_MARGIN = 1200;
 export const REMEASURE_STEP = 600;
 
@@ -70,19 +72,25 @@ export class ObstacleIndex {
         this.specs = [];
 
         const pinnedBy = new Map<Element, boolean>();
+        const fadedBy = new Map<Element, boolean>();
 
         for (const el of document.querySelectorAll('body *')) {
             const parent = el.parentElement;
-            const inherited = parent ? pinnedBy.get(parent) === true : false;
+            const inheritsPin = parent ? pinnedBy.get(parent) === true : false;
+            const inheritsFade = parent ? fadedBy.get(parent) === true : false;
 
             if ((el as SVGElement).ownerSVGElement) {
-                pinnedBy.set(el, inherited);
+                pinnedBy.set(el, inheritsPin);
+                fadedBy.set(el, inheritsFade);
                 continue;
             }
 
             const cs = getComputedStyle(el);
-            const pinned = inherited || cs.position === 'fixed' || cs.position === 'sticky';
+            const pinned = inheritsPin || cs.position === 'fixed' || cs.position === 'sticky';
+            const faded = inheritsFade || parseFloat(cs.opacity) < MIN_OPACITY;
             pinnedBy.set(el, pinned);
+            fadedBy.set(el, faded);
+            if (faded) continue;
 
             const spec = specOf(el, cs, pinned);
             if (spec) this.specs.push(spec);
@@ -141,7 +149,6 @@ const reset = (o: Obstacles) => {
 const specOf = (el: Element, cs: CSSStyleDeclaration, pinned: boolean): Spec | null => {
     if (SKIP_TAGS.has(el.tagName.toUpperCase())) return null;
     if (cs.display === 'none' || cs.visibility === 'hidden') return null;
-    if (parseFloat(cs.opacity) < 0.06) return null;
 
     const data = (el as HTMLElement).dataset;
     const segments = data?.collide === 'lines' ? parseSegments(data.segments) : null;

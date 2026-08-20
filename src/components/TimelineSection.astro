@@ -3,6 +3,7 @@ import {FIRST_YEAR, timeline} from '../data/timeline';
 import {getCurrentYear} from '../utils/dates';
 
 const years = getCurrentYear() - FIRST_YEAR;
+const MARK_STAGGER = 90;
 ---
 
 <section class="timeline-section" id="timeline">
@@ -25,7 +26,7 @@ const years = getCurrentYear() - FIRST_YEAR;
 
         <ol class="timeline" data-reveal>
             {timeline.map((milestone, index) => (
-                    <li class="milestone">
+                    <li class="milestone" style={`--mark-delay:${index * MARK_STAGGER}ms`}>
                         <p class="milestone-year">{milestone.year}</p>
                         <span class="milestone-mark" aria-hidden="true">
                             <span class="mark-line"></span>
@@ -95,7 +96,16 @@ const years = getCurrentYear() - FIRST_YEAR;
         right: auto;
         width: 0.5rem;
         height: 0.5rem;
+        background: transparent;
         transform: translateX(-50%);
+    }
+
+    .mark-node-now::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--white);
+        animation: nodeTurn 7s var(--ease-out-poster) infinite;
     }
 
     .milestone-body {

@@ -317,6 +317,36 @@ html:not(.js) .draw-path {
     transform 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms);
 }
 
+.js .section-rule,
+.js .section-line,
+.js .mark-node {
+    transform-origin: left center;
+    transition: transform 0.85s var(--ease-draw) calc(var(--reveal-delay, 0ms) + var(--mark-delay, 0ms) + 200ms);
+}
+
+.js [data-reveal]:not(.is-revealed) .section-rule,
+.js [data-reveal]:not(.is-revealed) .section-line,
+.js [data-reveal]:not(.is-revealed) .mark-node {
+    transform: scaleX(0);
+}
+
+.js .mark-line {
+    transform-origin: top center;
+    transition: transform 0.5s var(--ease-draw) calc(var(--reveal-delay, 0ms) + var(--mark-delay, 0ms));
+}
+
+.js [data-reveal]:not(.is-revealed) .mark-line {
+    transform: scaleY(0);
+}
+
+.js .mark-node-now {
+    transform-origin: center;
+}
+
+.js [data-reveal]:not(.is-revealed) .mark-node-now {
+    transform: translateX(-50%) scale(0);
+}
+
 /* ---- Ambient motion ------------------------------------------------------ */
 
 @keyframes traceLoop {
@@ -328,6 +358,16 @@ html:not(.js) .draw-path {
 @keyframes dashCrawl {
     to {
         stroke-dashoffset: -0.15;
+    }
+}
+
+@keyframes nodeTurn {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(60deg);
     }
 }
 
@@ -379,6 +419,17 @@ html:not(.js) .draw-path {
         opacity: 1;
         transform: none;
     }
+
+    .js [data-reveal]:not(.is-revealed) .section-rule,
+    .js [data-reveal]:not(.is-revealed) .section-line,
+    .js [data-reveal]:not(.is-revealed) .mark-line,
+    .js [data-reveal]:not(.is-revealed) .mark-node {
+        transform: none;
+    }
+
+    .js [data-reveal]:not(.is-revealed) .mark-node-now {
+        transform: translateX(-50%);
+    }
 }
 
 @media print {
@@ -396,5 +447,16 @@ html:not(.js) .draw-path {
     .js [data-reveal]:not(.is-revealed) {
         opacity: 1;
         transform: none;
+    }
+
+    .js [data-reveal]:not(.is-revealed) .section-rule,
+    .js [data-reveal]:not(.is-revealed) .section-line,
+    .js [data-reveal]:not(.is-revealed) .mark-line,
+    .js [data-reveal]:not(.is-revealed) .mark-node {
+        transform: none;
+    }
+
+    .js [data-reveal]:not(.is-revealed) .mark-node-now {
+        transform: translateX(-50%);
     }
 }
