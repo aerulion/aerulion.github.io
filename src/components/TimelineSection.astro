@@ -1,0 +1,153 @@
+---
+import {FIRST_YEAR, timeline} from '../data/timeline';
+import {getCurrentYear} from '../utils/dates';
+
+const years = getCurrentYear() - FIRST_YEAR;
+---
+
+<section class="timeline-section" id="timeline">
+    <div class="container">
+        <div class="section-header" data-reveal>
+            <div class="section-rail">
+                <p class="section-eyebrow">Timeline</p>
+                <span class="section-rule" aria-hidden="true"></span>
+                <p class="section-count">02 / 05</p>
+            </div>
+            <h2 class="section-title">Since before it had a name.</h2>
+            <div class="section-lede">
+                <p class="section-subtitle">
+                    Java came first, the name two years later, Corpium two after that. {years} years on it is still the
+                    same work, just steadily larger.
+                </p>
+                <div class="section-line" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <ol class="timeline" data-reveal>
+            {timeline.map((milestone, index) => (
+                    <li class="milestone">
+                        <p class="milestone-year">{milestone.year}</p>
+                        <span class="milestone-mark" aria-hidden="true">
+                            <span class="mark-line"></span>
+                            <span class:list={['mark-node', index === timeline.length - 1 && 'mark-node-now']}></span>
+                        </span>
+                        <div class="milestone-body">
+                            <h3 class="milestone-title">{milestone.title}</h3>
+                            <p class="milestone-note">{milestone.note}</p>
+                        </div>
+                        <p class="milestone-track">{milestone.track}</p>
+                    </li>
+            ))}
+        </ol>
+    </div>
+</section>
+
+<style>
+    .timeline-section {
+        padding-bottom: var(--spacing-5xl);
+    }
+
+    .timeline {
+        list-style: none;
+    }
+
+    .milestone {
+        display: grid;
+        grid-template-columns: 4.5rem 1rem minmax(0, 34rem) minmax(0, 1fr);
+        column-gap: clamp(1rem, 2vw, 2rem);
+    }
+
+    .milestone-year {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        text-align: right;
+        padding-top: 0.25rem;
+    }
+
+    .milestone-mark {
+        position: relative;
+        display: block;
+    }
+
+    .mark-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: var(--hairline);
+        background: var(--white);
+    }
+
+    .mark-node {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0.7rem;
+        height: var(--hairline);
+        background: var(--white);
+    }
+
+    .mark-node-now {
+        top: 0.45rem;
+        left: 50%;
+        right: auto;
+        width: 0.5rem;
+        height: 0.5rem;
+        transform: translateX(-50%);
+    }
+
+    .milestone-body {
+        padding-bottom: clamp(2rem, 4vw, 3.25rem);
+    }
+
+    .milestone:last-child .milestone-body {
+        padding-bottom: 0;
+    }
+
+    .milestone-title {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.15rem, 1.9vw, 1.6rem);
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .milestone-note {
+        padding-top: 0.6rem;
+    }
+
+    .milestone-track {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        text-align: right;
+        padding-top: 0.25rem;
+    }
+
+    @media (max-width: 1100px) {
+        .milestone {
+            grid-template-columns: 4.5rem 1rem minmax(0, 1fr) auto;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .milestone-track {
+            display: none;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .milestone {
+            grid-template-columns: 3.5rem 0.75rem minmax(0, 1fr) auto;
+            column-gap: var(--spacing-sm);
+        }
+
+        .milestone-note {
+            font-size: var(--font-size-sm);
+        }
+    }
+</style>

@@ -1,26 +1,30 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import StructureGrid from '../components/StructureGrid.astro';
+import ScreenFrame from '../components/ScreenFrame.astro';
 import LatticeField from '../components/LatticeField.astro';
 import PageTransition from '../components/PageTransition.astro';
 import Hero from '../components/Hero.astro';
 import AboutSection from '../components/AboutSection.astro';
+import TimelineSection from '../components/TimelineSection.astro';
 import ProjectsSection from '../components/ProjectsSection.astro';
+import StackSection from '../components/StackSection.astro';
 import ContactSection from '../components/ContactSection.astro';
 import Footer from '../components/Footer.astro';
 
-const title = "aerulion - Java Developer & Minecraft Plugin Creator";
-const description = "Professional Java developer specializing in Minecraft plugin development. Creator of Erenos and CloudStorage systems for Corpium server.";
+const title = 'aerulion - Java Developer & Minecraft Plugin Creator';
+const description = 'Professional Java developer specializing in Minecraft plugin development. Creator of Erenos and CloudStorage systems for Corpium server.';
 ---
 
 <Layout title={title} description={description}>
     <a href="#main" class="skip-link mono-label">Skip to content</a>
-    <StructureGrid/>
+    <ScreenFrame/>
     <LatticeField/>
-    <Hero/>
     <main class="main-content" id="main">
+        <Hero/>
         <AboutSection/>
+        <TimelineSection/>
         <ProjectsSection/>
+        <StackSection/>
         <ContactSection/>
     </main>
     <Footer/>

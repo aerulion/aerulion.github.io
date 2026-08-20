@@ -1,4 +1,6 @@
-export const commitHash = import.meta.env.PUBLIC_COMMIT_HASH || 'dev';
-export const shortCommitHash = commitHash.substring(0, 7);
+const DEV = 'dev';
+
 export const repoUrl = 'https://github.com/aerulion/aerulion.github.io';
-export const commitUrl = commitHash == 'dev' ? '#' : `${repoUrl}/commit/${commitHash}`;
+export const commitHash = import.meta.env.PUBLIC_COMMIT_HASH || DEV;
+export const shortCommitHash = commitHash.slice(0, 7);
+export const commitUrl = commitHash === DEV ? repoUrl : `${repoUrl}/commit/${commitHash}`;

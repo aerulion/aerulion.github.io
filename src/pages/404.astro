@@ -1,17 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import StructureGrid from "../components/StructureGrid.astro";
-import LatticeField from "../components/LatticeField.astro";
-import PageTransition from "../components/PageTransition.astro";
-import LogoMark from "../components/LogoMark.astro";
-import Footer from "../components/Footer.astro";
-import Button from "../components/Button.astro";
+import ScreenFrame from '../components/ScreenFrame.astro';
+import LatticeField from '../components/LatticeField.astro';
+import PageTransition from '../components/PageTransition.astro';
+import LogoMark from '../components/LogoMark.astro';
+import Footer from '../components/Footer.astro';
+import Button from '../components/Button.astro';
 ---
 
-<Layout title="404 - Page Not Found" description="This page does not exist.">
-    <StructureGrid/>
+<Layout title="404 - Page Not Found" description="This page does not exist." noindex>
+    <ScreenFrame/>
     <LatticeField/>
-    <div class="not-found-section">
+    <main class="not-found-section">
         <div class="not-found-card panel-cut">
             <div class="not-found-rail">
                 <p class="mono-label">aerulion / Route error</p>
@@ -26,7 +26,7 @@ import Button from "../components/Button.astro";
                     <h1>404</h1>
                     <h2>Page not found</h2>
                     <p>The page you're looking for doesn't exist or is no longer part of the current structure.</p>
-                    <Button href="/">Return to home</Button>
+                    <Button href="/" variant="solid">Return to home</Button>
                 </div>
             </div>
 
@@ -35,16 +35,17 @@ import Button from "../components/Button.astro";
                 <p class="mono-label">Route / Unresolved</p>
             </div>
         </div>
-    </div>
+    </main>
     <Footer/>
     <PageTransition/>
 </Layout>
 
 <style>
     .not-found-section {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-items: center;
         min-height: 100svh;
         padding: clamp(1rem, 3vw, 2rem);
     }
@@ -101,14 +102,9 @@ import Button from "../components/Button.astro";
         font-weight: 600;
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        color: var(--white);
     }
 
-    /* Scoped: a bare `p` compiles to p[data-astro-cid-…] and would outrank
-       .mono-label on the rails. */
     .not-found-copy p {
-        color: var(--white);
-        font-size: var(--font-size-base);
         max-width: 46ch;
     }
 

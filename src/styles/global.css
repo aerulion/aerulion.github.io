@@ -1,23 +1,17 @@
-/* True-monochrome poster system.
-   Palette is exactly #000 and #fff — no gradients, no tints, no alpha on
-   text; hierarchy comes from size and position. Every angle is 30° or 60°,
-   taken from the logo: an equilateral triangle with a 30/60 bolt cut. */
+/* #000 and #fff only. Every angle is 30° or 60°, taken from the logo. */
 :root {
     color-scheme: dark;
 
     --black: #000;
     --white: #fff;
 
-    /* Logo geometry */
-    --angle-30: 30deg;
-    --angle-60: 60deg;
     --tan-30: 0.5773502692;
-
-    /* Corner bevel, cut at 30° from horizontal */
     --cut-x: clamp(26px, 2.6vw, 52px);
     --cut-y: calc(var(--cut-x) * var(--tan-30));
 
     --hairline: 1px;
+
+    --frame-inset: clamp(0.5rem, 1vw, 1.15rem);
 
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
@@ -25,10 +19,7 @@
     --font-size-lg: 1.125rem;
     --font-size-xl: 1.25rem;
     --font-size-2xl: 1.5rem;
-    --font-size-3xl: 1.875rem;
     --font-size-4xl: 2.4rem;
-    --font-size-5xl: 3.5rem;
-    --font-size-6xl: 5rem;
     --label-size: 0.6875rem;
     --label-tracking: 0.2em;
 
@@ -42,7 +33,6 @@
     --spacing-4xl: 5rem;
     --spacing-5xl: 7rem;
 
-    --transition-fast: 0.15s linear;
     --transition-base: 0.25s linear;
     --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
     --ease-out-poster: cubic-bezier(0.22, 1, 0.36, 1);
@@ -61,7 +51,6 @@
 
 html {
     scroll-behavior: smooth;
-    font-size: 16px;
     background: var(--black);
 }
 
@@ -91,6 +80,12 @@ a {
     color: var(--black);
 }
 
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--white);
+    outline-offset: 3px;
+}
+
 .container {
     width: min(100%, var(--poster-max-width));
     margin: 0 auto;
@@ -100,7 +95,7 @@ a {
 .main-content {
     position: relative;
     z-index: 1;
-    padding: 0 0 var(--spacing-5xl);
+    padding-bottom: var(--spacing-5xl);
 }
 
 .skip-link {
@@ -119,53 +114,46 @@ a {
     transform: translateY(0);
 }
 
-/* Pure white: reads quiet because it is small, not because it is dimmed. */
-.mono-label {
+.mono-label,
+.section-eyebrow,
+.section-count {
     font-family: var(--font-family-mono), monospace;
     font-size: var(--label-size);
     letter-spacing: var(--label-tracking);
     text-transform: uppercase;
-    color: var(--white);
     line-height: 1.4;
 }
 
-/* ---- Panels: cut corner on the logo's 30° -------------------------------- */
+/* ---- Panels ------------------------------------------------------------- */
 
 .panel-cut {
     position: relative;
-    clip-path: polygon(var(--cut-x) 0,
-    100% 0,
-    100% calc(100% - var(--cut-y)),
-    calc(100% - var(--cut-x)) 100%,
-    0 100%,
-    0 var(--cut-y));
-    /* Transparent so the cursor lattice passes behind the content. */
     background: transparent;
-    border: var(--hairline) solid var(--white);
-}
-
-/* Hairlines continuing the 30° cut past each bevelled corner. */
-.panel-cut::before,
-.panel-cut::after {
-    content: '';
-    position: absolute;
-    height: var(--hairline);
-    width: calc(var(--cut-x) * 1.18);
-    background: var(--white);
 }
 
 .panel-cut::before {
-    top: calc(var(--cut-y) * 0.5);
-    left: calc(var(--cut-x) * -0.09);
-    transform: rotate(calc(var(--angle-30) * -1));
-    transform-origin: left center;
-}
-
-.panel-cut::after {
-    right: calc(var(--cut-x) * -0.09);
-    bottom: calc(var(--cut-y) * 0.5);
-    transform: rotate(calc(var(--angle-30) * -1));
-    transform-origin: right center;
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--white);
+    clip-path: polygon(
+            nonzero,
+            var(--cut-x) 0,
+            100% 0,
+            100% calc(100% - var(--cut-y)),
+            calc(100% - var(--cut-x)) 100%,
+            0 100%,
+            0 var(--cut-y),
+            var(--cut-x) 0,
+            calc(var(--cut-x) + 0.27px) var(--hairline),
+            var(--hairline) calc(var(--cut-y) + 0.58px),
+            var(--hairline) calc(100% - var(--hairline)),
+            calc(100% - var(--cut-x) - 0.27px) calc(100% - var(--hairline)),
+            calc(100% - var(--hairline)) calc(100% - var(--cut-y) - 0.58px),
+            calc(100% - var(--hairline)) var(--hairline),
+            calc(var(--cut-x) + 0.27px) var(--hairline)
+    );
 }
 
 /* ---- Section header system ---------------------------------------------- */
@@ -188,8 +176,6 @@ a {
     padding-bottom: var(--spacing-lg);
 }
 
-/* A real element, not ::after: a pseudo-element has no box, so the lattice
-   cannot measure it and would cut straight through. */
 .section-rule {
     grid-column: 2;
     grid-row: 1;
@@ -200,20 +186,12 @@ a {
 .section-eyebrow {
     grid-column: 1;
     grid-row: 1;
-    font-family: var(--font-family-mono), monospace;
-    font-size: var(--label-size);
-    letter-spacing: var(--label-tracking);
-    text-transform: uppercase;
 }
 
 .section-count {
     grid-column: 3;
     grid-row: 1;
     text-align: right;
-    font-family: var(--font-family-mono), monospace;
-    font-size: var(--label-size);
-    letter-spacing: var(--label-tracking);
-    text-transform: uppercase;
 }
 
 .section-title {
@@ -245,6 +223,46 @@ a {
     background: var(--white);
 }
 
+/* ---- Buttons ------------------------------------------------------------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 0.85rem 1.4rem;
+    border: var(--hairline) solid var(--white);
+    background: var(--black);
+    color: var(--white);
+    text-decoration: none;
+    font-family: var(--font-family-mono), monospace;
+    font-size: var(--label-size);
+    letter-spacing: var(--label-tracking);
+    text-transform: uppercase;
+    transition: background var(--transition-base), color var(--transition-base);
+}
+
+.btn-solid {
+    background: var(--white);
+    color: var(--black);
+}
+
+.btn:hover,
+.btn:focus-visible {
+    background: var(--white);
+    color: var(--black);
+}
+
+.btn-solid:hover,
+.btn-solid:focus-visible {
+    background: var(--black);
+    color: var(--white);
+}
+
+.btn-glyph {
+    font-size: 0.9em;
+}
+
 /* ---- Links --------------------------------------------------------------- */
 
 .modern-link {
@@ -253,7 +271,6 @@ a {
     align-items: center;
     gap: var(--spacing-xs);
     text-decoration: none;
-    color: var(--white);
     box-shadow: inset 0 -1px 0 0 var(--white);
     transition: background var(--transition-base), color var(--transition-base);
 }
@@ -264,9 +281,7 @@ a {
     color: var(--black);
 }
 
-/* ---- Self-drawing line geometry -------------------------------------------
-   Animated paths carry pathLength="1", so one dasharray value works for any
-   path regardless of its real length. */
+/* ---- Self-drawing lines ------------------------------------------------- */
 
 .draw-path {
     fill: none;
@@ -302,28 +317,18 @@ html:not(.js) .draw-path {
     transform 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms);
 }
 
-/* ---- Ambient motion --------------------------------------------------------
-   Runs along a path via dash offset, never transforms it, so no in-between
-   angle ever breaks the 30/60 grid. */
+/* ---- Ambient motion ------------------------------------------------------ */
 
-/* One full trip around the path. */
 @keyframes traceLoop {
     to {
         stroke-dashoffset: -1;
     }
 }
 
-/* Ten dash periods, so the crawl loops seamlessly. */
 @keyframes dashCrawl {
     to {
         stroke-dashoffset: -0.15;
     }
-}
-
-button:focus-visible,
-a:focus-visible {
-    outline: 2px solid var(--white);
-    outline-offset: 3px;
 }
 
 @media (max-width: 900px) {

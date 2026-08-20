@@ -1,31 +1,23 @@
 import {defineConfig, fontProviders} from 'astro/config';
 
-// All four faces are angular: the mark and the panel bevels are built
-// from 30/60 cuts, and the type follows.
+const fonts = [
+    {name: 'Space Grotesk', cssVariable: '--font-family', weights: [400, 500, 700]},
+    {name: 'Chakra Petch', cssVariable: '--font-family-display', weights: [500, 600, 700]},
+    {name: 'Tektur', cssVariable: '--font-family-accent', weights: [600, 700]},
+    {name: 'IBM Plex Mono', cssVariable: '--font-family-mono', weights: [400, 500]}
+];
+
+const FALLBACKS = {
+    '--font-family-mono': ['ui-monospace', 'monospace']
+};
+
 export default defineConfig({
-    site: 'https://aerulion.net', base: '/', fonts: [{
-        name: 'Space Grotesk',
-        cssVariable: '--font-family',
+    site: 'https://aerulion.net',
+    base: '/',
+    prefetch: {prefetchAll: true, defaultStrategy: 'hover'},
+    fonts: fonts.map((font) => ({
+        ...font,
         provider: fontProviders.fontsource(),
-        weights: [400, 500, 700],
-        fallbacks: ['system-ui', 'sans-serif'],
-    }, {
-        name: 'Chakra Petch',
-        cssVariable: '--font-family-display',
-        provider: fontProviders.fontsource(),
-        weights: [500, 600, 700],
-        fallbacks: ['system-ui', 'sans-serif'],
-    }, {
-        name: 'Tektur',
-        cssVariable: '--font-family-accent',
-        provider: fontProviders.fontsource(),
-        weights: [600, 700],
-        fallbacks: ['system-ui', 'sans-serif'],
-    }, {
-        name: 'IBM Plex Mono',
-        cssVariable: '--font-family-mono',
-        provider: fontProviders.fontsource(),
-        weights: [400, 500],
-        fallbacks: ['ui-monospace', 'monospace'],
-    }]
+        fallbacks: FALLBACKS[font.cssVariable] ?? ['system-ui', 'sans-serif']
+    }))
 });

@@ -9,7 +9,7 @@ import {projects} from '../data/projects';
             <div class="section-rail">
                 <p class="section-eyebrow">Selected systems</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count">02 / 03</p>
+                <p class="section-count">03 / 05</p>
             </div>
             <h2 class="section-title">Two systems, end to end.</h2>
             <div class="section-lede">
@@ -22,31 +22,21 @@ import {projects} from '../data/projects';
         </div>
 
         <div class="projects-grid">
-            {projects.map((project, index) => (
-                    <ProjectCard
-                            position={index + 1}
-                            title={project.title}
-                            tagline={project.tagline}
-                            description={project.description}
-                            iconUrl={project.iconUrl}
-                            iconAlt={project.iconAlt}
-                            meta={project.meta}
-                            capabilities={project.capabilities}
-                    />
-            ))}
+            {projects.map((project, index) =>
+                    <ProjectCard project={project} position={index + 1}/>)}
         </div>
     </div>
 </section>
 
 <style>
     .projects-section {
-        padding: 0 0 var(--spacing-5xl);
+        padding-bottom: var(--spacing-5xl);
     }
 
     .projects-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+        grid-template-rows: auto auto auto 1fr auto;
         gap: var(--spacing-xl);
-        align-items: stretch;
     }
 </style>

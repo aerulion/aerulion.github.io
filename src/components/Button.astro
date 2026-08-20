@@ -1,38 +1,20 @@
 ---
 interface Props {
     href: string;
+    variant?: 'outline' | 'solid';
+    glyph?: string;
 }
 
-const {href} = Astro.props;
+const {href, variant = 'outline', glyph} = Astro.props;
+const external = /^https?:/.test(href);
 ---
 
-<a href={href}>
+<a
+        class:list={['btn', variant === 'solid' && 'btn-solid']}
+        href={href}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+>
     <slot/>
+    {glyph && <span class="btn-glyph" aria-hidden="true">{glyph}</span>}
 </a>
-
-<style>
-
-    a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: var(--white);
-        padding: 0.9rem 1.2rem;
-        border: var(--hairline) solid var(--white);
-        background: var(--black);
-        font-family: var(--font-family-mono), monospace;
-        font-size: var(--label-size);
-        letter-spacing: var(--label-tracking);
-        text-transform: uppercase;
-        transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
-    }
-
-    a:hover {
-        border-color: var(--white);
-        background: var(--white);
-        color: var(--black);
-        transform: translateY(-1px);
-    }
-
-</style>

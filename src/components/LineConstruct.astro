@@ -1,16 +1,4 @@
 ---
-/*
- * Scaffolding on the logo's own 30/60 lattice: a flat-top hexagon, the
- * triangle pair inscribing it, and three axes through the centre.
- * Coordinates come from a circumradius of 44 on a 100x100 box; the axes
- * stop at 48.
- *
- * Nothing rotates. A rotating figure is off the 30/60 grid for all but six
- * frames of its cycle, so the motion runs along the lines instead. Holding
- * the geometry still also lets it be handed to the lattice as fixed
- * segments to collide with.
- */
-
 interface Props {
     class?: string;
     axes?: boolean;
@@ -20,13 +8,9 @@ const {class: className = '', axes = true} = Astro.props;
 
 type Pt = [number, number];
 
-// Flat-top hexagon: vertices at 0°, 60°, 120°, 180°, 240°, 300°.
 const HEX: Pt[] = [[94, 50], [72, 11.895], [28, 11.895], [6, 50], [28, 88.105], [72, 88.105]];
-// Apex-up equilateral triangle — the silhouette of the "A".
 const TRI_UP: Pt[] = [[50, 6], [88.105, 72], [11.895, 72]];
-// Apex-down counterpart; together they form a hexagram, all edges at 60°.
 const TRI_DOWN: Pt[] = [[50, 94], [11.895, 28], [88.105, 28]];
-// Hexagonal axes through the centre at 0°, 60° and 120°.
 const AXES: Pt[][] = [
     [[2, 50], [98, 50]],
     [[26, 8.43], [74, 91.57]],
@@ -36,7 +20,6 @@ const AXES: Pt[][] = [
 const closed = (pts: Pt[]) => `M ${pts.map((p) => p.join(' ')).join(' L ')} Z`;
 const open = (pts: Pt[]) => `M ${pts.map((p) => p.join(' ')).join(' L ')}`;
 
-// Flat segment list, in viewBox units, for the lattice to collide with.
 const edgesOf = (pts: Pt[], close: boolean) => {
     const out: number[][] = [];
     for (let i = 0; i < pts.length - (close ? 0 : 1); i++) {
@@ -83,8 +66,6 @@ const segments = [
         overflow: visible;
     }
 
-    /* Hierarchy comes from density, not opacity: every pixel stays pure
-       white or pure black. */
     .construct-axis {
         stroke-dasharray: 0.004 0.011;
     }
@@ -111,8 +92,6 @@ const segments = [
         opacity: 1;
     }
 
-    /* A short dash orbiting the figure, along the geometry rather than
-       through it. */
     .construct-tracer {
         fill: none;
         stroke: var(--white);
@@ -133,7 +112,7 @@ const segments = [
         animation: traceLoop 19s linear infinite reverse 1.2s;
     }
 
-    /* Both periods divide 0.15 exactly so the crawl loops seamlessly. */
+    /* Both periods divide 0.15 exactly, so the crawl loops. */
     :global(.is-drawn) .construct-axis {
         animation: dashCrawl 34s linear infinite;
     }

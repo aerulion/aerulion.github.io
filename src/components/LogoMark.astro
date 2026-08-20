@@ -1,6 +1,5 @@
 ---
-// The source mark shades its right-hand planes a second grey, which two
-// colours cannot carry, so only the silhouette is kept.
+import {uid} from '../utils/uid';
 
 interface Props {
     class?: string;
@@ -12,8 +11,21 @@ const {class: className = '', drawDelay = 0, fillDelay = 900} = Astro.props;
 
 const SILHOUETTE = "m24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z";
 
-// Unique per instance so two marks on one page cannot share a clip path.
-const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
+const clipId = uid('logo-clip');
+
+const VIEW = 26.458333;
+const TAN_30 = 0.5773502692;
+const MARGIN = 0.25;
+const INK_REST = 7.638 - MARGIN;
+const INK_TRAVEL = VIEW + 2 * MARGIN;
+
+const FAR = 60;
+const INK = [
+    [-FAR, INK_REST + FAR * TAN_30],
+    [FAR, INK_REST - FAR * TAN_30],
+    [FAR, FAR * 1.5],
+    [-FAR, FAR * 1.5]
+].map((point) => point.map((n) => Number(n.toFixed(4))).join(',')).join(' ');
 ---
 
 <svg
@@ -22,7 +34,7 @@ const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
         role="img"
         aria-label="aerulion logo"
         data-collide="logo"
-        style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms;`}
+        style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms; --ink-travel:${INK_TRAVEL}px;`}
 >
     <defs>
         <clipPath id={clipId}>
@@ -33,7 +45,7 @@ const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
     <path class="draw-path logo-outline" d={SILHOUETTE} pathLength="1"/>
 
     <g clip-path={`url(#${clipId})`}>
-        <path class="logo-flood" d={SILHOUETTE} pathLength="1"/>
+        <polygon class="logo-ink" points={INK}/>
     </g>
 </svg>
 
@@ -49,29 +61,21 @@ const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
         stroke-width: 0.4;
     }
 
-    /* Fill grows from four points at once: dash period 1/4 repeats the
-       pattern four times around the path, so 0 0.25 -> 0.25 0 spreads four
-       fronts until they meet. Stroke is thick enough to reach the middle of
-       every limb and clipped back to the silhouette. Butt caps keep a
-       zero-length dash invisible. */
-    .logo-flood {
-        fill: none;
-        stroke: var(--white);
-        stroke-width: 14;
-        stroke-linecap: butt;
-        stroke-linejoin: round;
-        stroke-dasharray: 0 0.25;
+    .logo-ink {
+        fill: var(--white);
+        transform: translateY(var(--ink-travel));
     }
 
-    :global(.js) .logo-flood {
-        transition: stroke-dasharray 1s var(--ease-draw) var(--fill-delay, 900ms);
+    :global(.js) .logo-ink {
+        transition: transform 0.9s var(--ease-draw) var(--fill-delay, 900ms);
     }
 
-    :global(.is-drawn) .logo-flood,
-    :global(html:not(.js)) .logo-flood {
-        stroke-dasharray: 0.25 0;
+    :global(.is-drawn) .logo-ink,
+    :global(html:not(.js)) .logo-ink {
+        transform: translateY(0);
     }
 
+    /* Half the stroke sits outside the silhouette, so it goes once inked. */
     :global(.js) .logo-outline {
         transition: stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
         stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
@@ -82,8 +86,8 @@ const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .logo-flood {
-            stroke-dasharray: 0.25 0;
+        .logo-ink {
+            transform: translateY(0);
         }
 
         .logo-outline {

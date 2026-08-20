@@ -1,32 +1,41 @@
 ---
-interface Props {
-    title: string;
-    description: string;
-}
-
-const {title, description} = Astro.props;
 import {Font} from 'astro:assets';
 import '../styles/global.css';
 
-const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "aerulion",
-    "jobTitle": "Java Developer & Minecraft Plugin Creator",
-    "description": "Professional Java developer specializing in Minecraft plugin development and custom server systems",
-    "url": "https://aerulion.net",
-    "image": "https://aerulion.net/assets/images/aerulion.webp",
-    "knowsAbout": ["Java Development", "Minecraft Plugin Development", "Paper API", "Bukkit API", "Database Design", "Game Development"],
-    "worksFor": {"@type": "Organization", "name": "Corpium", "url": "https://corpium.net"},
-    "nationality": {"@type": "Country", "name": "Germany"},
-    "sameAs": ["https://github.com/aerulion"]
+interface Props {
+    title: string;
+    description: string;
+    noindex?: boolean;
 }
----
 
-<Font cssVariable="--font-family" preload/>
-<Font cssVariable="--font-family-accent" preload/>
-<Font cssVariable="--font-family-display" preload/>
-<Font cssVariable="--font-family-mono" preload/>
+const {title, description, noindex = false} = Astro.props;
+
+const site = Astro.site ?? new URL('https://aerulion.net');
+const canonical = new URL(Astro.url.pathname, site);
+const socialImage = new URL('/assets/images/og.png', site);
+const socialImageAlt = 'aerulion — Java developer and Minecraft plugin creator';
+
+const person = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'aerulion',
+    jobTitle: 'Java Developer & Minecraft Plugin Creator',
+    description: 'Java developer specializing in Minecraft plugin development and custom server systems',
+    url: site.href,
+    image: socialImage.href,
+    knowsAbout: [
+        'Java Development',
+        'Minecraft Plugin Development',
+        'Paper API',
+        'Bukkit API',
+        'Database Design',
+        'Game Development'
+    ],
+    worksFor: {'@type': 'Organization', name: 'Corpium', url: 'https://corpium.net'},
+    nationality: {'@type': 'Country', name: 'Germany'},
+    sameAs: ['https://github.com/aerulion']
+};
+---
 
 <html lang="en">
 <head>
@@ -34,42 +43,43 @@ const structuredData = {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{title}</title>
     <meta name="description" content={description}>
-    <meta name="keywords"
-          content="Java developer, Minecraft plugins, Paper development, Bukkit, custom server development, Minecraft programming, game development, aerulion">
     <meta name="author" content="aerulion">
+    <meta name="theme-color" content="#000000">
+    {noindex ?
+            <meta name="robots" content="noindex, follow"/> :
+            <link rel="canonical" href={canonical}/>}
 
-    <!-- Open Graph / Facebook -->
+    <Font cssVariable="--font-family" preload/>
+    <Font cssVariable="--font-family-accent" preload/>
+    <Font cssVariable="--font-family-display" preload/>
+    <Font cssVariable="--font-family-mono" preload/>
+
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://aerulion.net/">
+    <meta property="og:site_name" content="aerulion">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content={canonical}>
     <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
-    <meta property="og:image" content="https://aerulion.net/assets/images/aerulion.webp">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:site_name" content="aerulion">
+    <meta property="og:image" content={socialImage}>
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content={socialImageAlt}>
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://aerulion.net/">
-    <meta property="twitter:title" content={title}>
-    <meta property="twitter:description" content={description}>
-    <meta property="twitter:image" content="https://aerulion.net/assets/images/aerulion.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={title}>
+    <meta name="twitter:description" content={description}>
+    <meta name="twitter:image" content={socialImage}>
+    <meta name="twitter:image:alt" content={socialImageAlt}>
 
-    <!-- Additional SEO -->
-    <meta name="robots" content="index, follow">
-    <meta name="googlebot" content="index, follow">
-    <link rel="canonical" href="https://aerulion.net/">
-
-    <!-- Structured Data -->
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}/>
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(person)}/>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <!-- Set before paint so reveal targets start hidden without flashing.
-         The timeout is a dead-man's switch: if the module never runs, the
-         class is dropped so content cannot stay invisible. -->
+    <!-- Set before paint so reveal targets start hidden. The timeout is a
+         dead-man's switch: without it a failed module hides the page. -->
     <script is:inline>
         document.documentElement.classList.add('js');
         setTimeout(function () {
@@ -82,33 +92,9 @@ const structuredData = {
 <slot/>
 
 <script>
-    document.documentElement.classList.add('motion-ready');
+    import {mountReveals} from '../scripts/reveal';
 
-    const reveals = document.querySelectorAll<HTMLElement>('[data-reveal]');
-    const draws = document.querySelectorAll<HTMLElement>('[data-draw]');
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const canObserve = 'IntersectionObserver' in window;
-
-    if (prefersReducedMotion || !canObserve) {
-        reveals.forEach((el) => el.classList.add('is-revealed'));
-        draws.forEach((el) => el.classList.add('is-drawn'));
-    } else {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add(
-                    entry.target.hasAttribute('data-draw') ? 'is-drawn' : 'is-revealed'
-                );
-                observer.unobserve(entry.target);
-            });
-        }, {rootMargin: '0px 0px -10% 0px', threshold: 0.05});
-
-        reveals.forEach((el, index) => {
-            el.style.setProperty('--reveal-delay', `${Math.min(index, 3) * 80}ms`);
-            observer.observe(el);
-        });
-        draws.forEach((el) => observer.observe(el));
-    }
+    mountReveals();
 </script>
 </body>
 </html>

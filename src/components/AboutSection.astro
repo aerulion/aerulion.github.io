@@ -1,12 +1,13 @@
 ---
 import {age} from '../utils/dates';
+import {FIRST_YEAR} from '../data/timeline';
 
 const facts = [
     {term: 'Role', value: 'Lead Developer'},
     {term: 'Base', value: `Germany / ${age}`},
     {term: 'Focus', value: 'Paper, Bukkit, Java, database architecture'},
     {term: 'Primary Client', value: 'Corpium'},
-    {term: 'Active Since', value: '2014'}
+    {term: 'Developing Since', value: String(FIRST_YEAR)}
 ];
 ---
 
@@ -17,7 +18,7 @@ const facts = [
                 <div class="section-rail">
                     <p class="section-eyebrow">Context</p>
                     <span class="section-rule" aria-hidden="true"></span>
-                    <p class="section-count">01 / 03</p>
+                    <p class="section-count">01 / 05</p>
                 </div>
                 <h2 class="section-title">Precision under load.</h2>
                 <div class="section-lede">
@@ -49,13 +50,11 @@ const facts = [
                         As the <strong>lead developer</strong> at <a
                             href="https://corpium.net/"
                             class="modern-link"
-                            rel="noopener"
+                            rel="noopener noreferrer"
                             target="_blank"
-                    >Corpium</a>, one of the oldest German Minecraft servers, I design and maintain sophisticated
-                        <strong
-                        >plugin ecosystems</strong> with performance-focused features, complex mechanics and a
-                        controlled
-                        vanilla-adjacent feel.
+                    >Corpium</a>, one of the oldest German Minecraft servers, I design and maintain
+                        sophisticated <strong>plugin ecosystems</strong> with performance-focused features, complex
+                        mechanics and a controlled vanilla-adjacent feel.
                     </p>
                     <p>
                         My expertise ranges from low-level Java optimization to high-level system design, with
@@ -71,7 +70,7 @@ const facts = [
 
 <style>
     .about-section {
-        padding: 0 0 var(--spacing-5xl);
+        padding-bottom: var(--spacing-5xl);
     }
 
     .about-wrapper {
@@ -93,13 +92,8 @@ const facts = [
 
     .fact-row {
         display: grid;
-        grid-template-columns: minmax(0, 1fr);
         gap: 0.3rem;
         padding: 0.9rem 0;
-        border-bottom: var(--hairline) solid var(--white);
-    }
-
-    .fact-row:last-child {
         border-bottom: var(--hairline) solid var(--white);
     }
 
@@ -108,11 +102,9 @@ const facts = [
         font-size: var(--label-size);
         text-transform: uppercase;
         letter-spacing: var(--label-tracking);
-        color: var(--white);
     }
 
     .fact-row dd {
-        color: var(--white);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-size: var(--font-size-sm);
@@ -126,12 +118,10 @@ const facts = [
     .about-text p {
         font-size: clamp(1rem, 1.25vw, var(--font-size-lg));
         line-height: 1.8;
-        color: var(--white);
         max-width: 68ch;
     }
 
     .about-text strong {
-        color: var(--white);
         font-weight: 600;
     }
 

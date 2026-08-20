@@ -1,7 +1,11 @@
 ---
 import {skills} from '../data/skills';
+import Button from './Button.astro';
 import LogoMark from './LogoMark.astro';
 import LineConstruct from './LineConstruct.astro';
+
+const TICKS = 12;
+const TICK_PERIOD = 2.8;
 ---
 
 <header class="hero-section">
@@ -9,11 +13,12 @@ import LineConstruct from './LineConstruct.astro';
         <div class="poster-shell panel-cut">
             <div class="poster-rail poster-rail-top">
                 <p class="mono-label">Java / Systems / Plugin architecture</p>
-                <div class="poster-ticks" aria-hidden="true">
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                <div class="poster-ticks" aria-hidden="true" style={`--tick-period:${TICK_PERIOD}s`}>
+                    {Array.from({length: TICKS}, (_, i) => (
+                            <span style={`--tick-delay:${(-i * TICK_PERIOD / TICKS).toFixed(3)}s`}></span>
+                    ))}
                 </div>
-                <p class="mono-label rail-end">EU Central / DE / Online</p>
+                <p class="mono-label rail-end">Germany / EU Central / Online</p>
             </div>
 
             <div class="hero-content">
@@ -44,8 +49,8 @@ import LineConstruct from './LineConstruct.astro';
                         <span>Data layer</span>
                     </div>
                     <div class="hero-actions">
-                        <a href="#work" class="hero-action hero-action-primary">Selected work</a>
-                        <a href="#context" class="hero-action">Context</a>
+                        <Button href="#work" variant="solid" glyph="↓">Selected work</Button>
+                        <Button href="#context" glyph="↓">Context</Button>
                     </div>
                 </div>
             </div>
@@ -56,7 +61,7 @@ import LineConstruct from './LineConstruct.astro';
                     <span>Status / Active</span>
                 </div>
                 <div class="poster-index rail-end" aria-hidden="true">
-                    <span>Active since / 2014</span>
+                    <span>Developing since / 2012</span>
                     <span>Selected work / below</span>
                 </div>
             </div>
@@ -64,8 +69,8 @@ import LineConstruct from './LineConstruct.astro';
             <ul class="skill-strip" aria-label="Core specialties">
                 {skills.map((skill, index) => (
                         <li class="skill-chip">
-                            <span class="skill-index">0{index + 1}</span>
-                            <span class="skill-name">{skill.name}</span>
+                            <span class="skill-index">{String(index + 1).padStart(2, '0')}</span>
+                            <span class="skill-name">{skill}</span>
                         </li>
                 ))}
             </ul>
@@ -85,7 +90,6 @@ import LineConstruct from './LineConstruct.astro';
         flex-direction: column;
         min-height: min(calc(100svh - clamp(2rem, 4vw, 4rem)), 980px);
         padding: clamp(1.4rem, 2.4vw, 2.2rem) var(--poster-gutter) var(--poster-gutter);
-        position: relative;
         overflow: hidden;
     }
 
@@ -123,9 +127,10 @@ import LineConstruct from './LineConstruct.astro';
         text-transform: uppercase;
     }
 
+    /* Bottom-aligned so one scaleY origin works for every bar. */
     .poster-ticks {
         display: flex;
-        align-items: stretch;
+        align-items: flex-end;
         gap: 0.3rem;
         height: 2.4rem;
         flex-shrink: 0;
@@ -136,16 +141,25 @@ import LineConstruct from './LineConstruct.astro';
         width: var(--hairline);
         height: 100%;
         background: var(--white);
+        transform-origin: bottom;
+        animation: tickWave var(--tick-period) ease-in-out infinite var(--tick-delay, 0s);
     }
 
     .poster-ticks span:nth-child(3n) {
         height: 66%;
-        align-self: flex-end;
     }
 
     .poster-ticks span:nth-child(4n) {
         height: 40%;
-        align-self: center;
+    }
+
+    @keyframes tickWave {
+        0%, 100% {
+            transform: scaleY(0.28);
+        }
+        50% {
+            transform: scaleY(1);
+        }
     }
 
     /* ---- Main split ---- */
@@ -166,8 +180,7 @@ import LineConstruct from './LineConstruct.astro';
         place-items: center;
     }
 
-    /* Square box: scaffolding and mark share one coordinate space, so the
-       composition cannot spill past the poster edge. */
+    /* Square: scaffolding and mark share one coordinate space. */
     .logo-construct {
         position: relative;
         width: 100%;
@@ -177,8 +190,7 @@ import LineConstruct from './LineConstruct.astro';
         place-items: center;
     }
 
-    /* Wrappers carry this component's scope id; a class handed to a child
-       component would not, since Astro scopes styles per component. */
+    /* Wrappers carry this component's scope id; a class on a child would not. */
     .stage-construct {
         position: absolute;
         inset: 0;
@@ -225,7 +237,6 @@ import LineConstruct from './LineConstruct.astro';
         font-weight: 700;
         line-height: 0.9;
         letter-spacing: -0.01em;
-        max-width: 100%;
     }
 
     .hero-subtitle {
@@ -254,42 +265,6 @@ import LineConstruct from './LineConstruct.astro';
         display: flex;
         flex-wrap: wrap;
         gap: var(--spacing-sm);
-    }
-
-    .hero-action {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: 0.85rem 1.4rem;
-        border: var(--hairline) solid var(--white);
-        text-decoration: none;
-        font-family: var(--font-family-mono), monospace;
-        font-size: var(--label-size);
-        letter-spacing: var(--label-tracking);
-        text-transform: uppercase;
-        background: var(--black);
-        color: var(--white);
-        transition: background var(--transition-base), color var(--transition-base);
-    }
-
-    .hero-action::after {
-        content: '↓';
-        font-size: 0.9em;
-    }
-
-    .hero-action:hover {
-        background: var(--white);
-        color: var(--black);
-    }
-
-    .hero-action-primary {
-        background: var(--white);
-        color: var(--black);
-    }
-
-    .hero-action-primary:hover {
-        background: var(--black);
-        color: var(--white);
     }
 
     /* ---- Skill strip ---- */
@@ -381,12 +356,8 @@ import LineConstruct from './LineConstruct.astro';
         }
 
         .hero-actions {
-            width: 100%;
-        }
-
-        .hero-action {
-            flex: 1;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 </style>

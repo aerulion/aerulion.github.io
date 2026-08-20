@@ -1,0 +1,53 @@
+---
+---
+
+<div class="frame" aria-hidden="true">
+    <span class="rule rule-top"></span>
+    <span class="rule rule-bottom"></span>
+    <span class="rule rule-left"></span>
+    <span class="rule rule-right"></span>
+</div>
+
+<style>
+    .frame {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .rule {
+        position: absolute;
+        background: var(--white);
+    }
+
+    .rule-top,
+    .rule-bottom {
+        left: 0;
+        right: 0;
+        height: var(--hairline);
+    }
+
+    .rule-left,
+    .rule-right {
+        top: 0;
+        bottom: 0;
+        width: var(--hairline);
+    }
+
+    .rule-top {
+        top: var(--frame-inset);
+    }
+
+    .rule-bottom {
+        bottom: var(--frame-inset);
+    }
+
+    .rule-left {
+        left: var(--frame-inset);
+    }
+
+    .rule-right {
+        right: var(--frame-inset);
+    }
+</style>
