@@ -14,16 +14,15 @@ export interface Obstacles {
 export const emptyObstacles = (): Obstacles => ({boxes: [], capsules: [], hulls: []});
 
 export class DistanceField {
+    empty = true;
+    value = 0;
+    gx = 0;
+    gy = 0;
     private readonly n: number;
     private readonly half: number;
     private readonly d: Float32Array;
     private ox = 0;
     private oy = 0;
-    empty = true;
-
-    value = 0;
-    gx = 0;
-    gy = 0;
 
     constructor(halfSpan: number) {
         this.half = halfSpan;
@@ -50,6 +49,47 @@ export class DistanceField {
             const [x0, y0, x1, y1] = h.bbox;
             if (this.reaches(x0, y0, x1, y1, h.pad, offsetX, offsetY)) this.stampHull(h, offsetX, offsetY);
         }
+    }
+
+    probe(x: number, y: number) {
+        const {n, d} = this;
+        const edge = n - 1.0001;
+
+        let u = (x - this.ox) * INV_CELL;
+        let v = (y - this.oy) * INV_CELL;
+        u = u < 0 ? 0 : u > edge ? edge : u;
+        v = v < 0 ? 0 : v > edge ? edge : v;
+
+        const c = u | 0, r = v | 0;
+        const fu = u - c, fv = v - r;
+        const i = r * n + c;
+
+        const a = d[i], b = d[i + 1], e = d[i + n], f = d[i + n + 1];
+        const top = a + (b - a) * fu;
+        const bottom = e + (f - e) * fu;
+
+        this.value = top + (bottom - top) * fv;
+        this.gx = ((b - a) * (1 - fv) + (f - e) * fv) * INV_CELL;
+        this.gy = ((e - a) * (1 - fu) + (f - b) * fu) * INV_CELL;
+    }
+
+    distance(x: number, y: number): number {
+        const {n, d} = this;
+        const edge = n - 1.0001;
+
+        let u = (x - this.ox) * INV_CELL;
+        let v = (y - this.oy) * INV_CELL;
+        u = u < 0 ? 0 : u > edge ? edge : u;
+        v = v < 0 ? 0 : v > edge ? edge : v;
+
+        const c = u | 0, r = v | 0;
+        const fu = u - c, fv = v - r;
+        const i = r * n + c;
+
+        const a = d[i], b = d[i + 1], e = d[i + n], f = d[i + n + 1];
+        const top = a + (b - a) * fu;
+        const bottom = e + (f - e) * fu;
+        return top + (bottom - top) * fv;
     }
 
     private reaches(x0: number, y0: number, x1: number, y1: number, pad: number, dx: number, dy: number) {
@@ -149,46 +189,5 @@ export class DistanceField {
         const raw = (world - origin) * INV_CELL;
         const idx = round === 1 ? Math.ceil(raw) : Math.floor(raw);
         return idx < 0 ? 0 : idx > this.n - 1 ? this.n - 1 : idx;
-    }
-
-    probe(x: number, y: number) {
-        const {n, d} = this;
-        const edge = n - 1.0001;
-
-        let u = (x - this.ox) * INV_CELL;
-        let v = (y - this.oy) * INV_CELL;
-        u = u < 0 ? 0 : u > edge ? edge : u;
-        v = v < 0 ? 0 : v > edge ? edge : v;
-
-        const c = u | 0, r = v | 0;
-        const fu = u - c, fv = v - r;
-        const i = r * n + c;
-
-        const a = d[i], b = d[i + 1], e = d[i + n], f = d[i + n + 1];
-        const top = a + (b - a) * fu;
-        const bottom = e + (f - e) * fu;
-
-        this.value = top + (bottom - top) * fv;
-        this.gx = ((b - a) * (1 - fv) + (f - e) * fv) * INV_CELL;
-        this.gy = ((e - a) * (1 - fu) + (f - b) * fu) * INV_CELL;
-    }
-
-    distance(x: number, y: number): number {
-        const {n, d} = this;
-        const edge = n - 1.0001;
-
-        let u = (x - this.ox) * INV_CELL;
-        let v = (y - this.oy) * INV_CELL;
-        u = u < 0 ? 0 : u > edge ? edge : u;
-        v = v < 0 ? 0 : v > edge ? edge : v;
-
-        const c = u | 0, r = v | 0;
-        const fu = u - c, fv = v - r;
-        const i = r * n + c;
-
-        const a = d[i], b = d[i + 1], e = d[i + n], f = d[i + n + 1];
-        const top = a + (b - a) * fu;
-        const bottom = e + (f - e) * fu;
-        return top + (bottom - top) * fv;
     }
 }
