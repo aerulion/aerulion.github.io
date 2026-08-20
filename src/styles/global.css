@@ -223,6 +223,19 @@ a:focus-visible {
     background: var(--white);
 }
 
+.prose {
+    text-align: justify;
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 3;
+}
+
+@media (max-width: 560px) {
+    .prose {
+        text-align: left;
+        hyphens: manual;
+    }
+}
+
 /* ---- Buttons ------------------------------------------------------------- */
 
 .btn {
