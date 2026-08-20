@@ -1,0 +1,93 @@
+---
+// The source mark shades its right-hand planes a second grey, which two
+// colours cannot carry, so only the silhouette is kept.
+
+interface Props {
+    class?: string;
+    drawDelay?: number;
+    fillDelay?: number;
+}
+
+const {class: className = '', drawDelay = 0, fillDelay = 900} = Astro.props;
+
+const SILHOUETTE = "m24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z";
+
+// Unique per instance so two marks on one page cannot share a clip path.
+const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<svg
+        class:list={['logo-mark', className]}
+        viewBox="0 0 26.458333 26.458333"
+        role="img"
+        aria-label="aerulion logo"
+        data-collide="logo"
+        style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms;`}
+>
+    <defs>
+        <clipPath id={clipId}>
+            <path d={SILHOUETTE}/>
+        </clipPath>
+    </defs>
+
+    <path class="draw-path logo-outline" d={SILHOUETTE} pathLength="1"/>
+
+    <g clip-path={`url(#${clipId})`}>
+        <path class="logo-flood" d={SILHOUETTE} pathLength="1"/>
+    </g>
+</svg>
+
+<style>
+    .logo-mark {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .logo-outline {
+        stroke-width: 0.4;
+    }
+
+    /* Fill grows from four points at once: dash period 1/4 repeats the
+       pattern four times around the path, so 0 0.25 -> 0.25 0 spreads four
+       fronts until they meet. Stroke is thick enough to reach the middle of
+       every limb and clipped back to the silhouette. Butt caps keep a
+       zero-length dash invisible. */
+    .logo-flood {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 14;
+        stroke-linecap: butt;
+        stroke-linejoin: round;
+        stroke-dasharray: 0 0.25;
+    }
+
+    :global(.js) .logo-flood {
+        transition: stroke-dasharray 1s var(--ease-draw) var(--fill-delay, 900ms);
+    }
+
+    :global(.is-drawn) .logo-flood,
+    :global(html:not(.js)) .logo-flood {
+        stroke-dasharray: 0.25 0;
+    }
+
+    :global(.js) .logo-outline {
+        transition: stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
+        stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
+    }
+
+    :global(.is-drawn) .logo-outline {
+        stroke-opacity: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .logo-flood {
+            stroke-dasharray: 0.25 0;
+        }
+
+        .logo-outline {
+            stroke-opacity: 0;
+        }
+    }
+</style>

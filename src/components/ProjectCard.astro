@@ -1,52 +1,72 @@
 ---
+import type {ProjectMeta} from '../data/projects';
+
 interface Props {
     position: number;
     title: string;
-    description: string;
+    tagline: string;
+    description: string[];
     iconUrl: string;
     iconAlt: string;
+    meta: ProjectMeta[];
+    capabilities: string[];
 }
 
-const {position, title, description, iconUrl, iconAlt} = Astro.props;
+const {position, title, tagline, description, iconUrl, iconAlt, meta, capabilities} = Astro.props;
+const index = String(position).padStart(2, '0');
 ---
 
-<article class="project-card panel-cut">
+<article class="project-card panel-cut" data-reveal>
     <div class="project-topline">
-        <span class="project-index">0{position}</span>
+        <span class="project-index">{index}</span>
         <span class="project-rule" aria-hidden="true"></span>
-        <span class="project-kind">SYSTEM</span>
+        <span class="project-kind">System</span>
     </div>
+
     <div class="project-head">
         <div class="project-icon">
             <img src={iconUrl} alt={iconAlt} width="64" height="64" loading="lazy">
         </div>
-        <h3 class="project-title">{title}</h3>
+        <div class="project-heading">
+            <h3 class="project-title">{title}</h3>
+            <p class="project-tagline">{tagline}</p>
+        </div>
     </div>
+
+    <dl class="project-meta">
+        {meta.map((item) => (
+                <div class="meta-row">
+                    <dt>{item.label}</dt>
+                    <dd>{item.value}</dd>
+                </div>
+        ))}
+    </dl>
+
     <div class="project-content">
-        <p class="project-description">{description}</p>
+        {description.map((paragraph) => <p class="project-description">{paragraph}</p>)}
+    </div>
+
+    <div class="project-capabilities">
+        <p class="capabilities-label">Surface</p>
+        <ul class="capability-list">
+            {capabilities.map((capability) =>
+                    <li>{capability}</li>)}
+        </ul>
     </div>
 </article>
 
 <style>
     .project-card {
         display: grid;
+        grid-template-rows: auto auto auto 1fr auto;
         gap: var(--spacing-xl);
         min-height: 100%;
         padding: clamp(1.5rem, 3vw, 2.5rem);
-        animation: fadeInUp 0.6s ease-out backwards;
-    }
-
-    .project-card:nth-of-type(1) {
-        animation-delay: 0.1s;
-    }
-
-    .project-card:nth-of-type(2) {
-        animation-delay: 0.2s;
+        transition: border-color var(--transition-base), background var(--transition-base);
     }
 
     .project-card:hover {
-        border-color: var(--line-strong);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+        border-color: var(--white);
     }
 
     .project-topline {
@@ -56,19 +76,25 @@ const {position, title, description, iconUrl, iconAlt} = Astro.props;
         gap: var(--spacing-sm);
     }
 
-    .project-index,
+    .project-index {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-sm);
+        letter-spacing: 0.16em;
+        color: var(--white);
+    }
+
     .project-kind {
         font-family: var(--font-family-mono), monospace;
-        font-size: var(--font-size-xs);
-        letter-spacing: 0.18em;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
         text-transform: uppercase;
-        color: var(--text-muted);
+        color: var(--white);
     }
 
     .project-rule {
         display: block;
         height: 1px;
-        background: linear-gradient(90deg, var(--line-strong), transparent);
+        background: var(--white);
     }
 
     .project-head {
@@ -82,8 +108,8 @@ const {position, title, description, iconUrl, iconAlt} = Astro.props;
         height: 72px;
         display: grid;
         place-items: center;
-        border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.025);
+        border: var(--hairline) solid var(--white);
+        background: var(--black);
         flex-shrink: 0;
     }
 
@@ -91,28 +117,113 @@ const {position, title, description, iconUrl, iconAlt} = Astro.props;
         width: 42px;
         height: 42px;
         object-fit: contain;
-        filter: grayscale(1) brightness(1.25) contrast(1.05);
+        filter: grayscale(1) brightness(0) invert(1);
+    }
+
+    .project-heading {
+        display: grid;
+        gap: 0.4rem;
+        min-width: 0;
     }
 
     .project-title {
         font-family: var(--font-family-display), sans-serif;
-        font-size: clamp(1.8rem, 3vw, var(--font-size-4xl));
+        font-size: clamp(1.75rem, 2.6vw, var(--font-size-4xl));
         font-weight: 600;
         line-height: 0.96;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
     }
 
-    .project-description {
-        font-size: clamp(1rem, 1.1vw, var(--font-size-lg));
-        color: var(--text-secondary);
-        line-height: 1.85;
+    .project-tagline {
+        font-size: var(--font-size-sm);
+        color: var(--white);
+        text-wrap: balance;
     }
 
-    @media (max-width: 768px) {
+    .project-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        background: var(--white);
+        border: var(--hairline) solid var(--white);
+    }
+
+    .meta-row {
+        display: grid;
+        align-content: start;
+        gap: 0.35rem;
+        padding: 0.85rem 0.9rem;
+        background: var(--black);
+    }
+
+    .meta-row dt {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--white);
+    }
+
+    .meta-row dd {
+        font-size: var(--font-size-sm);
+        color: var(--white);
+        line-height: 1.4;
+    }
+
+    .project-content {
+        display: grid;
+        gap: var(--spacing-md);
+        align-content: start;
+    }
+
+    .project-description {
+        font-size: var(--font-size-base);
+        color: var(--white);
+        line-height: 1.8;
+        max-width: 62ch;
+    }
+
+    .project-capabilities {
+        display: grid;
+        gap: var(--spacing-sm);
+        padding-top: var(--spacing-lg);
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .capabilities-label {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        color: var(--white);
+    }
+
+    .capability-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        list-style: none;
+    }
+
+    .capability-list li {
+        padding: 0.35rem 0.65rem;
+        border: var(--hairline) solid var(--white);
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--white);
+    }
+
+    @media (max-width: 560px) {
         .project-head {
             align-items: flex-start;
             flex-direction: column;
+        }
+
+        .project-meta {
+            grid-template-columns: 1fr;
         }
     }
 </style>

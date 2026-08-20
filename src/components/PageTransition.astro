@@ -1,0 +1,118 @@
+---
+import LineConstruct from './LineConstruct.astro';
+
+/* On an internal navigation the curtain covers the page, the construct
+   draws, then the curtain lifts — same mechanic as the intro. */
+---
+
+<div class="curtain" data-curtain aria-hidden="true">
+    <div class="curtain-figure">
+        <LineConstruct class="curtain-construct"/>
+    </div>
+    <p class="curtain-label mono-label" data-curtain-label>Routing</p>
+</div>
+
+<style>
+    .curtain {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        display: grid;
+        place-items: center;
+        background: var(--black);
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .curtain[data-state='active'] {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+
+    /* Clears on 30°, matching the panel bevels. */
+    .curtain[data-state='lifting'] {
+        opacity: 1;
+        visibility: visible;
+        animation: curtainLift 0.55s var(--ease-out-poster) forwards;
+    }
+
+    @keyframes curtainLift {
+        from {
+            clip-path: polygon(0 -20%, 100% -75%, 100% 100%, 0 100%);
+        }
+        to {
+            clip-path: polygon(0 100%, 100% 45%, 100% 100%, 0 100%);
+        }
+    }
+
+    .curtain-figure {
+        width: min(38vmin, 300px);
+    }
+
+    .curtain-label {
+        position: absolute;
+        bottom: clamp(1.5rem, 4vw, 3rem);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+</style>
+
+<script>
+    const curtain = document.querySelector<HTMLElement>('[data-curtain]');
+    const label = document.querySelector<HTMLElement>('[data-curtain-label]');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (curtain && !reduced) {
+        const construct = curtain.querySelector('.curtain-construct');
+
+        const lift = () => {
+            curtain.dataset.state = 'lifting';
+            window.setTimeout(() => {
+                delete curtain.dataset.state;
+                construct?.classList.remove('is-drawn');
+            }, 560);
+        };
+
+        // Intercept same-origin navigations so the curtain can play first.
+        document.addEventListener('click', (event) => {
+            const link = (event.target as HTMLElement)?.closest?.('a');
+            if (!link) return;
+
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+            if (link.target === '_blank' || link.hasAttribute('download')) return;
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+
+            const url = new URL(link.href, location.href);
+            if (url.origin !== location.origin) return;
+            if (url.pathname === location.pathname) return;
+
+            event.preventDefault();
+            if (label) label.textContent = `Routing / ${url.pathname}`;
+
+            curtain.dataset.state = 'active';
+            requestAnimationFrame(() => construct?.classList.add('is-drawn'));
+            window.setTimeout(() => {
+                location.href = url.href;
+            }, 900);
+        });
+
+        // Arriving, including via bfcache: draw, then lift.
+        const intro = () => {
+            curtain.dataset.state = 'active';
+            construct?.classList.add('is-drawn');
+            window.setTimeout(lift, 1150);
+        };
+
+        if (sessionStorage.getItem('aerulion:seen') === '1') {
+            window.addEventListener('pageshow', (e) => {
+                if ((e as PageTransitionEvent).persisted) lift();
+            });
+        } else {
+            sessionStorage.setItem('aerulion:seen', '1');
+            intro();
+        }
+    }
+</script>

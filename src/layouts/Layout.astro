@@ -66,8 +66,49 @@ const structuredData = {
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Set before paint so reveal targets start hidden without flashing.
+         The timeout is a dead-man's switch: if the module never runs, the
+         class is dropped so content cannot stay invisible. -->
+    <script is:inline>
+        document.documentElement.classList.add('js');
+        setTimeout(function () {
+            var root = document.documentElement;
+            if (!root.classList.contains('motion-ready')) root.classList.remove('js');
+        }, 4000);
+    </script>
 </head>
 <body>
 <slot/>
+
+<script>
+    document.documentElement.classList.add('motion-ready');
+
+    const reveals = document.querySelectorAll<HTMLElement>('[data-reveal]');
+    const draws = document.querySelectorAll<HTMLElement>('[data-draw]');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canObserve = 'IntersectionObserver' in window;
+
+    if (prefersReducedMotion || !canObserve) {
+        reveals.forEach((el) => el.classList.add('is-revealed'));
+        draws.forEach((el) => el.classList.add('is-drawn'));
+    } else {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add(
+                    entry.target.hasAttribute('data-draw') ? 'is-drawn' : 'is-revealed'
+                );
+                observer.unobserve(entry.target);
+            });
+        }, {rootMargin: '0px 0px -10% 0px', threshold: 0.05});
+
+        reveals.forEach((el, index) => {
+            el.style.setProperty('--reveal-delay', `${Math.min(index, 3) * 80}ms`);
+            observer.observe(el);
+        });
+        draws.forEach((el) => observer.observe(el));
+    }
+</script>
 </body>
 </html>

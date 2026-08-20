@@ -1,21 +1,24 @@
-/* Monochrome poster system */
+/* True-monochrome poster system.
+   Palette is exactly #000 and #fff — no gradients, no tints, no alpha on
+   text; hierarchy comes from size and position. Every angle is 30° or 60°,
+   taken from the logo: an equilateral triangle with a 30/60 bolt cut. */
 :root {
     color-scheme: dark;
-    --bg-primary: #020202;
-    --bg-secondary: #070707;
-    --bg-tertiary: #101010;
-    --surface: rgba(255, 255, 255, 0.02);
-    --surface-strong: rgba(255, 255, 255, 0.04);
-    --text-primary: #f5f5f5;
-    --text-secondary: rgba(245, 245, 245, 0.78);
-    --text-muted: rgba(245, 245, 245, 0.54);
-    --line-soft: rgba(255, 255, 255, 0.09);
-    --line: rgba(255, 255, 255, 0.18);
-    --line-strong: rgba(255, 255, 255, 0.42);
-    --shadow-color: rgba(0, 0, 0, 0.6);
-    --glass-bg: rgba(255, 255, 255, 0.06);
-    --glass-bg-strong: rgba(255, 255, 255, 0.09);
-    --glass-border: rgba(255, 255, 255, 0.16);
+
+    --black: #000;
+    --white: #fff;
+
+    /* Logo geometry */
+    --angle-30: 30deg;
+    --angle-60: 60deg;
+    --tan-30: 0.5773502692;
+
+    /* Corner bevel, cut at 30° from horizontal */
+    --cut-x: clamp(26px, 2.6vw, 52px);
+    --cut-y: calc(var(--cut-x) * var(--tan-30));
+
+    --hairline: 1px;
+
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
@@ -26,7 +29,9 @@
     --font-size-4xl: 2.4rem;
     --font-size-5xl: 3.5rem;
     --font-size-6xl: 5rem;
-    --font-size-7xl: clamp(4.75rem, 10vw, 9rem);
+    --label-size: 0.6875rem;
+    --label-tracking: 0.2em;
+
     --spacing-xs: 0.5rem;
     --spacing-sm: 0.75rem;
     --spacing-md: 1rem;
@@ -36,13 +41,14 @@
     --spacing-3xl: 4rem;
     --spacing-4xl: 5rem;
     --spacing-5xl: 7rem;
-    --transition-fast: 0.15s ease-out;
-    --transition-base: 0.3s ease-out;
-    --transition-slow: 0.5s ease-out;
+
+    --transition-fast: 0.15s linear;
+    --transition-base: 0.25s linear;
+    --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-out-poster: cubic-bezier(0.22, 1, 0.36, 1);
+
     --poster-max-width: 1600px;
-    --poster-cut: clamp(22px, 2.2vw, 42px);
-    --angle-primary: -32deg;
-    --angle-secondary: 58deg;
+    --poster-gutter: clamp(1.25rem, 3vw, 2.75rem);
 }
 
 *,
@@ -56,43 +62,19 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
-    background: #000;
+    background: var(--black);
 }
 
 body {
     font-family: var(--font-family), sans-serif;
     font-size: var(--font-size-base);
     line-height: 1.6;
-    color: var(--text-primary);
-    background: radial-gradient(circle at top center, var(--surface-strong), transparent 32%),
-    linear-gradient(180deg, #060606 0%, #010101 48%, #000 100%);
-    overflow-x: hidden;
+    color: var(--white);
+    background: var(--black);
     min-height: 100vh;
     position: relative;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-}
-
-body::before,
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: -1;
-}
-
-body::before {
-    opacity: 0.12;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 120px 120px;
-    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-}
-
-body::after {
-    opacity: 0.12;
-    background-image: radial-gradient(circle at center, transparent 55%, rgba(0, 0, 0, 0.6) 100%);
 }
 
 img {
@@ -102,6 +84,11 @@ img {
 
 a {
     color: inherit;
+}
+
+::selection {
+    background: var(--white);
+    color: var(--black);
 }
 
 .container {
@@ -116,75 +103,149 @@ a {
     padding: 0 0 var(--spacing-5xl);
 }
 
-.panel-cut {
-    position: relative;
-    clip-path: polygon(var(--poster-cut) 0, 100% 0, 100% calc(100% - var(--poster-cut)), calc(100% - var(--poster-cut)) 100%, 0 100%, 0 var(--poster-cut));
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), var(--surface));
-    border: 1px solid var(--line);
-    box-shadow: 0 30px 80px var(--shadow-color);
+.skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    padding: 0.85rem 1.2rem;
+    background: var(--black);
+    border: var(--hairline) solid var(--white);
+    transform: translateY(-140%);
+    transition: transform var(--transition-base);
 }
 
+.skip-link:focus-visible {
+    transform: translateY(0);
+}
+
+/* Pure white: reads quiet because it is small, not because it is dimmed. */
+.mono-label {
+    font-family: var(--font-family-mono), monospace;
+    font-size: var(--label-size);
+    letter-spacing: var(--label-tracking);
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1.4;
+}
+
+/* ---- Panels: cut corner on the logo's 30° -------------------------------- */
+
+.panel-cut {
+    position: relative;
+    clip-path: polygon(var(--cut-x) 0,
+    100% 0,
+    100% calc(100% - var(--cut-y)),
+    calc(100% - var(--cut-x)) 100%,
+    0 100%,
+    0 var(--cut-y));
+    /* Transparent so the cursor lattice passes behind the content. */
+    background: transparent;
+    border: var(--hairline) solid var(--white);
+}
+
+/* Hairlines continuing the 30° cut past each bevelled corner. */
 .panel-cut::before,
 .panel-cut::after {
     content: '';
     position: absolute;
-    background: var(--line-strong);
-    opacity: 0.85;
+    height: var(--hairline);
+    width: calc(var(--cut-x) * 1.18);
+    background: var(--white);
 }
 
 .panel-cut::before {
-    top: calc(var(--poster-cut) * 0.56);
-    left: calc(var(--poster-cut) * -0.15);
-    width: calc(var(--poster-cut) * 1.35);
-    height: 1px;
-    transform: rotate(var(--angle-primary));
+    top: calc(var(--cut-y) * 0.5);
+    left: calc(var(--cut-x) * -0.09);
+    transform: rotate(calc(var(--angle-30) * -1));
     transform-origin: left center;
 }
 
 .panel-cut::after {
-    right: calc(var(--poster-cut) * -0.15);
-    bottom: calc(var(--poster-cut) * 0.56);
-    width: calc(var(--poster-cut) * 1.35);
-    height: 1px;
-    transform: rotate(var(--angle-primary));
+    right: calc(var(--cut-x) * -0.09);
+    bottom: calc(var(--cut-y) * 0.5);
+    transform: rotate(calc(var(--angle-30) * -1));
     transform-origin: right center;
 }
 
+/* ---- Section header system ---------------------------------------------- */
+
 .section-header {
     display: grid;
-    gap: var(--spacing-sm);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    column-gap: clamp(2rem, 5vw, 5rem);
+    row-gap: var(--spacing-lg);
+    align-items: start;
     margin-bottom: var(--spacing-3xl);
 }
 
+.section-rail {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(2rem, 1fr) auto;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding-bottom: var(--spacing-lg);
+}
+
+/* A real element, not ::after: a pseudo-element has no box, so the lattice
+   cannot measure it and would cut straight through. */
+.section-rule {
+    grid-column: 2;
+    grid-row: 1;
+    height: var(--hairline);
+    background: var(--white);
+}
+
 .section-eyebrow {
+    grid-column: 1;
+    grid-row: 1;
     font-family: var(--font-family-mono), monospace;
-    font-size: var(--font-size-xs);
-    letter-spacing: 0.28em;
+    font-size: var(--label-size);
+    letter-spacing: var(--label-tracking);
     text-transform: uppercase;
-    color: var(--text-muted);
+}
+
+.section-count {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+    font-family: var(--font-family-mono), monospace;
+    font-size: var(--label-size);
+    letter-spacing: var(--label-tracking);
+    text-transform: uppercase;
 }
 
 .section-title {
     font-family: var(--font-family-display), sans-serif;
-    font-size: clamp(2.2rem, 4vw, var(--font-size-6xl));
+    font-size: clamp(2.3rem, 4.4vw, 4.4rem);
     font-weight: 600;
-    letter-spacing: 0.08em;
-    line-height: 0.96;
+    letter-spacing: 0.01em;
+    line-height: 0.94;
     text-transform: uppercase;
-    max-width: 12ch;
+    text-wrap: balance;
+    max-width: 15ch;
+}
+
+.section-lede {
+    display: grid;
+    gap: var(--spacing-md);
+    align-content: start;
+    padding-top: 0.4rem;
 }
 
 .section-subtitle {
-    font-size: clamp(1rem, 1.4vw, var(--font-size-xl));
-    color: var(--text-secondary);
-    max-width: 60ch;
+    font-size: clamp(1rem, 1.25vw, var(--font-size-lg));
+    max-width: 52ch;
 }
 
 .section-line {
     width: min(100%, 220px);
-    height: 1px;
-    background: linear-gradient(90deg, var(--line-strong), transparent);
+    height: var(--hairline);
+    background: var(--white);
 }
+
+/* ---- Links --------------------------------------------------------------- */
 
 .modern-link {
     position: relative;
@@ -192,207 +253,95 @@ a {
     align-items: center;
     gap: var(--spacing-xs);
     text-decoration: none;
-    color: var(--text-primary);
-    transition: color var(--transition-base), opacity var(--transition-base);
+    color: var(--white);
+    box-shadow: inset 0 -1px 0 0 var(--white);
+    transition: background var(--transition-base), color var(--transition-base);
 }
 
-.modern-link::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -0.18rem;
-    width: 100%;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0.2);
-    transform-origin: left center;
-    opacity: 0.35;
-    transition: transform var(--transition-base), opacity var(--transition-base);
+.modern-link:hover,
+.modern-link:focus-visible {
+    background: var(--white);
+    color: var(--black);
 }
 
-.modern-link:hover::after,
-.modern-link:focus-visible::after {
-    transform: scaleX(1);
-    opacity: 1;
+/* ---- Self-drawing line geometry -------------------------------------------
+   Animated paths carry pathLength="1", so one dasharray value works for any
+   path regardless of its real length. */
+
+.draw-path {
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(28px);
-    }
+.js .draw-path {
+    transition: stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms);
+}
+
+.is-drawn .draw-path,
+.draw-path.is-drawn {
+    stroke-dashoffset: 0;
+}
+
+html:not(.js) .draw-path {
+    stroke-dashoffset: 0;
+}
+
+/* ---- Scroll reveal ------------------------------------------------------- */
+
+.js [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+}
+
+.js [data-reveal] {
+    transition: opacity 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms),
+    transform 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms);
+}
+
+/* ---- Ambient motion --------------------------------------------------------
+   Runs along a path via dash offset, never transforms it, so no in-between
+   angle ever breaks the 30/60 grid. */
+
+/* One full trip around the path. */
+@keyframes traceLoop {
     to {
-        opacity: 1;
-        transform: translateY(0);
+        stroke-dashoffset: -1;
     }
 }
 
-@keyframes lineFlicker {
-    0%, 100% {
-        opacity: 0.2;
-    }
-    4% {
-        opacity: 0.88;
-    }
-    8% {
-        opacity: 0.92;
-    }
-    12% {
-        opacity: 0.14;
-    }
-    17% {
-        opacity: 0.72;
-    }
-    22% {
-        opacity: 0.22;
-    }
-    54% {
-        opacity: 0.28;
-    }
-    57% {
-        opacity: 0.96;
-    }
-    60% {
-        opacity: 0.12;
-    }
-    74% {
-        opacity: 0.64;
-    }
-    78% {
-        opacity: 0.16;
-    }
-}
-
-@keyframes slowScan {
-    0% {
-        transform: translate3d(-14%, -18%, 0) scale(0.96);
-        opacity: 0;
-    }
-    12% {
-        opacity: 0.08;
-    }
-    24% {
-        opacity: 0.28;
-    }
-    50% {
-        transform: translate3d(6%, 10%, 0) scale(1.02);
-        opacity: 0.14;
-    }
-    100% {
-        transform: translate3d(18%, 28%, 0) scale(1.08);
-        opacity: 0;
-    }
-}
-
-@keyframes noiseShift {
-    0%, 100% {
-        transform: translate3d(0, 0, 0);
-    }
-    20% {
-        transform: translate3d(-1%, 0.7%, 0);
-    }
-    40% {
-        transform: translate3d(1.2%, -0.5%, 0);
-    }
-    60% {
-        transform: translate3d(-0.6%, 1%, 0);
-    }
-    80% {
-        transform: translate3d(0.8%, -0.8%, 0);
-    }
-}
-
-@keyframes scanPulse {
-    0%, 100% {
-        opacity: 0.08;
-        transform: scaleX(0.92) scaleY(0.98);
-    }
-    18% {
-        opacity: 0.12;
-    }
-    46% {
-        opacity: 0.34;
-        transform: scaleX(1.03) scaleY(1.02);
-    }
-    52% {
-        opacity: 0.14;
-    }
-    72% {
-        opacity: 0.26;
-        transform: scaleX(1.06) scaleY(1.04);
-    }
-}
-
-@keyframes metaDrift {
-    0%, 100% {
-        transform: translate3d(0, 0, 0);
-    }
-    25% {
-        transform: translate3d(0.35rem, -0.18rem, 0);
-    }
-    50% {
-        transform: translate3d(-0.22rem, 0.25rem, 0);
-    }
-    75% {
-        transform: translate3d(0.28rem, 0.12rem, 0);
-    }
-}
-
-@keyframes axisPulse {
-    0%, 100% {
-        opacity: 0.08;
-        transform: scaleX(1) scaleY(1);
-    }
-    50% {
-        opacity: 0.28;
-        transform: scaleX(1.02) scaleY(1.02);
-    }
-}
-
-@keyframes logoHover {
-    0%, 100% {
-        transform: translate3d(0, 0, 0);
-        filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.14));
-    }
-    50% {
-        transform: translate3d(0, -0.65rem, 0) scale(1.018);
-        filter: drop-shadow(0 0 42px rgba(255, 255, 255, 0.28));
-    }
-}
-
-@keyframes softBreath {
-    0%, 100% {
-        opacity: 0.72;
-        transform: translate3d(0, 0, 0);
-    }
-    50% {
-        opacity: 0.96;
-        transform: translate3d(0, -0.08rem, 0);
-    }
-}
-
-@keyframes angleSweep {
-    0%, 100% {
-        opacity: 0.22;
-        transform: translate3d(0, 0, 0) scale(0.98);
-    }
-    45% {
-        opacity: 0.64;
-        transform: translate3d(0.3rem, -0.35rem, 0) scale(1.03);
-    }
-    70% {
-        opacity: 0.34;
-        transform: translate3d(-0.18rem, 0.22rem, 0) scale(1.01);
+/* Ten dash periods, so the crawl loops seamlessly. */
+@keyframes dashCrawl {
+    to {
+        stroke-dashoffset: -0.15;
     }
 }
 
 button:focus-visible,
 a:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline: 2px solid var(--white);
     outline-offset: 3px;
 }
 
+@media (max-width: 900px) {
+    .section-header {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title {
+        max-width: 18ch;
+    }
+}
+
 @media (max-width: 768px) {
+    :root {
+        --label-tracking: 0.16em;
+        --cut-x: clamp(20px, 5vw, 32px);
+    }
+
     .main-content {
         padding-bottom: var(--spacing-4xl);
     }
@@ -403,7 +352,7 @@ a:focus-visible {
 
     .section-title {
         max-width: 100%;
-        font-size: clamp(1.85rem, 9vw, 3rem);
+        font-size: clamp(1.9rem, 8.5vw, 3rem);
     }
 }
 
@@ -416,22 +365,31 @@ a:focus-visible {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+
+    .js .draw-path {
+        stroke-dashoffset: 0;
+    }
+
+    .js [data-reveal]:not(.is-revealed) {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 @media print {
-    :root {
-        color-scheme: only dark;
-    }
-
     html,
     body {
-        background: #000 !important;
+        background: var(--black) !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
-    body::before,
-    body::after {
-        opacity: 0.04;
+    .js .draw-path {
+        stroke-dashoffset: 0;
+    }
+
+    .js [data-reveal]:not(.is-revealed) {
+        opacity: 1;
+        transform: none;
     }
 }

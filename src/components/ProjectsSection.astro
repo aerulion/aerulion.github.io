@@ -3,23 +3,35 @@ import ProjectCard from './ProjectCard.astro';
 import {projects} from '../data/projects';
 ---
 
-<section class="projects-section">
+<section class="projects-section" id="work">
     <div class="container">
-        <div class="section-header">
-            <p class="section-eyebrow">SELECTED SYSTEMS / 02</p>
-            <h2 class="section-title">Two large-scale builds shaped around progression, storage and control.</h2>
-            <p class="section-subtitle">Core systems built for live gameplay, long sessions and server-side
-                reliability.</p>
-            <div class="section-line" aria-hidden="true"></div>
+        <div class="section-header" data-reveal>
+            <div class="section-rail">
+                <p class="section-eyebrow">Selected systems</p>
+                <span class="section-rule" aria-hidden="true"></span>
+                <p class="section-count">02 / 03</p>
+            </div>
+            <h2 class="section-title">Two systems, end to end.</h2>
+            <div class="section-lede">
+                <p class="section-subtitle">
+                    Large-scale builds shaped around progression, storage and control — designed for live gameplay,
+                    long sessions and server-side reliability.
+                </p>
+                <div class="section-line" aria-hidden="true"></div>
+            </div>
         </div>
+
         <div class="projects-grid">
             {projects.map((project, index) => (
                     <ProjectCard
                             position={index + 1}
                             title={project.title}
+                            tagline={project.tagline}
                             description={project.description}
                             iconUrl={project.iconUrl}
                             iconAlt={project.iconAlt}
+                            meta={project.meta}
+                            capabilities={project.capabilities}
                     />
             ))}
         </div>
@@ -33,19 +45,8 @@ import {projects} from '../data/projects';
 
     .projects-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
         gap: var(--spacing-xl);
-    }
-
-    @media (max-width: 1200px) {
-        .projects-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .projects-grid {
-            grid-template-columns: 1fr;
-        }
+        align-items: stretch;
     }
 </style>

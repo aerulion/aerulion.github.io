@@ -17,20 +17,21 @@ const {href} = Astro.props;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        color: var(--text-primary);
+        color: var(--white);
         padding: 0.9rem 1.2rem;
-        border: 1px solid var(--line);
-        background: var(--surface);
+        border: var(--hairline) solid var(--white);
+        background: var(--black);
         font-family: var(--font-family-mono), monospace;
-        font-size: var(--font-size-xs);
-        letter-spacing: 0.2em;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
         text-transform: uppercase;
         transition: color var(--transition-base), background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
     }
 
     a:hover {
-        border-color: var(--line-strong);
-        background: var(--surface-strong);
+        border-color: var(--white);
+        background: var(--white);
+        color: var(--black);
         transform: translateY(-1px);
     }
 

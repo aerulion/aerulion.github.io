@@ -1,0 +1,713 @@
+---
+/*
+ * Cursor-reactive triangular lattice on the logo's 30/60 grid, bent by a
+ * well around the pointer.
+ *
+ * Falloff is density, not opacity: a segment is stroked pure white or
+ * skipped, so the field never produces a grey pixel.
+ *
+ * It collides per element, not per card — text line boxes, border edges,
+ * opaque surfaces, the mark's convex hull, the construct's segments.
+ * Vertices inside an obstacle are pushed clear so the lattice wraps it;
+ * ones buried too deep are dropped, crossing segments culled.
+ */
+---
+
+<canvas class="lattice-field" aria-hidden="true"></canvas>
+
+<style>
+    .lattice-field {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        display: block;
+    }
+</style>
+
+<script>
+    const CELL = 40;        // lattice spacing in CSS px
+    const RADIUS = 360;     // influence radius of the pointer
+    const PULL = 26;        // peak vertex displacement toward the pointer
+    const EASE = 0.12;      // pointer lerp
+    const PAD = 5;          // clearance around boxes and surfaces
+    const TEXT_PAD_X = 4;   // line boxes are already generous vertically,
+    const TEXT_PAD_Y = 2;   // so they need far less padding than a box
+    const LINE_PAD = 6;     // clearance either side of a construct line
+    const MARGIN = 2;       // extra offset applied when a vertex is pushed out
+    const MAX_PUSH = 26;    // deeper than this and the vertex is dropped
+
+    const canvas = document.querySelector<HTMLCanvasElement>('.lattice-field');
+    const ctx = canvas?.getContext('2d');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fine = window.matchMedia('(pointer: fine)').matches;
+
+    if (canvas && ctx && !reduced && fine) {
+        const ROW = CELL * Math.sin(Math.PI / 3); // 60° row height
+
+        let w = 0, h = 0, dpr = 1;
+        let targetX = -9999, targetY = -9999;
+        let px = -9999, py = -9999;
+        let strength = 0, targetStrength = 0;
+        let raf = 0;
+
+        const resize = () => {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = Math.floor(w * dpr);
+            canvas.height = Math.floor(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+
+        // Deterministic hash so a segment's dither threshold never flickers.
+        const hash = (a: number, b: number) => {
+            const n = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+            return n - Math.floor(n);
+        };
+
+        /* Which elements obstruct is decided once (it needs getComputedStyle);
+           afterwards only their boxes are re-read. */
+
+        // The mark's bounding box lies about its shape, so it collides as a
+        // hull: apex, base corners, tail, normalised to its viewBox.
+        const LOGO_HULL = [[0.5, 0], [0.933, 0.75], [0.5, 1], [0.067, 0.75]];
+
+        type Spec = {
+            el: Element;
+            box: boolean;
+            edges: number[] | null;
+            hull: number[][] | null;
+            segs: number[][] | null;   // viewBox units, mapped at collect time
+            bevel: boolean;            // the 30° cut corners of a .panel-cut
+            text: Text[];
+        };
+        type Poly = { bbox: number[]; pts: number[][] };
+
+        const RANGE = document.createRange();
+
+        /* --cut-x/--cut-y are unregistered custom properties, so
+           getComputedStyle returns the raw `clamp(...)` token, not a length.
+           A probe sized by them resolves it, and re-measures on resize. */
+        const probe = document.createElement('div');
+        probe.style.cssText =
+            'position:absolute;top:0;left:0;visibility:hidden;pointer-events:none;' +
+            'width:var(--cut-x);height:var(--cut-y);';
+        document.body.appendChild(probe);
+
+        let cutX = 0, cutY = 0;
+        const readCut = () => {
+            const r = probe.getBoundingClientRect();
+            cutX = r.width;
+            cutY = r.height;
+        };
+
+        let specs: Spec[] = [];
+        let rects: number[][] = [];
+        let polys: Poly[] = [];
+        let lines: number[][] = [];
+        let active: number[][] = [];
+        let activePolys: Poly[] = [];
+        let activeLines: number[][] = [];
+        let stale = true;
+        let lastScrollY = -1;
+
+        const buildSpecs = () => {
+            specs = [];
+            document.querySelectorAll('body *').forEach((el) => {
+                // Skip anything inside an SVG; the root stands in for it.
+                if ((el as SVGElement).ownerSVGElement) return;
+
+                const tag = el.tagName.toUpperCase();
+                if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'CANVAS' || tag === 'BR') return;
+
+                const cs = getComputedStyle(el);
+                if (cs.display === 'none' || cs.visibility === 'hidden') return;
+
+                const data = (el as HTMLElement).dataset;
+
+                let segs: number[][] | null = null;
+                if (data?.collide === 'lines' && data.segments) {
+                    try {
+                        segs = JSON.parse(data.segments);
+                    } catch {
+                        segs = null;
+                    }
+                }
+                const hull = data?.collide === 'logo' ? LOGO_HULL : null;
+
+                // The cut corners are pseudo-elements, which have no box to
+                // measure, so they are rebuilt from the rect and the cut vars.
+                const bevel = el.classList.contains('panel-cut');
+
+                // Direct text children only; nested markup has its own spec.
+                const text: Text[] = [];
+                for (let n = el.firstChild; n; n = n.nextSibling) {
+                    if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim()) text.push(n as Text);
+                }
+
+                // An opaque background already hides the field behind it.
+                const bg = cs.backgroundColor;
+                const painted = !!bg && bg !== 'transparent' && !bg.endsWith(', 0)');
+                const box = !hull && !segs && (painted || tag === 'IMG');
+
+                const bw = [
+                    parseFloat(cs.borderTopWidth) || 0,
+                    parseFloat(cs.borderRightWidth) || 0,
+                    parseFloat(cs.borderBottomWidth) || 0,
+                    parseFloat(cs.borderLeftWidth) || 0
+                ];
+                const edges = bw.some((v) => v > 0) ? bw : null;
+
+                if (box || edges || hull || segs || bevel || text.length) {
+                    specs.push({el, box, edges, hull, segs, bevel, text});
+                }
+            });
+        };
+
+        const onScreen = (r: DOMRect) =>
+            r.width > 0 && r.height > 0 && r.bottom > -80 && r.top < h + 80;
+
+        const collectRects = () => {
+            stale = false;
+            rects = [];
+            polys = [];
+            lines = [];
+
+            for (let i = 0; i < specs.length; i++) {
+                const sp = specs[i];
+                const r = sp.el.getBoundingClientRect();
+                if (!r.width || !r.height) continue;
+                if (r.bottom < -80 || r.top > h + 80 || r.right < -80 || r.left > w + 80) continue;
+
+                if (sp.hull) {
+                    const pts = sp.hull.map(([nx, ny]) => [r.left + nx * r.width, r.top + ny * r.height]);
+                    let gx = 0, gy = 0;
+                    for (const pt of pts) {
+                        gx += pt[0];
+                        gy += pt[1];
+                    }
+                    gx /= pts.length;
+                    gy /= pts.length;
+
+                    let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+                    for (const pt of pts) {
+                        const dx = pt[0] - gx, dy = pt[1] - gy;
+                        const d = Math.hypot(dx, dy) || 1;
+                        pt[0] = gx + dx * (1 + PAD / d);
+                        pt[1] = gy + dy * (1 + PAD / d);
+                        if (pt[0] < bx0) bx0 = pt[0];
+                        if (pt[1] < by0) by0 = pt[1];
+                        if (pt[0] > bx1) bx1 = pt[0];
+                        if (pt[1] > by1) by1 = pt[1];
+                    }
+                    polys.push({bbox: [bx0, by0, bx1, by1], pts});
+                }
+
+                if (sp.segs) {
+                    // Square viewBox in a square box, so units map linearly.
+                    const sx = r.width / 100, sy = r.height / 100;
+                    for (const s of sp.segs) {
+                        lines.push([
+                            r.left + s[0] * sx, r.top + s[1] * sy,
+                            r.left + s[2] * sx, r.top + s[3] * sy
+                        ]);
+                    }
+                }
+
+                if (sp.bevel && cutX > 0 && cutY > 0) {
+                    lines.push([r.left + cutX, r.top, r.left, r.top + cutY]);
+                    lines.push([r.right - cutX, r.bottom, r.right, r.bottom - cutY]);
+                }
+
+                if (sp.box) {
+                    rects.push([r.left - PAD, r.top - PAD, r.right + PAD, r.bottom + PAD]);
+                }
+
+                if (sp.edges) {
+                    // Only the border lines obstruct, never the hollow middle.
+                    const [t, rr, b, l] = sp.edges;
+                    if (t > 0) rects.push([r.left - PAD, r.top - PAD, r.right + PAD, r.top + t + PAD]);
+                    if (b > 0) rects.push([r.left - PAD, r.bottom - b - PAD, r.right + PAD, r.bottom + PAD]);
+                    if (l > 0) rects.push([r.left - PAD, r.top - PAD, r.left + l + PAD, r.bottom + PAD]);
+                    if (rr > 0) rects.push([r.right - rr - PAD, r.top - PAD, r.right + PAD, r.bottom + PAD]);
+                }
+
+                // Line boxes, not the element box: a heading in a wide column
+                // blocks only the width its glyphs cover.
+                for (let k = 0; k < sp.text.length; k++) {
+                    RANGE.selectNodeContents(sp.text[k]);
+                    const list = RANGE.getClientRects();
+                    for (let j = 0; j < list.length; j++) {
+                        const lr = list[j];
+                        if (!onScreen(lr)) continue;
+                        rects.push([
+                            lr.left - TEXT_PAD_X, lr.top - TEXT_PAD_Y,
+                            lr.right + TEXT_PAD_X, lr.bottom + TEXT_PAD_Y
+                        ]);
+                    }
+                }
+            }
+        };
+
+        /* Scrolling only marks measurements stale; the re-measure happens in
+           the frame that draws. Deferring it to its own frame let a fast
+           scroll paint against the previous scroll position. */
+        const markStale = () => {
+            stale = true;
+        };
+
+        // Narrow to what the field can touch, so the per-vertex tests stay
+        // cheap however much is on screen.
+        const filterActive = () => {
+            const l = px - RADIUS, t = py - RADIUS, r = px + RADIUS, b = py + RADIUS;
+
+            active = [];
+            for (let i = 0; i < rects.length; i++) {
+                const q = rects[i];
+                if (q[2] >= l && q[0] <= r && q[3] >= t && q[1] <= b) active.push(q);
+            }
+            activePolys = [];
+            for (let i = 0; i < polys.length; i++) {
+                const q = polys[i].bbox;
+                if (q[2] >= l && q[0] <= r && q[3] >= t && q[1] <= b) activePolys.push(polys[i]);
+            }
+            activeLines = [];
+            for (let i = 0; i < lines.length; i++) {
+                const s = lines[i];
+                if (Math.max(s[0], s[2]) >= l && Math.min(s[0], s[2]) <= r &&
+                    Math.max(s[1], s[3]) >= t && Math.min(s[1], s[3]) <= b) activeLines.push(s);
+            }
+        };
+
+        const insideIndex = (x: number, y: number) => {
+            for (let i = 0; i < active.length; i++) {
+                const q = active[i];
+                if (x >= q[0] && x <= q[2] && y >= q[1] && y <= q[3]) return i;
+            }
+            return -1;
+        };
+
+        // Convex containment: every edge cross product shares a sign.
+        const inPoly = (x: number, y: number, p: Poly) => {
+            const q = p.bbox;
+            if (x < q[0] || x > q[2] || y < q[1] || y > q[3]) return false;
+            const pts = p.pts;
+            let sign = 0;
+            for (let i = 0; i < pts.length; i++) {
+                const a = pts[i], b = pts[(i + 1) % pts.length];
+                const cross = (b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]);
+                if (cross !== 0) {
+                    const s = cross > 0 ? 1 : -1;
+                    if (sign === 0) sign = s;
+                    else if (s !== sign) return false;
+                }
+            }
+            return true;
+        };
+
+        const inPolyIndex = (x: number, y: number) => {
+            for (let i = 0; i < activePolys.length; i++) {
+                if (inPoly(x, y, activePolys[i])) return i;
+            }
+            return -1;
+        };
+
+        const closestOn = (x: number, y: number, s: number[]) => {
+            const dx = s[2] - s[0], dy = s[3] - s[1];
+            const len2 = dx * dx + dy * dy;
+            let t = len2 ? ((x - s[0]) * dx + (y - s[1]) * dy) / len2 : 0;
+            t = t < 0 ? 0 : t > 1 ? 1 : t;
+            const cx0 = s[0] + t * dx, cy0 = s[1] + t * dy;
+            return [cx0, cy0, Math.hypot(x - cx0, y - cy0)];
+        };
+
+        const nearLineIndex = (x: number, y: number) => {
+            for (let i = 0; i < activeLines.length; i++) {
+                if (closestOn(x, y, activeLines[i])[2] < LINE_PAD) return i;
+            }
+            return -1;
+        };
+
+        const obstructed = (x: number, y: number) =>
+            insideIndex(x, y) >= 0 || inPolyIndex(x, y) >= 0 || nearLineIndex(x, y) >= 0;
+
+        // Out of a convex polygon via the edge needing the least travel.
+        const escapePoly = (x: number, y: number, p: Poly) => {
+            const pts = p.pts;
+            let gx = 0, gy = 0;
+            for (const pt of pts) {
+                gx += pt[0];
+                gy += pt[1];
+            }
+            gx /= pts.length;
+            gy /= pts.length;
+
+            let bestNeed = Infinity, bx = x, by = y;
+            for (let i = 0; i < pts.length; i++) {
+                const a = pts[i], b = pts[(i + 1) % pts.length];
+                let nx = b[1] - a[1], ny = -(b[0] - a[0]);
+                if ((gx - a[0]) * nx + (gy - a[1]) * ny > 0) {
+                    nx = -nx;
+                    ny = -ny;
+                }
+                const len = Math.hypot(nx, ny) || 1;
+                nx /= len;
+                ny /= len;
+                const need = -((x - a[0]) * nx + (y - a[1]) * ny) + MARGIN;
+                if (need < bestNeed) {
+                    bestNeed = need;
+                    bx = x + nx * need;
+                    by = y + ny * need;
+                }
+            }
+            return [bx, by, bestNeed];
+        };
+
+        const escapeLine = (x: number, y: number, s: number[]) => {
+            const [cx0, cy0, d] = closestOn(x, y, s);
+            let nx = x - cx0, ny = y - cy0;
+            if (d < 0.001) {
+                // Sitting exactly on the line: leave along its normal.
+                const dx = s[2] - s[0], dy = s[3] - s[1];
+                const len = Math.hypot(dx, dy) || 1;
+                nx = -dy / len;
+                ny = dx / len;
+            } else {
+                nx /= d;
+                ny /= d;
+            }
+            return [cx0 + nx * LINE_PAD, cy0 + ny * LINE_PAD, LINE_PAD - d];
+        };
+
+        /* Clears a vertex, into ex/ey, returning whether it survived.
+
+           For rects it takes the nearest FREE exit of four. Stepping to the
+           closest edge is not enough: obstacles overlap constantly (a card's
+           border against its text) and a vertex between two just ping-pongs
+           until it runs out of tries, punching holes along the very edges
+           the lattice should hug. */
+        const cx = new Float64Array(4), cy = new Float64Array(4), cd = new Float64Array(4);
+        let ex = 0, ey = 0;
+
+        const escape = (x0: number, y0: number) => {
+            let x = x0, y = y0;
+
+            for (let step = 0; step < 4; step++) {
+                const hitPoly = inPolyIndex(x, y);
+                if (hitPoly >= 0) {
+                    const [nx, ny, need] = escapePoly(x, y, activePolys[hitPoly]);
+                    if (need > MAX_PUSH) return 0;
+                    x = nx;
+                    y = ny;
+                    continue;
+                }
+
+                const hitLine = nearLineIndex(x, y);
+                if (hitLine >= 0) {
+                    const [nx, ny, need] = escapeLine(x, y, activeLines[hitLine]);
+                    if (need > MAX_PUSH) return 0;
+                    x = nx;
+                    y = ny;
+                    continue;
+                }
+
+                const hit = insideIndex(x, y);
+                if (hit < 0) {
+                    ex = x;
+                    ey = y;
+                    return 1;
+                }
+
+                const q = active[hit];
+                cx[0] = q[0] - MARGIN;
+                cy[0] = y;
+                cd[0] = x - q[0];
+                cx[1] = q[2] + MARGIN;
+                cy[1] = y;
+                cd[1] = q[2] - x;
+                cx[2] = x;
+                cy[2] = q[1] - MARGIN;
+                cd[2] = y - q[1];
+                cx[3] = x;
+                cy[3] = q[3] + MARGIN;
+                cd[3] = q[3] - y;
+
+                let best = -1, bestD = Infinity, near = 0, nearD = Infinity;
+                for (let i = 0; i < 4; i++) {
+                    if (cd[i] < nearD) {
+                        nearD = cd[i];
+                        near = i;
+                    }
+                    if (cd[i] <= MAX_PUSH && cd[i] < bestD && !obstructed(cx[i], cy[i])) {
+                        bestD = cd[i];
+                        best = i;
+                    }
+                }
+
+                if (best >= 0) {
+                    ex = cx[best];
+                    ey = cy[best];
+                    return 1;
+                }
+                if (nearD > MAX_PUSH) return 0;
+                x = cx[near];
+                y = cy[near];
+            }
+
+            ex = x;
+            ey = y;
+            return obstructed(x, y) ? 0 : 1;
+        };
+
+        // Liang-Barsky: does the segment touch the rect at all?
+        const crosses = (x1: number, y1: number, x2: number, y2: number, q: number[]) => {
+            if (Math.max(x1, x2) < q[0] || Math.min(x1, x2) > q[2]) return false;
+            if (Math.max(y1, y2) < q[1] || Math.min(y1, y2) > q[3]) return false;
+
+            const dx = x2 - x1, dy = y2 - y1;
+            const p = [-dx, dx, -dy, dy];
+            const c = [x1 - q[0], q[2] - x1, y1 - q[1], q[3] - y1];
+            let t0 = 0, t1 = 1;
+
+            for (let i = 0; i < 4; i++) {
+                if (p[i] === 0) {
+                    if (c[i] < 0) return false;
+                } else {
+                    const r = c[i] / p[i];
+                    if (p[i] < 0) {
+                        if (r > t1) return false;
+                        if (r > t0) t0 = r;
+                    } else {
+                        if (r < t0) return false;
+                        if (r < t1) t1 = r;
+                    }
+                }
+            }
+            return true;
+        };
+
+        // Segment vs segment, used against polygon edges and construct lines.
+        const segHit = (ax: number, ay: number, bx: number, by: number,
+                        px0: number, py0: number, qx: number, qy: number) => {
+            const d1 = (qx - px0) * (ay - py0) - (qy - py0) * (ax - px0);
+            const d2 = (qx - px0) * (by - py0) - (qy - py0) * (bx - px0);
+            const d3 = (bx - ax) * (py0 - ay) - (by - ay) * (px0 - ax);
+            const d4 = (bx - ax) * (qy - ay) - (by - ay) * (qx - ax);
+            return ((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0));
+        };
+
+        const anyCross = (x1: number, y1: number, x2: number, y2: number) => {
+            for (let i = 0; i < active.length; i++) {
+                if (crosses(x1, y1, x2, y2, active[i])) return true;
+            }
+            for (let i = 0; i < activeLines.length; i++) {
+                const s = activeLines[i];
+                if (Math.max(x1, x2) < Math.min(s[0], s[2]) - LINE_PAD) continue;
+                if (Math.min(x1, x2) > Math.max(s[0], s[2]) + LINE_PAD) continue;
+                if (Math.max(y1, y2) < Math.min(s[1], s[3]) - LINE_PAD) continue;
+                if (Math.min(y1, y2) > Math.max(s[1], s[3]) + LINE_PAD) continue;
+                if (segHit(x1, y1, x2, y2, s[0], s[1], s[2], s[3])) return true;
+            }
+            for (let i = 0; i < activePolys.length; i++) {
+                const p = activePolys[i], q = p.bbox;
+                if (Math.max(x1, x2) < q[0] || Math.min(x1, x2) > q[2]) continue;
+                if (Math.max(y1, y2) < q[1] || Math.min(y1, y2) > q[3]) continue;
+                if (inPoly(x1, y1, p) || inPoly(x2, y2, p)) return true;
+                const pts = p.pts;
+                for (let j = 0; j < pts.length; j++) {
+                    const a = pts[j], b = pts[(j + 1) % pts.length];
+                    if (segHit(x1, y1, x2, y2, a[0], a[1], b[0], b[1])) return true;
+                }
+            }
+            return false;
+        };
+
+        /* Well profile peaks a third of the way out and is zero at both the
+           centre and the rim, so the lattice dimples instead of collapsing;
+           a flat falloff flings near vertices past the pointer. */
+        const wellAt = (dist: number) => {
+            const u = dist / RADIUS;
+            return 6.75 * u * (1 - u) * (1 - u);   // peaks at u = 1/3
+        };
+
+        const influenceAt = (dist: number) => {
+            if (dist > RADIUS) return 0;
+            const t = 1 - dist / RADIUS;
+            return t * t * (3 - 2 * t) * strength;
+        };
+
+        let vx = new Float32Array(0), vy = new Float32Array(0);
+        let vlive = new Uint8Array(0), vinf = new Float32Array(0);
+
+        const draw = () => {
+            ctx.clearRect(0, 0, w, h);
+
+            if (strength > 0.004) {
+                // Compositor scrolling can deliver its event late, so check
+                // position directly rather than trusting the listener.
+                const sy = window.scrollY;
+                if (sy !== lastScrollY) {
+                    lastScrollY = sy;
+                    stale = true;
+                }
+                if (stale) collectRects();
+                filterActive();
+
+                const pad = RADIUS + CELL;
+                const r0 = Math.floor((py - pad) / ROW);
+                const r1 = Math.ceil((py + pad) / ROW) + 1;
+                const c0 = Math.floor((px - pad) / CELL) - 1;
+                const c1 = Math.ceil((px + pad) / CELL) + 1;
+
+                const cols = c1 - c0 + 1;
+                const rowN = r1 - r0 + 1;
+                const total = cols * rowN;
+
+                if (vx.length < total) {
+                    vx = new Float32Array(total);
+                    vy = new Float32Array(total);
+                    vlive = new Uint8Array(total);
+                    vinf = new Float32Array(total);
+                }
+
+                const HALF = CELL / 2;
+
+                // Place every vertex once: warp, then clear obstacles.
+                for (let r = r0; r <= r1; r++) {
+                    const baseY = r * ROW;
+                    const offset = (r & 1) ? HALF : 0;
+                    const rowIdx = (r - r0) * cols;
+
+                    for (let c = c0; c <= c1; c++) {
+                        const i = rowIdx + (c - c0);
+                        const bx = c * CELL + offset;
+
+                        const ddx = px - bx, ddy = py - baseY;
+                        const dist = Math.hypot(ddx, ddy);
+                        const inf = influenceAt(dist);
+                        vinf[i] = inf;
+
+                        if (inf <= 0.02) {
+                            vlive[i] = 0;
+                            continue;
+                        }
+
+                        let x = bx, y = baseY;
+                        if (dist > 0.001 && dist <= RADIUS) {
+                            const amount = wellAt(dist) * PULL * strength;
+                            x += (ddx / dist) * amount;
+                            y += (ddy / dist) * amount;
+                        }
+
+                        vlive[i] = escape(x, y);
+                        vx[i] = ex;
+                        vy[i] = ey;
+                    }
+                }
+
+                ctx.beginPath();
+
+                const link = (i: number, j: number, gx: number, gy: number, salt: number) => {
+                    if (!vlive[i] || !vlive[j]) return;
+
+                    // Dither: full white or nothing. Saturating the ramp keeps
+                    // the core solid and thins only the outer edge.
+                    const mid = (vinf[i] + vinf[j]) * 0.5;
+                    if (mid <= 0.03) return;
+                    if (Math.min(1, mid * 1.7) < hash(gx + salt * 17.3, gy - salt * 8.9)) return;
+
+                    const x1 = vx[i], y1 = vy[i], x2 = vx[j], y2 = vy[j];
+                    if (anyCross(x1, y1, x2, y2)) return;
+
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                };
+
+                for (let r = r0; r < r1; r++) {
+                    const rowIdx = (r - r0) * cols;
+                    const nextIdx = (r + 1 - r0) * cols;
+                    const even = (r & 1) === 0;
+
+                    for (let c = c0; c < c1; c++) {
+                        const i = rowIdx + (c - c0);
+                        if (!vlive[i]) continue;
+
+                        // Rows offset by half a cell: two neighbours below at
+                        // x ± CELL/2, which with ROW = CELL·sin60 land on ±60°.
+                        link(i, rowIdx + (c + 1 - c0), c, r, 1);
+
+                        const blCol = even ? c - 1 : c;
+                        const brCol = even ? c : c + 1;
+                        if (blCol >= c0) link(i, nextIdx + (blCol - c0), c, r, 2);
+                        if (brCol <= c1) link(i, nextIdx + (brCol - c0), c, r, 3);
+                    }
+                }
+
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            px += (targetX - px) * EASE;
+            py += (targetY - py) * EASE;
+            strength += (targetStrength - strength) * EASE;
+
+            raf = requestAnimationFrame(draw);
+        };
+
+        const onMove = (e: PointerEvent) => {
+            if (px < -9000) {
+                px = e.clientX;
+                py = e.clientY;
+            }
+            targetX = e.clientX;
+            targetY = e.clientY;
+            targetStrength = 1;
+        };
+
+        window.addEventListener('pointermove', onMove, {passive: true});
+        window.addEventListener('pointerdown', onMove, {passive: true});
+        document.addEventListener('pointerleave', () => {
+            targetStrength = 0;
+        });
+        window.addEventListener('blur', () => {
+            targetStrength = 0;
+        });
+        window.addEventListener('scroll', markStale, {passive: true});
+        window.addEventListener('resize', () => {
+            resize();
+            readCut();
+            buildSpecs();
+            markStale();
+        }, {passive: true});
+
+        // Layout shifts as fonts land and reveals settle, so re-measure.
+        document.fonts?.ready.then(() => {
+            readCut();
+            buildSpecs();
+            markStale();
+        });
+        window.setTimeout(() => {
+            readCut();
+            buildSpecs();
+            markStale();
+        }, 2200);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                cancelAnimationFrame(raf);
+                raf = 0;
+            } else if (!raf) {
+                raf = requestAnimationFrame(draw);
+            }
+        });
+
+        resize();
+        readCut();
+        buildSpecs();
+        raf = requestAnimationFrame(draw);
+    }
+</script>

@@ -8,14 +8,14 @@ const currentYear = getCurrentYear();
 <footer>
     <div class="container">
         <div class="footer-content">
-            <p>
-                &copy; 2022-{currentYear}
-                <a href={repoUrl} target="_blank" rel="noopener noreferrer" class="footer-link">
-                    aerulion.net
-                </a>
-                {' @ '}
-                <a href={commitUrl} target="_blank" rel="noopener noreferrer" class="footer-link commit-hash">
-                    {shortCommitHash}
+            <p class="footer-mark">aerulion.net</p>
+            <p class="footer-line">
+                <span>&copy; 2022&ndash;{currentYear}</span>
+                <span aria-hidden="true">/</span>
+                <a href={repoUrl} target="_blank" rel="noopener noreferrer" class="footer-link">Source</a>
+                <span aria-hidden="true">/</span>
+                <a href={commitUrl} target="_blank" rel="noopener noreferrer" class="footer-link">
+                    Build {shortCommitHash}
                 </a>
             </p>
         </div>
@@ -24,42 +24,52 @@ const currentYear = getCurrentYear();
 
 <style>
     footer {
-        padding: var(--spacing-2xl) 0;
-        border-top: 1px solid var(--line);
-        background: linear-gradient(180deg, var(--surface), transparent);
+        padding: var(--spacing-2xl) 0 var(--spacing-xl);
+        border-top: var(--hairline) solid var(--white);
+        background: var(--black);
     }
+
 
     .footer-content {
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-md);
     }
 
-    .footer-content p {
-        color: var(--text-muted);
-        font-family: var(--font-family-mono), monospace;
-        font-size: var(--font-size-xs);
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        margin: 0;
+    .footer-mark {
+        font-family: var(--font-family-accent), sans-serif;
+        font-size: var(--font-size-base);
+        letter-spacing: 0.02em;
+        color: var(--white);
+    }
+
+    .footer-line {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.4rem;
-        justify-content: center;
+        align-items: center;
+        gap: 0.6rem;
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        color: var(--white);
     }
 
     .footer-link {
         color: inherit;
         text-decoration: none;
-        transition: color var(--transition-base), opacity var(--transition-base);
+        transition: color var(--transition-base);
     }
 
     .footer-link:hover {
-        opacity: 1;
-        color: var(--text-primary);
+        color: var(--white);
     }
 
-    .commit-hash {
-        font-family: var(--font-family-mono), monospace;
-        font-size: 1em;
+    @media (max-width: 560px) {
+        .footer-content {
+            justify-content: flex-start;
+        }
     }
 </style>

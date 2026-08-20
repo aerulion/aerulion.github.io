@@ -1,13 +1,31 @@
 import {defineConfig, fontProviders} from 'astro/config';
 
+// All four faces are angular: the mark and the panel bevels are built
+// from 30/60 cuts, and the type follows.
 export default defineConfig({
     site: 'https://aerulion.net', base: '/', fonts: [{
-        name: 'Inter', cssVariable: '--font-family', provider: fontProviders.fontsource(),
+        name: 'Space Grotesk',
+        cssVariable: '--font-family',
+        provider: fontProviders.fontsource(),
+        weights: [400, 500, 700],
+        fallbacks: ['system-ui', 'sans-serif'],
     }, {
-        name: 'Inter Tight', cssVariable: '--font-family-display', provider: fontProviders.fontsource(),
+        name: 'Chakra Petch',
+        cssVariable: '--font-family-display',
+        provider: fontProviders.fontsource(),
+        weights: [500, 600, 700],
+        fallbacks: ['system-ui', 'sans-serif'],
     }, {
-        name: 'Audiowide', cssVariable: '--font-family-accent', provider: fontProviders.fontsource(),
+        name: 'Tektur',
+        cssVariable: '--font-family-accent',
+        provider: fontProviders.fontsource(),
+        weights: [600, 700],
+        fallbacks: ['system-ui', 'sans-serif'],
     }, {
-        name: 'IBM Plex Mono', cssVariable: '--font-family-mono', provider: fontProviders.fontsource(),
+        name: 'IBM Plex Mono',
+        cssVariable: '--font-family-mono',
+        provider: fontProviders.fontsource(),
+        weights: [400, 500],
+        fallbacks: ['ui-monospace', 'monospace'],
     }]
 });
