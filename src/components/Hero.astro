@@ -1,7 +1,7 @@
 ---
 import {skills} from '../data/skills';
 import Button from './Button.astro';
-import LogoMark from './LogoMark.astro';
+import HypercubeMark from './HypercubeMark.astro';
 import LineConstruct from './LineConstruct.astro';
 
 const TICKS = 12;
@@ -28,7 +28,7 @@ const TICK_PERIOD = 2.8;
                             <LineConstruct/>
                         </div>
                         <div class="stage-mark">
-                            <LogoMark drawDelay={520} fillDelay={1500}/>
+                            <HypercubeMark drawDelay={520} fillDelay={1500} shells={2} depth={0.4} ladder={0}/>
                         </div>
                         <span class="construct-label construct-label-a">Core / Aerulion</span>
                         <span class="construct-label construct-label-b">Lattice / 30° / 60°</span>
