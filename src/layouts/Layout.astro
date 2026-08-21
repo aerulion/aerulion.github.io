@@ -47,7 +47,10 @@ const person = {
     <meta name="theme-color" content="#000000">
     {noindex ?
             <meta name="robots" content="noindex, follow"/> :
-            <link rel="canonical" href={canonical}/>}
+            <>
+                <meta name="robots" content="index, follow, max-image-preview:large"/>
+                <link rel="canonical" href={canonical}/>
+            </>}
 
     <Font cssVariable="--font-family" preload/>
     <Font cssVariable="--font-family-accent" preload/>

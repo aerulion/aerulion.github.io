@@ -2,6 +2,9 @@
     "name": "aerulion - Java Developer & Minecraft Plugin Creator",
     "short_name": "aerulion",
     "description": "Professional Java developer specializing in Minecraft plugin development",
+    "id": "/",
+    "lang": "en",
+    "dir": "ltr",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",

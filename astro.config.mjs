@@ -1,4 +1,5 @@
 import {defineConfig, fontProviders} from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 const fonts = [
     {name: 'Space Grotesk', cssVariable: '--font-family', weights: [400, 500, 700]},
@@ -15,6 +16,7 @@ export default defineConfig({
     site: 'https://aerulion.net',
     base: '/',
     prefetch: {prefetchAll: true, defaultStrategy: 'hover'},
+    integrations: [sitemap({filter: (page) => !page.includes('/404')})],
     fonts: fonts.map((font) => ({
         ...font,
         provider: fontProviders.fontsource(),
