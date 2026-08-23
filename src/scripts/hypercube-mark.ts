@@ -26,6 +26,7 @@ interface Rig {
     ladder: SVGPathElement;
     shells: SVGPathElement[];
     ink: SVGPolygonElement;
+    silhouette: string;
     options: UnfoldOptions;
     ladderAlpha: number;
     episode: Episode;
@@ -60,6 +61,7 @@ const rigOf = (svg: SVGSVGElement): Rig | null => {
     const alpha = Number(svg.dataset.ladder);
     return {
         svg, outline, clip, bare, ladder, ink, shells,
+        silhouette: outline.getAttribute('d') ?? '',
         options: readOptions(svg),
         ladderAlpha: Number.isFinite(alpha) ? alpha : LADDER_ALPHA,
         episode: planEpisode(Math.random),
@@ -111,6 +113,8 @@ export function mountHypercubeMarks() {
 
     const rest = (rig: Rig) => {
         rig.svg.classList.remove('is-live');
+        rig.outline.setAttribute('d', rig.silhouette);
+        rig.clip.setAttribute('d', rig.silhouette);
         rig.ladder.style.opacity = '0';
         rig.shells.forEach((s) => (s.style.opacity = '0'));
         rig.ink.style.transform = '';
