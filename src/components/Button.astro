@@ -10,11 +10,17 @@ const external = /^https?:/.test(href);
 ---
 
 <a
-        class:list={['btn', variant === 'solid' && 'btn-solid']}
-        href={href}
-        target={external ? '_blank' : undefined}
-        rel={external ? 'noopener noreferrer' : undefined}
+    class:list={['btn', variant === 'solid' && 'btn-solid']}
+    href={href}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noopener noreferrer' : undefined}
 >
-    <slot/>
-    {glyph && <span class="btn-glyph" aria-hidden="true">{glyph}</span>}
+    <slot />
+    {
+        glyph && (
+            <span class="btn-glyph" aria-hidden="true">
+                {glyph}
+            </span>
+        )
+    }
 </a>

@@ -30,40 +30,38 @@ const INTRO = fillDelay + 1400;
 ---
 
 <svg
-        class:list={['morphing-logo-mark', className]}
-        viewBox="0 0 26.458333 26.458333"
-        role="img"
-        aria-label="aerulion logo"
-        data-collide="logo"
-        data-morphing-logo
-        data-intro-delay={INTRO}
-        data-shells={shells}
-        data-depth={depth}
-        data-ladder={ladder}
-        style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms; --ink-travel:${INK_TRAVEL}px;`}
+    class:list={['morphing-logo-mark', className]}
+    viewBox="0 0 26.458333 26.458333"
+    role="img"
+    aria-label="aerulion logo"
+    data-collide="logo"
+    data-morphing-logo
+    data-intro-delay={INTRO}
+    data-shells={shells}
+    data-depth={depth}
+    data-ladder={ladder}
+    style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms; --ink-travel:${INK_TRAVEL}px;`}
 >
     <defs>
         <clipPath id={clipId}>
-            <path class="mark-clip" d={SILHOUETTE}/>
+            <path class="mark-clip" d={SILHOUETTE}></path>
         </clipPath>
         <clipPath id={bareId}>
-            <path class="mark-bare" clip-rule="evenodd" d={BARE}/>
+            <path class="mark-bare" clip-rule="evenodd" d={BARE}></path>
         </clipPath>
     </defs>
 
     <g class="mark-depth" aria-hidden="true">
-        <path class="mark-ladder" d="" style={ladder > 0 ? undefined : 'display:none'}/>
-        {Array.from({length: shells * 2}, () => (
-                <path class="mark-shell" d=""/>
-        ))}
+        <path class="mark-ladder" d="" style={ladder > 0 ? undefined : 'display:none'}></path>
+        {Array.from({length: shells * 2}, () => <path class="mark-shell" d="" />)}
     </g>
 
     <g clip-path={`url(#${bareId})`}>
-        <path class="draw-path mark-outline" d={SILHOUETTE} pathLength="1"/>
+        <path class="draw-path mark-outline" d={SILHOUETTE} pathLength="1"></path>
     </g>
 
     <g clip-path={`url(#${clipId})`}>
-        <polygon class="mark-ink" points={INK}/>
+        <polygon class="mark-ink" points={INK}></polygon>
     </g>
 </svg>
 
@@ -113,8 +111,9 @@ const INTRO = fillDelay + 1400;
 
     /* Half the stroke sits outside the silhouette, so it goes once inked. */
     :global(.js) .mark-outline {
-        transition: stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
-        stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
+        transition:
+            stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
+            stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
     }
 
     :global(.is-drawn) .mark-outline {

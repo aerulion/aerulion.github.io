@@ -20,7 +20,7 @@ const index = String(position).padStart(2, '0');
 
     <div class="project-head">
         <div class="project-icon">
-            <img src={iconUrl} alt={iconAlt} width="64" height="64" loading="lazy">
+            <img src={iconUrl} alt={iconAlt} width="64" height="64" loading="lazy" />
         </div>
         <div class="project-heading">
             <h3 class="project-title">{title}</h3>
@@ -29,12 +29,14 @@ const index = String(position).padStart(2, '0');
     </div>
 
     <dl class="project-meta">
-        {meta.map((item) => (
+        {
+            meta.map((item) => (
                 <div class="meta-row">
                     <dt>{item.label}</dt>
                     <dd>{item.value}</dd>
                 </div>
-        ))}
+            ))
+        }
     </dl>
 
     <div class="project-content prose">
@@ -44,8 +46,7 @@ const index = String(position).padStart(2, '0');
     <div class="project-capabilities">
         <p class="capabilities-label">Surface</p>
         <ul class="capability-list" role="list">
-            {capabilities.map((capability) =>
-                    <li>{capability}</li>)}
+            {capabilities.map((capability) => <li>{capability}</li>)}
         </ul>
     </div>
 </article>

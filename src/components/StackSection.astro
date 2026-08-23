@@ -21,17 +21,20 @@ import {stack} from '../data/stack';
         </div>
 
         <dl class="stack-grid" data-reveal>
-            {stack.map((group) => (
+            {
+                stack.map((group) => (
                     <div class="stack-cell">
                         <dt class="stack-label">{group.label}</dt>
                         <dd class="stack-items">
                             <ul role="list">
-                                {group.items.map((item) =>
-                                        <li>{item}</li>)}
+                                {group.items.map((item) => (
+                                    <li>{item}</li>
+                                ))}
                             </ul>
                         </dd>
                     </div>
-            ))}
+                ))
+            }
         </dl>
     </div>
 </section>

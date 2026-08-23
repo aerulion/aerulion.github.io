@@ -26,7 +26,7 @@ export class DistanceField {
 
     constructor(halfSpan: number) {
         this.half = halfSpan;
-        this.n = Math.ceil((halfSpan * 2) * INV_CELL) + 3;
+        this.n = Math.ceil(halfSpan * 2 * INV_CELL) + 3;
         this.d = new Float32Array(this.n * this.n);
     }
 
@@ -41,8 +41,10 @@ export class DistanceField {
             if (this.reaches(b[0], b[1], b[2], b[3], b[4], offsetX, offsetY)) this.stampBox(b, offsetX, offsetY);
         }
         for (const c of obstacles.capsules) {
-            const x0 = Math.min(c[0], c[2]), x1 = Math.max(c[0], c[2]);
-            const y0 = Math.min(c[1], c[3]), y1 = Math.max(c[1], c[3]);
+            const x0 = Math.min(c[0], c[2]),
+                x1 = Math.max(c[0], c[2]);
+            const y0 = Math.min(c[1], c[3]),
+                y1 = Math.max(c[1], c[3]);
             if (this.reaches(x0, y0, x1, y1, c[4], offsetX, offsetY)) this.stampCapsule(c, offsetX, offsetY);
         }
         for (const h of obstacles.hulls) {
@@ -60,11 +62,16 @@ export class DistanceField {
         u = u < 0 ? 0 : u > edge ? edge : u;
         v = v < 0 ? 0 : v > edge ? edge : v;
 
-        const c = u | 0, r = v | 0;
-        const fu = u - c, fv = v - r;
+        const c = u | 0,
+            r = v | 0;
+        const fu = u - c,
+            fv = v - r;
         const i = r * n + c;
 
-        const a = d[i], b = d[i + 1], e = d[i + n], f = d[i + n + 1];
+        const a = d[i],
+            b = d[i + 1],
+            e = d[i + n],
+            f = d[i + n + 1];
         const top = a + (b - a) * fu;
         const bottom = e + (f - e) * fu;
 
@@ -82,11 +89,16 @@ export class DistanceField {
         u = u < 0 ? 0 : u > edge ? edge : u;
         v = v < 0 ? 0 : v > edge ? edge : v;
 
-        const c = u | 0, r = v | 0;
-        const fu = u - c, fv = v - r;
+        const c = u | 0,
+            r = v | 0;
+        const fu = u - c,
+            fv = v - r;
         const i = r * n + c;
 
-        const a = d[i], b = d[i + 1], e = d[i + n], f = d[i + n + 1];
+        const a = d[i],
+            b = d[i + 1],
+            e = d[i + n],
+            f = d[i + n + 1];
         const top = a + (b - a) * fu;
         const bottom = e + (f - e) * fu;
         return top + (bottom - top) * fv;
@@ -106,12 +118,16 @@ export class DistanceField {
     }
 
     private stampBox([x0, y0, x1, y1, pad]: Box, dx: number, dy: number) {
-        const cx = (x0 + x1) * 0.5 + dx, cy = (y0 + y1) * 0.5 + dy;
-        const hx = (x1 - x0) * 0.5, hy = (y1 - y0) * 0.5;
+        const cx = (x0 + x1) * 0.5 + dx,
+            cy = (y0 + y1) * 0.5 + dy;
+        const hx = (x1 - x0) * 0.5,
+            hy = (y1 - y0) * 0.5;
         const reach = pad + BAND;
 
-        const c0 = this.cellOf(cx - hx - reach, 1), c1 = this.cellOf(cx + hx + reach, -1);
-        const r0 = this.cellOf(cy - hy - reach, 1, true), r1 = this.cellOf(cy + hy + reach, -1, true);
+        const c0 = this.cellOf(cx - hx - reach, 1),
+            c1 = this.cellOf(cx + hx + reach, -1);
+        const r0 = this.cellOf(cy - hy - reach, 1, true),
+            r1 = this.cellOf(cy + hy + reach, -1, true);
         if (c0 > c1 || r0 > r1) return;
 
         const {n, d, ox, oy} = this;
@@ -132,11 +148,16 @@ export class DistanceField {
     }
 
     private stampCapsule([x0, y0, x1, y1, pad]: Capsule, dx: number, dy: number) {
-        const ax = x0 + dx, ay = y0 + dy, bx = x1 + dx, by = y1 + dy;
+        const ax = x0 + dx,
+            ay = y0 + dy,
+            bx = x1 + dx,
+            by = y1 + dy;
         const reach = pad + BAND;
 
-        const c0 = this.cellOf(Math.min(ax, bx) - reach, 1), c1 = this.cellOf(Math.max(ax, bx) + reach, -1);
-        const r0 = this.cellOf(Math.min(ay, by) - reach, 1, true), r1 = this.cellOf(Math.max(ay, by) + reach, -1, true);
+        const c0 = this.cellOf(Math.min(ax, bx) - reach, 1),
+            c1 = this.cellOf(Math.max(ax, bx) + reach, -1);
+        const r0 = this.cellOf(Math.min(ay, by) - reach, 1, true),
+            r1 = this.cellOf(Math.max(ay, by) + reach, -1, true);
         if (c0 > c1 || r0 > r1) return;
 
         const {n, d, ox, oy} = this;
@@ -157,8 +178,10 @@ export class DistanceField {
         const reach = hull.pad + BAND;
         const [bx0, by0, bx1, by1] = hull.bbox;
 
-        const c0 = this.cellOf(bx0 + dx - reach, 1), c1 = this.cellOf(bx1 + dx + reach, -1);
-        const r0 = this.cellOf(by0 + dy - reach, 1, true), r1 = this.cellOf(by1 + dy + reach, -1, true);
+        const c0 = this.cellOf(bx0 + dx - reach, 1),
+            c1 = this.cellOf(bx1 + dx + reach, -1);
+        const r0 = this.cellOf(by0 + dy - reach, 1, true),
+            r1 = this.cellOf(by1 + dy + reach, -1, true);
         if (c0 > c1 || r0 > r1) return;
 
         const {n, d, ox, oy} = this;
@@ -170,7 +193,8 @@ export class DistanceField {
 
                 let best = Infinity;
                 for (let k = 0; k < pts.length; k++) {
-                    const a = pts[k], b = pts[(k + 1) % pts.length];
+                    const a = pts[k],
+                        b = pts[(k + 1) % pts.length];
                     const d2 = distToSegment2(px, py, a[0], a[1], b[0], b[1]);
                     if (d2 < best) best = d2;
                 }

@@ -16,23 +16,23 @@ const INK = inkPoints();
 ---
 
 <svg
-        class:list={['logo-mark', className]}
-        viewBox="0 0 26.458333 26.458333"
-        role="img"
-        aria-label="aerulion logo"
-        data-collide="logo"
-        style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms; --ink-travel:${INK_TRAVEL}px;`}
+    class:list={['logo-mark', className]}
+    viewBox="0 0 26.458333 26.458333"
+    role="img"
+    aria-label="aerulion logo"
+    data-collide="logo"
+    style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms; --ink-travel:${INK_TRAVEL}px;`}
 >
     <defs>
         <clipPath id={clipId}>
-            <path d={SILHOUETTE}/>
+            <path d={SILHOUETTE}></path>
         </clipPath>
     </defs>
 
-    <path class="draw-path logo-outline" d={SILHOUETTE} pathLength="1"/>
+    <path class="draw-path logo-outline" d={SILHOUETTE} pathLength="1"></path>
 
     <g clip-path={`url(#${clipId})`}>
-        <polygon class="logo-ink" points={INK}/>
+        <polygon class="logo-ink" points={INK}></polygon>
     </g>
 </svg>
 
@@ -64,8 +64,9 @@ const INK = inkPoints();
 
     /* Half the stroke sits outside the silhouette, so it goes once inked. */
     :global(.js) .logo-outline {
-        transition: stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
-        stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
+        transition:
+            stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
+            stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
     }
 
     :global(.is-drawn) .logo-outline {

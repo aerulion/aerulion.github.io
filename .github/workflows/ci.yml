@@ -1,0 +1,57 @@
+name: 🔍 CI
+
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  quality:
+    name: ✅ Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v7
+
+      - name: 🟩 Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: 🍞 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: 💾 Restore dependency cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
+
+      - name: 📦 Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: 🎨 Check formatting
+        if: ${{ !cancelled() }}
+        run: bun run format:check
+
+      - name: 🔍 Lint
+        if: ${{ !cancelled() }}
+        run: bun run lint
+
+      - name: 🧩 Check types
+        if: ${{ !cancelled() }}
+        run: bunx astro check
+
+      - name: 🧪 Run tests
+        if: ${{ !cancelled() }}
+        run: bun test

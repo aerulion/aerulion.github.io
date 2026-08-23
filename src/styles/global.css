@@ -142,21 +142,21 @@ a:focus-visible {
     pointer-events: none;
     background: var(--white);
     clip-path: polygon(
-            nonzero,
-            var(--cut-x) 0,
-            100% 0,
-            100% calc(100% - var(--cut-y)),
-            calc(100% - var(--cut-x)) 100%,
-            0 100%,
-            0 var(--cut-y),
-            var(--cut-x) 0,
-            calc(var(--cut-x) + 0.27px) var(--hairline),
-            var(--hairline) calc(var(--cut-y) + 0.58px),
-            var(--hairline) calc(100% - var(--hairline)),
-            calc(100% - var(--cut-x) - 0.27px) calc(100% - var(--hairline)),
-            calc(100% - var(--hairline)) calc(100% - var(--cut-y) - 0.58px),
-            calc(100% - var(--hairline)) var(--hairline),
-            calc(var(--cut-x) + 0.27px) var(--hairline)
+        nonzero,
+        var(--cut-x) 0,
+        100% 0,
+        100% calc(100% - var(--cut-y)),
+        calc(100% - var(--cut-x)) 100%,
+        0 100%,
+        0 var(--cut-y),
+        var(--cut-x) 0,
+        calc(var(--cut-x) + 0.27px) var(--hairline),
+        var(--hairline) calc(var(--cut-y) + 0.58px),
+        var(--hairline) calc(100% - var(--hairline)),
+        calc(100% - var(--cut-x) - 0.27px) calc(100% - var(--hairline)),
+        calc(100% - var(--hairline)) calc(100% - var(--cut-y) - 0.58px),
+        calc(100% - var(--hairline)) var(--hairline),
+        calc(var(--cut-x) + 0.27px) var(--hairline)
     );
 }
 
@@ -256,7 +256,9 @@ a:focus-visible {
     font-size: var(--label-size);
     letter-spacing: var(--label-tracking);
     text-transform: uppercase;
-    transition: background var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
 }
 
 .btn-solid {
@@ -289,7 +291,9 @@ a:focus-visible {
     gap: var(--spacing-xs);
     text-decoration: none;
     box-shadow: inset 0 -1px 0 0 var(--white);
-    transition: background var(--transition-base), color var(--transition-base);
+    transition:
+        background var(--transition-base),
+        color var(--transition-base);
 }
 
 .modern-link:hover,
@@ -330,8 +334,9 @@ html:not(.js) .draw-path {
 }
 
 .js [data-reveal] {
-    transition: opacity 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms),
-    transform 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms);
+    transition:
+        opacity 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms),
+        transform 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms);
 }
 
 .js .section-rule,

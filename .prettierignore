@@ -1,0 +1,7 @@
+dist/
+node_modules/
+.astro/
+.idea/
+bun.lock
+public/
+.claude/

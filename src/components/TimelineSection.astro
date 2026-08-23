@@ -17,23 +17,24 @@ const MARK_STAGGER = 90;
             <h2 class="section-title">Since before it had a name.</h2>
             <div class="section-lede">
                 <p class="section-subtitle">
-                    Java came first, the name two years later, Corpium two after that. {years} years on it is still the
-                    same work, just steadily larger.
+                    Java came first, the name two years later, Corpium two after that. {years} years on it is still the same
+                    work, just steadily larger.
                 </p>
                 <div class="section-line" aria-hidden="true"></div>
             </div>
         </div>
 
         <ol class="timeline" role="list" data-reveal>
-            {timeline.map((milestone, index) => {
-                const isNow = index === timeline.length - 1;
-                return (
+            {
+                timeline.map((milestone, index) => {
+                    const isNow = index === timeline.length - 1;
+                    return (
                         <li class="milestone" style={`--mark-delay:${index * MARK_STAGGER}ms`}>
                             <p class="milestone-year">{milestone.year}</p>
                             <span class="milestone-mark" aria-hidden="true">
-                                <span class="mark-line"></span>
+                                <span class="mark-line" />
                                 <span class:list={['mark-node', isNow && 'mark-node-now']}>
-                                    {isNow && <span class="node-face"></span>}
+                                    {isNow && <span class="node-face" />}
                                 </span>
                             </span>
                             <div class="milestone-body">
@@ -42,8 +43,9 @@ const MARK_STAGGER = 90;
                             </div>
                             <p class="milestone-track">{milestone.track}</p>
                         </li>
-                );
-            })}
+                    );
+                })
+            }
         </ol>
     </div>
 </section>

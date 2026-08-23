@@ -60,7 +60,13 @@ const rigOf = (svg: SVGSVGElement): Rig | null => {
 
     const alpha = Number(svg.dataset.ladder);
     return {
-        svg, outline, clip, bare, ladder, ink, shells,
+        svg,
+        outline,
+        clip,
+        bare,
+        ladder,
+        ink,
+        shells,
         silhouette: outline.getAttribute('d') ?? '',
         options: readOptions(svg),
         ladderAlpha: Number.isFinite(alpha) ? alpha : LADDER_ALPHA,
@@ -139,9 +145,10 @@ export function mountMorphingLogoMarks() {
     };
 
     const sync = () => {
-        const wanted = reduced.matches || document.hidden
-            ? []
-            : rigs.filter((rig) => rig.svg.dataset.visible === 'true' && rig.svg.dataset.intro === 'done');
+        const wanted =
+            reduced.matches || document.hidden
+                ? []
+                : rigs.filter((rig) => rig.svg.dataset.visible === 'true' && rig.svg.dataset.intro === 'done');
 
         for (const rig of live) if (!wanted.includes(rig)) rest(rig);
         for (const rig of wanted) if (!live.includes(rig)) rig.svg.classList.add('is-live');
@@ -158,22 +165,26 @@ export function mountMorphingLogoMarks() {
         }
     };
 
-    const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            (entry.target as SVGSVGElement).dataset.visible = String(entry.isIntersecting);
-        }
-        sync();
-    }, {rootMargin: '120px'});
+    const observer = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                (entry.target as SVGSVGElement).dataset.visible = String(entry.isIntersecting);
+            }
+            sync();
+        },
+        {rootMargin: '120px'}
+    );
 
     for (const rig of rigs) {
         observer.observe(rig.svg);
 
         const host = rig.svg.closest('[data-draw]');
         const delay = Number(rig.svg.dataset.introDelay) || 0;
-        const arm = () => window.setTimeout(() => {
-            rig.svg.dataset.intro = 'done';
-            sync();
-        }, delay);
+        const arm = () =>
+            window.setTimeout(() => {
+                rig.svg.dataset.intro = 'done';
+                sync();
+            }, delay);
 
         if (!host || host.classList.contains('is-drawn')) {
             arm();

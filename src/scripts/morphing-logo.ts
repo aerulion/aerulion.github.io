@@ -1,12 +1,24 @@
 import type {Point} from './geometry';
 
-export const SILHOUETTE = "m24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z";
+export const SILHOUETTE =
+    'm24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z';
 
 const LOGO_OUTLINE: Point[] = [
-    [24.686, 19.8438], [21.5511, 21.6538], [18.1738, 15.8042], [13.2294, 18.6588],
-    [11.4192, 17.6139], [13.2292, 14.4791], [16.3639, 12.6693], [13.2292, 7.2396],
-    [6.7172, 18.5189], [13.2292, 22.2786], [16.6065, 20.3286], [18.4165, 23.4636],
-    [13.2292, 26.4583], [1.7724, 19.8438], [13.2292, 0]
+    [24.686, 19.8438],
+    [21.5511, 21.6538],
+    [18.1738, 15.8042],
+    [13.2294, 18.6588],
+    [11.4192, 17.6139],
+    [13.2292, 14.4791],
+    [16.3639, 12.6693],
+    [13.2292, 7.2396],
+    [6.7172, 18.5189],
+    [13.2292, 22.2786],
+    [16.6065, 20.3286],
+    [18.4165, 23.4636],
+    [13.2292, 26.4583],
+    [1.7724, 19.8438],
+    [13.2292, 0]
 ];
 
 const TAU = Math.PI * 2;
@@ -18,8 +30,7 @@ const AXIS_ANGLES = [30, 60, 120, 150];
 
 const AXES: Point[] = AXIS_ANGLES.map((a) => [Math.cos(a * DEG), Math.sin(a * DEG)]);
 
-const dot4 = (u: number[], v: number[]): number =>
-    u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3];
+const dot4 = (u: number[], v: number[]): number => u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3];
 
 const F1 = AXES.map((g) => g[0] / ROOT2);
 const F2 = AXES.map((g) => g[1] / ROOT2);
@@ -71,8 +82,7 @@ const lift = (): number[][] => {
     return out;
 };
 
-const rmsOf = (pts: Point[]): number =>
-    Math.sqrt(pts.reduce((s, p) => s + p[0] * p[0] + p[1] * p[1], 0) / pts.length);
+const rmsOf = (pts: Point[]): number => Math.sqrt(pts.reduce((s, p) => s + p[0] * p[0] + p[1] * p[1], 0) / pts.length);
 
 const build = () => {
     const raw = lift();
@@ -151,10 +161,7 @@ export const unfold = (angle: number, options: UnfoldOptions = UNFOLD_DEFAULTS):
         const u = LIFT.perp[i];
         const x = z[0] * ca - (-z[1] + anomaly * u[0]) * sa;
         const y = z[1] * ca - (z[0] + anomaly * u[1]) * sa;
-        return [
-            LOGO_CENTRE[0] + x * cg - y * sg,
-            LOGO_CENTRE[1] + x * sg + y * cg
-        ];
+        return [LOGO_CENTRE[0] + x * cg - y * sg, LOGO_CENTRE[1] + x * sg + y * cg];
     });
 
     const out: Shell[] = [];
@@ -182,8 +189,7 @@ const INK_POLY: Point[] = [
 
 const BARE_FRAME = 'M-200 -200H200V200H-200Z';
 
-export const inkPoints = (): string =>
-    INK_POLY.map((p) => `${p[0]},${Number(p[1].toFixed(4))}`).join(' ');
+export const inkPoints = (): string => INK_POLY.map((p) => `${p[0]},${Number(p[1].toFixed(4))}`).join(' ');
 
 export const barePath = (dy: number): string =>
     `${BARE_FRAME}M${INK_POLY.map(([x, y]) => `${x} ${(y + dy).toFixed(3)}`).join('L')}Z`;
@@ -224,8 +230,7 @@ export const planEpisode = (rand: () => number, shape: EpisodeShape = EPISODE_DE
     return {rest: between(shape.rest), span: turns * between(shape.turn), turns, phases, reach};
 };
 
-export const episodeLength = (episode: Episode, lead: number): number =>
-    episode.rest + 2 * lead + episode.span;
+export const episodeLength = (episode: Episode, lead: number): number => episode.rest + 2 * lead + episode.span;
 
 export interface Beat {
     angle: number;

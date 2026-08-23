@@ -51,47 +51,54 @@ const endpoints: Endpoint[] = [
         </div>
 
         <ul class="endpoint-list" role="list" data-reveal>
-            {endpoints.map((endpoint, index) => {
-                const position = String(index + 1).padStart(2, '0');
-                const external = endpoint.href?.startsWith('http');
+            {
+                endpoints.map((endpoint, index) => {
+                    const position = String(index + 1).padStart(2, '0');
+                    const external = endpoint.href?.startsWith('http');
 
-                return (
+                    return (
                         <li class="endpoint">
                             {endpoint.href ? (
-                                    <a
-                                            href={endpoint.href}
-                                            class="endpoint-link"
-                                            target={external ? '_blank' : undefined}
-                                            rel={external ? 'noopener noreferrer' : undefined}
-                                    >
-                                        <span class="endpoint-index">{position}</span>
-                                        <span class="endpoint-body">
-                                            <span class="endpoint-label">{endpoint.label}</span>
-                                            <span class="endpoint-value">{endpoint.value}</span>
-                                        </span>
-                                        <span class="endpoint-note">{endpoint.note}</span>
-                                        <span class="endpoint-glyph" aria-hidden="true">↗</span>
-                                    </a>
+                                <a
+                                    href={endpoint.href}
+                                    class="endpoint-link"
+                                    target={external ? '_blank' : undefined}
+                                    rel={external ? 'noopener noreferrer' : undefined}
+                                >
+                                    <span class="endpoint-index">{position}</span>
+                                    <span class="endpoint-body">
+                                        <span class="endpoint-label">{endpoint.label}</span>
+                                        <span class="endpoint-value">{endpoint.value}</span>
+                                    </span>
+                                    <span class="endpoint-note">{endpoint.note}</span>
+                                    <span class="endpoint-glyph" aria-hidden="true">
+                                        ↗
+                                    </span>
+                                </a>
                             ) : (
-                                    <button
-                                            type="button"
-                                            class="endpoint-link"
-                                            data-copy={endpoint.value}
-                                            aria-label={`Copy ${endpoint.label} handle ${endpoint.value}`}
-                                    >
-                                        <span class="endpoint-index">{position}</span>
-                                        <span class="endpoint-body">
-                                            <span class="endpoint-label">{endpoint.label}</span>
-                                            <span class="endpoint-value">{endpoint.value}</span>
-                                        </span>
-                                        <span class="endpoint-note" data-copy-note
-                                              aria-live="polite">{endpoint.note}</span>
-                                        <span class="endpoint-glyph" aria-hidden="true">⧉</span>
-                                    </button>
+                                <button
+                                    type="button"
+                                    class="endpoint-link"
+                                    data-copy={endpoint.value}
+                                    aria-label={`Copy ${endpoint.label} handle ${endpoint.value}`}
+                                >
+                                    <span class="endpoint-index">{position}</span>
+                                    <span class="endpoint-body">
+                                        <span class="endpoint-label">{endpoint.label}</span>
+                                        <span class="endpoint-value">{endpoint.value}</span>
+                                    </span>
+                                    <span class="endpoint-note" data-copy-note aria-live="polite">
+                                        {endpoint.note}
+                                    </span>
+                                    <span class="endpoint-glyph" aria-hidden="true">
+                                        ⧉
+                                    </span>
+                                </button>
                             )}
                         </li>
-                );
-            })}
+                    );
+                })
+            }
         </ul>
     </div>
 </section>
@@ -121,7 +128,9 @@ const endpoints: Endpoint[] = [
         text-decoration: none;
         color: inherit;
         cursor: pointer;
-        transition: background var(--transition-base), padding-left var(--transition-base);
+        transition:
+            background var(--transition-base),
+            padding-left var(--transition-base);
     }
 
     /* Children inherit colour, or they would vanish against the white. */

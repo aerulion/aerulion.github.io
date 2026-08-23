@@ -35,15 +35,27 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
     const obstacles = new ObstacleIndex();
     const field = new DistanceField(FIELD_HALF);
 
-    let width = 0, height = 0;
-    let pointerX = OFF_POINTER, pointerY = OFF_POINTER;
-    let targetX = OFF_POINTER, targetY = OFF_POINTER;
-    let strength = 0, targetStrength = 0;
+    let width = 0,
+        height = 0;
+    let pointerX = OFF_POINTER,
+        pointerY = OFF_POINTER;
+    let targetX = OFF_POINTER,
+        targetY = OFF_POINTER;
+    let strength = 0,
+        targetStrength = 0;
     let frame = 0;
 
-    let needScan = true, needMeasure = true, fieldStale = true;
-    let front = 0, burstAt = 0, tapX = 0, tapY = 0;
-    let fieldX = NaN, fieldY = NaN, fieldScrollX = NaN, fieldScrollY = NaN;
+    let needScan = true,
+        needMeasure = true,
+        fieldStale = true;
+    let front = 0,
+        burstAt = 0,
+        tapX = 0,
+        tapY = 0;
+    let fieldX = NaN,
+        fieldY = NaN,
+        fieldScrollX = NaN,
+        fieldScrollY = NaN;
 
     const resize = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
@@ -60,18 +72,24 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
             needMeasure = true;
             obstacles.scan();
         }
-        if (needMeasure ||
+        if (
+            needMeasure ||
             Math.abs(scrollX - obstacles.scrollX) > REMEASURE_STEP ||
-            Math.abs(scrollY - obstacles.scrollY) > REMEASURE_STEP) {
+            Math.abs(scrollY - obstacles.scrollY) > REMEASURE_STEP
+        ) {
             needMeasure = false;
             fieldStale = true;
             obstacles.measure();
         }
 
-        if (!fieldStale &&
-            scrollX === fieldScrollX && scrollY === fieldScrollY &&
+        if (
+            !fieldStale &&
+            scrollX === fieldScrollX &&
+            scrollY === fieldScrollY &&
             Math.abs(pointerX - fieldX) <= FIELD_SLACK &&
-            Math.abs(pointerY - fieldY) <= FIELD_SLACK) return false;
+            Math.abs(pointerY - fieldY) <= FIELD_SLACK
+        )
+            return false;
 
         field.begin(pointerX, pointerY);
         field.add(obstacles.flow, -scrollX, -scrollY);
@@ -85,7 +103,8 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         return true;
     };
 
-    let escapedX = 0, escapedY = 0;
+    let escapedX = 0,
+        escapedY = 0;
 
     const escape = (x: number, y: number): boolean => {
         if (field.empty) {
@@ -125,12 +144,15 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
     const traceClear = (x1: number, y1: number, x2: number, y2: number): number => {
         if (field.empty) return BAND;
 
-        const dx = x2 - x1, dy = y2 - y1;
+        const dx = x2 - x1,
+            dy = y2 - y1;
         const len = Math.sqrt(dx * dx + dy * dy);
         if (len < 1e-4) return field.distance(x1, y1);
 
-        const ix = dx / len, iy = dy / len;
-        let t = 0, min = Infinity;
+        const ix = dx / len,
+            iy = dy / len;
+        let t = 0,
+            min = Infinity;
 
         for (let i = 0; i < TRACE_LIMIT; i++) {
             const d = field.distance(x1 + ix * t, y1 + iy * t);
@@ -164,8 +186,10 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         return 0.28 + 0.72 * t * t;
     };
 
-    let vx = new Float32Array(0), vy = new Float32Array(0);
-    let alive = new Uint8Array(0), influence = new Float32Array(0);
+    let vx = new Float32Array(0),
+        vy = new Float32Array(0);
+    let alive = new Uint8Array(0),
+        influence = new Float32Array(0);
     let path = new Path2D();
 
     const buildPath = () => {
@@ -188,14 +212,15 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
 
         for (let r = rowStart; r <= rowEnd; r++) {
             const baseY = r * ROW;
-            const offset = (r & 1) ? half : 0;
+            const offset = r & 1 ? half : 0;
             const rowIdx = (r - rowStart) * cols;
 
             for (let c = colStart; c <= colEnd; c++) {
                 const i = rowIdx + (c - colStart);
                 const baseX = c * CELL + offset;
 
-                const dx = pointerX - baseX, dy = pointerY - baseY;
+                const dx = pointerX - baseX,
+                    dy = pointerY - baseY;
                 const dist2 = dx * dx + dy * dy;
 
                 if (dist2 > RADIUS * RADIUS) {
@@ -216,11 +241,10 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
                     continue;
                 }
 
-                let x = baseX, y = baseY;
+                let x = baseX,
+                    y = baseY;
                 if (dist > 0.001) {
-                    const amount = burstAt
-                        ? -profile * PULL * RING_PUSH * strength
-                        : wellAt(u) * PULL * strength;
+                    const amount = burstAt ? -profile * PULL * RING_PUSH * strength : wellAt(u) * PULL * strength;
                     x += (dx / dist) * amount;
                     y += (dy / dist) * amount;
                 }
@@ -270,7 +294,10 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         }
     };
 
-    let drawnX = NaN, drawnY = NaN, drawnStrength = NaN, drawnFront = NaN;
+    let drawnX = NaN,
+        drawnY = NaN,
+        drawnStrength = NaN,
+        drawnFront = NaN;
 
     const tick = (now: number) => {
         if (burstAt) {
@@ -296,11 +323,13 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         if (strength > 0.004) {
             const rebuilt = syncField(window.scrollX, window.scrollY);
 
-            if (rebuilt ||
+            if (
+                rebuilt ||
                 Math.abs(pointerX - drawnX) > 0.25 ||
                 Math.abs(pointerY - drawnY) > 0.25 ||
                 Math.abs(strength - drawnStrength) > 0.002 ||
-                Math.abs(front - drawnFront) > 0.002) {
+                Math.abs(front - drawnFront) > 0.002
+            ) {
                 buildPath();
                 drawnX = pointerX;
                 drawnY = pointerY;
@@ -370,29 +399,45 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         drawnStrength = NaN;
     };
 
-    window.addEventListener('pointermove', (e) => {
-        if (e.pointerType === 'touch') onTapMove(e);
-        else onPointer(e);
-    }, {passive: true});
+    window.addEventListener(
+        'pointermove',
+        (e) => {
+            if (e.pointerType === 'touch') onTapMove(e);
+            else onPointer(e);
+        },
+        {passive: true}
+    );
 
-    window.addEventListener('pointerdown', (e) => {
-        if (e.pointerType === 'touch') onTap(e);
-        else onPointer(e);
-    }, {passive: true});
+    window.addEventListener(
+        'pointerdown',
+        (e) => {
+            if (e.pointerType === 'touch') onTap(e);
+            else onPointer(e);
+        },
+        {passive: true}
+    );
 
     document.addEventListener('pointerleave', retreat);
     window.addEventListener('blur', retreat);
 
-    window.addEventListener('resize', () => {
-        resize();
-        markDirty();
-    }, {passive: true});
+    window.addEventListener(
+        'resize',
+        () => {
+            resize();
+            markDirty();
+        },
+        {passive: true}
+    );
 
     for (const type of ['transitionstart', 'transitionend', 'transitioncancel']) {
-        document.addEventListener(type, (e) => {
-            const name = (e as TransitionEvent).propertyName;
-            if (name === 'transform' || name === 'opacity') markDirty();
-        }, {capture: true, passive: true});
+        document.addEventListener(
+            type,
+            (e) => {
+                const name = (e as TransitionEvent).propertyName;
+                if (name === 'transform' || name === 'opacity') markDirty();
+            },
+            {capture: true, passive: true}
+        );
     }
 
     new ResizeObserver(markDirty).observe(document.body);

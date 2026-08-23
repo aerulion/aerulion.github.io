@@ -98,7 +98,8 @@ export class ObstacleIndex {
     }
 
     measure() {
-        const sx = window.scrollX, sy = window.scrollY;
+        const sx = window.scrollX,
+            sy = window.scrollY;
         this.scrollX = sx;
         this.scrollY = sy;
 
@@ -131,8 +132,11 @@ export class ObstacleIndex {
                     if (line.width <= 0 || line.bottom < top || line.top > bottom) continue;
                     const bleed = PAD_TEXT_X - PAD_TEXT_Y;
                     out.boxes.push([
-                        line.left + dx - bleed, line.top + dy,
-                        line.right + dx + bleed, line.bottom + dy, PAD_TEXT_Y
+                        line.left + dx - bleed,
+                        line.top + dy,
+                        line.right + dx + bleed,
+                        line.bottom + dy,
+                        PAD_TEXT_Y
                     ]);
                 }
             }
@@ -182,18 +186,25 @@ const mapHull = (r: DOMRect, dx: number, dy: number) => {
 };
 
 const mapSegments = (segments: Segment[], r: DOMRect, dx: number, dy: number, out: Obstacles) => {
-    const sx = r.width / 100, sy = r.height / 100;
+    const sx = r.width / 100,
+        sy = r.height / 100;
     for (const [x0, y0, x1, y1] of segments) {
         out.capsules.push([
-            r.left + dx + x0 * sx, r.top + dy + y0 * sy,
-            r.left + dx + x1 * sx, r.top + dy + y1 * sy, PAD_LINE
+            r.left + dx + x0 * sx,
+            r.top + dy + y0 * sy,
+            r.left + dx + x1 * sx,
+            r.top + dy + y1 * sy,
+            PAD_LINE
         ]);
     }
 };
 
 const panelOutline = (r: DOMRect, dx: number, dy: number, cutX: number, cutY: number, out: Obstacles) => {
     if (cutX <= 0 || cutY <= 0) return;
-    const l = r.left + dx, t = r.top + dy, rt = r.right + dx, b = r.bottom + dy;
+    const l = r.left + dx,
+        t = r.top + dy,
+        rt = r.right + dx,
+        b = r.bottom + dy;
     out.capsules.push(
         [l + cutX, t, rt, t, PAD_LINE],
         [rt, t, rt, b - cutY, PAD_LINE],
@@ -205,11 +216,16 @@ const panelOutline = (r: DOMRect, dx: number, dy: number, cutX: number, cutY: nu
 };
 
 const borderBands = (
-    r: DOMRect, dx: number, dy: number,
+    r: DOMRect,
+    dx: number,
+    dy: number,
     [top, right, bottom, left]: [number, number, number, number],
     out: Obstacles
 ) => {
-    const l = r.left + dx, t = r.top + dy, rt = r.right + dx, b = r.bottom + dy;
+    const l = r.left + dx,
+        t = r.top + dy,
+        rt = r.right + dx,
+        b = r.bottom + dy;
     if (top > 0) out.boxes.push([l, t, rt, t + top, PAD_BORDER]);
     if (bottom > 0) out.boxes.push([l, b - bottom, rt, b, PAD_BORDER]);
     if (left > 0) out.boxes.push([l, t, l + left, b, PAD_BORDER]);

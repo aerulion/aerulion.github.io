@@ -14,16 +14,15 @@ import {projects} from '../data/projects';
             <h2 class="section-title">Two systems, end to end.</h2>
             <div class="section-lede">
                 <p class="section-subtitle">
-                    Large-scale builds shaped around progression, storage and control — designed for live gameplay,
-                    long sessions and server-side reliability.
+                    Large-scale builds shaped around progression, storage and control — designed for live gameplay, long
+                    sessions and server-side reliability.
                 </p>
                 <div class="section-line" aria-hidden="true"></div>
             </div>
         </div>
 
         <div class="projects-grid">
-            {projects.map((project, index) =>
-                    <ProjectCard project={project} position={index + 1}/>)}
+            {projects.map((project, index) => <ProjectCard project={project} position={index + 1} />)}
         </div>
     </div>
 </section>

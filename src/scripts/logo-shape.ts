@@ -1,6 +1,11 @@
 import type {Point} from './geometry';
 
-export const LOGO_HULL: Point[] = [[0.5, 0], [0.933, 0.75], [0.5, 1], [0.067, 0.75]];
+export const LOGO_HULL: Point[] = [
+    [0.5, 0],
+    [0.933, 0.75],
+    [0.5, 1],
+    [0.067, 0.75]
+];
 
 const CENTRE_X = 0.5;
 const CENTRE_Y = 0.5;
@@ -8,16 +13,20 @@ const STEPS = 512;
 const TAU = Math.PI * 2;
 
 const castRay = (angle: number): number => {
-    const dx = Math.cos(angle), dy = Math.sin(angle);
+    const dx = Math.cos(angle),
+        dy = Math.sin(angle);
     let best = 0;
 
     for (let i = 0; i < LOGO_HULL.length; i++) {
-        const a = LOGO_HULL[i], b = LOGO_HULL[(i + 1) % LOGO_HULL.length];
-        const ex = b[0] - a[0], ey = b[1] - a[1];
+        const a = LOGO_HULL[i],
+            b = LOGO_HULL[(i + 1) % LOGO_HULL.length];
+        const ex = b[0] - a[0],
+            ey = b[1] - a[1];
         const den = dx * ey - dy * ex;
         if (Math.abs(den) < 1e-12) continue;
 
-        const ax = a[0] - CENTRE_X, ay = a[1] - CENTRE_Y;
+        const ax = a[0] - CENTRE_X,
+            ay = a[1] - CENTRE_Y;
         const t = (ax * ey - ay * ex) / den;
         const s = (ax * dy - ay * dx) / den;
         if (t > best && s >= 0 && s <= 1) best = t;

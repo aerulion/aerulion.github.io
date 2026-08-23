@@ -14,9 +14,11 @@ const TICK_PERIOD = 2.8;
             <div class="poster-rail poster-rail-top">
                 <p class="mono-label">Java / Systems / Plugin architecture</p>
                 <div class="poster-ticks" aria-hidden="true" style={`--tick-period:${TICK_PERIOD}s`}>
-                    {Array.from({length: TICKS}, (_, i) => (
-                            <span style={`--tick-delay:${(-i * TICK_PERIOD / TICKS).toFixed(3)}s`}></span>
-                    ))}
+                    {
+                        Array.from({length: TICKS}, (_, i) => (
+                            <span style={`--tick-delay:${((-i * TICK_PERIOD) / TICKS).toFixed(3)}s`} />
+                        ))
+                    }
                 </div>
                 <p class="mono-label rail-end">Germany / EU Central / Online</p>
             </div>
@@ -25,10 +27,10 @@ const TICK_PERIOD = 2.8;
                 <div class="hero-stage">
                     <div class="logo-construct" data-draw>
                         <div class="stage-construct">
-                            <LineConstruct/>
+                            <LineConstruct />
                         </div>
                         <div class="stage-mark">
-                            <MorphingLogoMark drawDelay={520} fillDelay={1500} shells={2} depth={0.4} ladder={0}/>
+                            <MorphingLogoMark drawDelay={520} fillDelay={1500} shells={2} depth={0.4} ladder={0} />
                         </div>
                         <span class="construct-label construct-label-a">Core / Aerulion</span>
                         <span class="construct-label construct-label-b">Lattice / 30° / 60°</span>
@@ -67,12 +69,14 @@ const TICK_PERIOD = 2.8;
             </div>
 
             <ul class="skill-strip" role="list" aria-label="Core specialties">
-                {skills.map((skill, index) => (
+                {
+                    skills.map((skill, index) => (
                         <li class="skill-chip">
                             <span class="skill-index">{String(index + 1).padStart(2, '0')}</span>
                             <span class="skill-name">{skill}</span>
                         </li>
-                ))}
+                    ))
+                }
             </ul>
         </div>
     </div>
@@ -153,7 +157,8 @@ const TICK_PERIOD = 2.8;
     }
 
     @keyframes tickWave {
-        0%, 100% {
+        0%,
+        100% {
             transform: scaleY(0.28);
         }
         50% {

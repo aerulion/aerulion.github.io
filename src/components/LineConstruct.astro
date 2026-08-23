@@ -8,13 +8,37 @@ const {class: className = '', axes = true} = Astro.props;
 
 type Pt = [number, number];
 
-const HEX: Pt[] = [[94, 50], [72, 11.895], [28, 11.895], [6, 50], [28, 88.105], [72, 88.105]];
-const TRI_UP: Pt[] = [[50, 6], [88.105, 72], [11.895, 72]];
-const TRI_DOWN: Pt[] = [[50, 94], [11.895, 28], [88.105, 28]];
+const HEX: Pt[] = [
+    [94, 50],
+    [72, 11.895],
+    [28, 11.895],
+    [6, 50],
+    [28, 88.105],
+    [72, 88.105]
+];
+const TRI_UP: Pt[] = [
+    [50, 6],
+    [88.105, 72],
+    [11.895, 72]
+];
+const TRI_DOWN: Pt[] = [
+    [50, 94],
+    [11.895, 28],
+    [88.105, 28]
+];
 const AXES: Pt[][] = [
-    [[2, 50], [98, 50]],
-    [[26, 8.43], [74, 91.57]],
-    [[26, 91.57], [74, 8.43]]
+    [
+        [2, 50],
+        [98, 50]
+    ],
+    [
+        [26, 8.43],
+        [74, 91.57]
+    ],
+    [
+        [26, 91.57],
+        [74, 8.43]
+    ]
 ];
 
 const closed = (pts: Pt[]) => `M ${pts.map((p) => p.join(' ')).join(' L ')} Z`;
@@ -23,7 +47,8 @@ const open = (pts: Pt[]) => `M ${pts.map((p) => p.join(' ')).join(' L ')}`;
 const edgesOf = (pts: Pt[], close: boolean) => {
     const out: number[][] = [];
     for (let i = 0; i < pts.length - (close ? 0 : 1); i++) {
-        const a = pts[i], b = pts[(i + 1) % pts.length];
+        const a = pts[i],
+            b = pts[(i + 1) % pts.length];
         out.push([a[0], a[1], b[0], b[1]]);
     }
     return out;
@@ -38,24 +63,31 @@ const segments = [
 ---
 
 <svg
-        class:list={['line-construct', className]}
-        viewBox="0 0 100 100"
-        aria-hidden="true"
-        focusable="false"
-        data-collide="lines"
-        data-segments={JSON.stringify(segments)}
+    class:list={['line-construct', className]}
+    viewBox="0 0 100 100"
+    aria-hidden="true"
+    focusable="false"
+    data-collide="lines"
+    data-segments={JSON.stringify(segments)}
 >
-    {axes && AXES.map((axis, i) => (
-            <path class="draw-path construct-axis" d={open(axis)} pathLength="1"
-                  style={`--draw-delay:${i * 80}ms`}/>
-    ))}
+    {
+        axes &&
+            AXES.map((axis, i) => (
+                <path
+                    class="draw-path construct-axis"
+                    d={open(axis)}
+                    pathLength="1"
+                    style={`--draw-delay:${i * 80}ms`}
+                />
+            ))
+    }
 
-    <path class="draw-path construct-hex" d={closed(HEX)} pathLength="1" style="--draw-delay:240ms"/>
-    <path class="draw-path construct-tri" d={closed(TRI_UP)} pathLength="1" style="--draw-delay:380ms"/>
-    <path class="draw-path construct-ghost" d={closed(TRI_DOWN)} pathLength="1" style="--draw-delay:500ms"/>
+    <path class="draw-path construct-hex" d={closed(HEX)} pathLength="1" style="--draw-delay:240ms"></path>
+    <path class="draw-path construct-tri" d={closed(TRI_UP)} pathLength="1" style="--draw-delay:380ms"></path>
+    <path class="draw-path construct-ghost" d={closed(TRI_DOWN)} pathLength="1" style="--draw-delay:500ms"></path>
 
-    <path class="construct-tracer tracer-hex" d={closed(HEX)} pathLength="1"/>
-    <path class="construct-tracer tracer-tri" d={closed(TRI_UP)} pathLength="1"/>
+    <path class="construct-tracer tracer-hex" d={closed(HEX)} pathLength="1"></path>
+    <path class="construct-tracer tracer-tri" d={closed(TRI_UP)} pathLength="1"></path>
 </svg>
 
 <style>
