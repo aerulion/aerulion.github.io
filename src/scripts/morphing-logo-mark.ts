@@ -11,7 +11,7 @@ import {
     unfold,
     UNFOLD_DEFAULTS,
     type UnfoldOptions
-} from './hypercube';
+} from './morphing-logo';
 
 const SHELL_ALPHA = 0.3;
 const SHELL_FADE = 0.5;
@@ -99,8 +99,8 @@ const paint = (rig: Rig) => {
     });
 };
 
-export function mountHypercubeMarks() {
-    const marks = Array.from(document.querySelectorAll<SVGSVGElement>('[data-hypercube]'));
+export function mountMorphingLogoMarks() {
+    const marks = Array.from(document.querySelectorAll<SVGSVGElement>('[data-morphing-logo]'));
     if (!marks.length) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');

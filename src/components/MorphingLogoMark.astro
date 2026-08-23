@@ -1,6 +1,6 @@
 ---
 import {uid} from '../utils/uid';
-import {barePath, inkPoints, INK_TRAVEL, UNFOLD_DEFAULTS} from '../scripts/hypercube';
+import {barePath, inkPoints, INK_TRAVEL, UNFOLD_DEFAULTS} from '../scripts/morphing-logo';
 
 interface Props {
     class?: string;
@@ -22,8 +22,8 @@ const {
 
 const SILHOUETTE = "m24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z";
 
-const clipId = uid('hyper-clip');
-const bareId = uid('hyper-bare');
+const clipId = uid('morph-clip');
+const bareId = uid('morph-bare');
 
 const INK = inkPoints();
 const BARE = barePath(INK_TRAVEL);
@@ -32,12 +32,12 @@ const INTRO = fillDelay + 1400;
 ---
 
 <svg
-        class:list={['hypercube-mark', className]}
+        class:list={['morphing-logo-mark', className]}
         viewBox="0 0 26.458333 26.458333"
         role="img"
         aria-label="aerulion logo"
         data-collide="logo"
-        data-hypercube
+        data-morphing-logo
         data-intro-delay={INTRO}
         data-shells={shells}
         data-depth={depth}
@@ -70,7 +70,7 @@ const INTRO = fillDelay + 1400;
 </svg>
 
 <style>
-    .hypercube-mark {
+    .morphing-logo-mark {
         display: block;
         width: 100%;
         height: auto;
@@ -109,7 +109,7 @@ const INTRO = fillDelay + 1400;
     }
 
     /* Once the loop owns the ink offset, the intro transition must let go. */
-    .hypercube-mark.is-live .mark-ink {
+    .morphing-logo-mark.is-live .mark-ink {
         transition: none;
     }
 
@@ -126,7 +126,7 @@ const INTRO = fillDelay + 1400;
     /* A centred stroke overhangs the filled silhouette, so the outline is clipped to
        wherever the ink is not: the sweep itself uncovers and re-covers the wireframe,
        with no gap between the two and no rim past the fill. */
-    .hypercube-mark.is-live .mark-outline {
+    .morphing-logo-mark.is-live .mark-outline {
         stroke-opacity: 1;
         stroke-width: 0.9;
         stroke-dasharray: none;
