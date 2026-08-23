@@ -66,7 +66,7 @@ const TICK_PERIOD = 2.8;
                 </div>
             </div>
 
-            <ul class="skill-strip" aria-label="Core specialties">
+            <ul class="skill-strip" role="list" aria-label="Core specialties">
                 {skills.map((skill, index) => (
                         <li class="skill-chip">
                             <span class="skill-index">{String(index + 1).padStart(2, '0')}</span>
@@ -356,7 +356,8 @@ const TICK_PERIOD = 2.8;
 
         .hero-actions {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+            justify-self: stretch;
         }
     }
 </style>

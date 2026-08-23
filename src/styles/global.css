@@ -98,6 +98,10 @@ a:focus-visible {
     padding-bottom: var(--spacing-5xl);
 }
 
+.main-content:focus {
+    outline: none;
+}
+
 .skip-link {
     position: absolute;
     top: 0;

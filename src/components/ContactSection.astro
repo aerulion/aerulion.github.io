@@ -50,7 +50,7 @@ const endpoints: Endpoint[] = [
             </div>
         </div>
 
-        <ul class="endpoint-list" data-reveal>
+        <ul class="endpoint-list" role="list" data-reveal>
             {endpoints.map((endpoint, index) => {
                 const position = String(index + 1).padStart(2, '0');
                 const external = endpoint.href?.startsWith('http');

@@ -1,5 +1,6 @@
 ---
 import {uid} from '../utils/uid';
+import {inkPoints, INK_TRAVEL, SILHOUETTE} from '../scripts/morphing-logo';
 
 interface Props {
     class?: string;
@@ -9,23 +10,9 @@ interface Props {
 
 const {class: className = '', drawDelay = 0, fillDelay = 900} = Astro.props;
 
-const SILHOUETTE = "m24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z";
-
 const clipId = uid('logo-clip');
 
-const VIEW = 26.458333;
-const TAN_30 = 0.5773502692;
-const MARGIN = 0.25;
-const INK_REST = 7.638 - MARGIN;
-const INK_TRAVEL = VIEW + 2 * MARGIN;
-
-const FAR = 60;
-const INK = [
-    [-FAR, INK_REST + FAR * TAN_30],
-    [FAR, INK_REST - FAR * TAN_30],
-    [FAR, FAR * 1.5],
-    [-FAR, FAR * 1.5]
-].map((point) => point.map((n) => Number(n.toFixed(4))).join(',')).join(' ');
+const INK = inkPoints();
 ---
 
 <svg

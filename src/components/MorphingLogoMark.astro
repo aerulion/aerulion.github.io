@@ -1,6 +1,6 @@
 ---
 import {uid} from '../utils/uid';
-import {barePath, inkPoints, INK_TRAVEL, UNFOLD_DEFAULTS} from '../scripts/morphing-logo';
+import {barePath, inkPoints, INK_TRAVEL, SILHOUETTE, UNFOLD_DEFAULTS} from '../scripts/morphing-logo';
 
 interface Props {
     class?: string;
@@ -19,8 +19,6 @@ const {
     depth = UNFOLD_DEFAULTS.depth,
     ladder = 0.13
 } = Astro.props;
-
-const SILHOUETTE = "m24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z";
 
 const clipId = uid('morph-clip');
 const bareId = uid('morph-bare');

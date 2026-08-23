@@ -12,12 +12,13 @@ export function mountCopyEndpoints() {
         let timer = 0;
 
         button.addEventListener('click', async () => {
+            let message = 'Handle copied';
             try {
                 await navigator.clipboard.writeText(value);
             } catch {
-                return;
+                message = 'Copy failed';
             }
-            note.textContent = 'Handle copied';
+            note.textContent = message;
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
                 note.textContent = original;

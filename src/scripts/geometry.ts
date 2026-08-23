@@ -17,15 +17,6 @@ export const hash = (a: number, b: number): number => {
     return n - Math.floor(n);
 };
 
-export const centroid = (points: Point[]): Point => {
-    let x = 0, y = 0;
-    for (const p of points) {
-        x += p[0];
-        y += p[1];
-    }
-    return [x / points.length, y / points.length];
-};
-
 export const boundsOf = (points: Point[]): Rect => {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const [x, y] of points) {

@@ -24,7 +24,7 @@ const MARK_STAGGER = 90;
             </div>
         </div>
 
-        <ol class="timeline" data-reveal>
+        <ol class="timeline" role="list" data-reveal>
             {timeline.map((milestone, index) => {
                 const isNow = index === timeline.length - 1;
                 return (
