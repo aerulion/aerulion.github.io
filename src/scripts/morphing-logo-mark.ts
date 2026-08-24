@@ -45,7 +45,8 @@ const readOptions = (svg: SVGSVGElement): UnfoldOptions => {
         shells: Math.round(num('shells', UNFOLD_DEFAULTS.shells)),
         precess: num('precess', UNFOLD_DEFAULTS.precess),
         anomaly: num('anomaly', UNFOLD_DEFAULTS.anomaly),
-        phase: 0
+        phase: 0,
+        fan: 0
     };
 };
 
@@ -80,6 +81,7 @@ const paint = (rig: Rig) => {
     const frame = unfold(beat.angle, {
         ...rig.options,
         phase: beat.phase,
+        fan: beat.fan,
         depth: rig.options.depth * beat.reach
     });
 

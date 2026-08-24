@@ -115,6 +115,7 @@ export interface UnfoldOptions {
     precess: number;
     anomaly: number;
     phase: number;
+    fan: number;
 }
 
 export const UNFOLD_DEFAULTS: UnfoldOptions = {
@@ -122,7 +123,8 @@ export const UNFOLD_DEFAULTS: UnfoldOptions = {
     shells: 2,
     precess: -1,
     anomaly: 0.14,
-    phase: 0
+    phase: 0,
+    fan: 0
 };
 
 export interface Shell {
@@ -137,10 +139,8 @@ export interface UnfoldFrame {
     spread: number;
 }
 
-const smootherstep = (u: number): number => u * u * u * (u * (u * 6 - 15) + 10);
-
 export const unfold = (angle: number, options: UnfoldOptions = UNFOLD_DEFAULTS): UnfoldFrame => {
-    const {depth, shells, precess, anomaly, phase} = options;
+    const {depth, shells, precess, anomaly, phase, fan} = options;
 
     const ca = Math.cos(angle);
     const sa = Math.sin(angle);
@@ -157,10 +157,15 @@ export const unfold = (angle: number, options: UnfoldOptions = UNFOLD_DEFAULTS):
         return [x * cg - y * sg, x * sg + y * cg];
     };
 
+    const cf = Math.cos(fan);
+    const sf = Math.sin(fan);
+
     const base = LIFT.visible.map((z, i): Point => {
         const u = LIFT.perp[i];
-        const x = z[0] * ca - (-z[1] + anomaly * u[0]) * sa;
-        const y = z[1] * ca - (z[0] + anomaly * u[1]) * sa;
+        const u0 = u[0] * cf - u[1] * sf;
+        const u1 = u[0] * sf + u[1] * cf;
+        const x = z[0] * ca - (-z[1] + anomaly * u0) * sa;
+        const y = z[1] * ca - (z[0] + anomaly * u1) * sa;
         return [LOGO_CENTRE[0] + x * cg - y * sg, LOGO_CENTRE[1] + x * sg + y * cg];
     });
 
@@ -194,40 +199,106 @@ export const inkPoints = (): string => INK_POLY.map((p) => `${p[0]},${Number(p[1
 export const barePath = (dy: number): string =>
     `${BARE_FRAME}M${INK_POLY.map(([x, y]) => `${x} ${(y + dy).toFixed(3)}`).join('L')}Z`;
 
+const glide = (u: number): number => u * u * u * (u * (u * 6 - 15) + 10);
+
+const snap = (u: number): number => 1 - (1 - u) ** 3;
+
+const BACK = 1.70158;
+
+const recoil = (u: number): number => {
+    const v = u - 1;
+    return 1 + (BACK + 1) * v * v * v + BACK * v * v;
+};
+
+export const EASES = {glide, snap, recoil};
+
+export type EaseName = keyof typeof EASES;
+
+const EASE_BAG: EaseName[] = ['snap', 'snap', 'recoil', 'glide'];
+
+const HALF = Math.PI;
+
+const QUARTER = Math.PI / 2;
+
+const PEAK_JITTER = 0.14 * Math.PI;
+
+const FAN_DRIFT = 0.32;
+
 export interface EpisodeShape {
     rest: [number, number];
-    turns: [number, number];
-    turn: [number, number];
+    arcs: [number, number];
+    strike: [number, number];
+    fanned: [number, number];
+    flat: [number, number];
+    settle: [number, number];
     lead: number;
 }
 
 export const EPISODE_DEFAULTS: EpisodeShape = {
     rest: [7, 15],
-    turns: [2, 4],
-    turn: [3, 4.4],
+    arcs: [2, 4],
+    strike: [0.5, 0.8],
+    fanned: [1.5, 3],
+    flat: [0.35, 0.7],
+    settle: [1, 1.8],
     lead: 0.9
 };
+
+export interface Move {
+    strike: number;
+    hold: number;
+    ease: EaseName;
+}
+
+export interface Arc {
+    fan: number;
+    phase: number;
+    reach: number;
+    dir: 1 | -1;
+    peak: number;
+    out: Move;
+    back: Move;
+}
 
 export interface Episode {
     rest: number;
     span: number;
-    turns: number;
-    phases: number[];
-    reach: number[];
+    arcs: Arc[];
 }
+
+const moveLength = (move: Move): number => move.strike + move.hold;
+
+export const arcLength = (arc: Arc): number => moveLength(arc.out) + moveLength(arc.back);
 
 export const planEpisode = (rand: () => number, shape: EpisodeShape = EPISODE_DEFAULTS): Episode => {
     const between = ([lo, hi]: [number, number]) => lo + rand() * (hi - lo);
-    const turns = Math.round(between(shape.turns));
-    const phases: number[] = [];
-    const reach: number[] = [];
+    const pick = () => EASE_BAG[Math.min(EASE_BAG.length - 1, Math.floor(rand() * EASE_BAG.length))];
+    const count = Math.round(between(shape.arcs));
+    const arcs: Arc[] = [];
+    let span = 0;
+    let fan = rand() * TAU;
 
-    for (let i = 0; i < turns; i++) {
-        phases.push(rand() * TAU);
-        reach.push(0.8 + rand() * 0.45);
+    for (let i = 0; i < count; i++) {
+        const arc: Arc = {
+            fan,
+            phase: rand() * TAU,
+            reach: 0.8 + rand() * 0.45,
+            dir: rand() < 0.5 ? -1 : 1,
+            peak: QUARTER + (rand() - 0.5) * 2 * PEAK_JITTER,
+            out: {strike: between(shape.strike), hold: between(shape.fanned), ease: pick()},
+            back: {
+                strike: between(shape.strike),
+                hold: between(i === count - 1 ? shape.settle : shape.flat),
+                ease: pick()
+            }
+        };
+
+        arcs.push(arc);
+        span += arcLength(arc);
+        fan = (fan + QUARTER + rand() * HALF) % TAU;
     }
 
-    return {rest: between(shape.rest), span: turns * between(shape.turn), turns, phases, reach};
+    return {rest: between(shape.rest), span, arcs};
 };
 
 export const episodeLength = (episode: Episode, lead: number): number => episode.rest + 2 * lead + episode.span;
@@ -236,35 +307,63 @@ export interface Beat {
     angle: number;
     phase: number;
     reach: number;
+    fan: number;
     ink: number;
 }
 
-export const episodeBeat = (episode: Episode, time: number, lead: number): Beat => {
-    const last = episode.turns - 1;
-    const at = (turn: number, ink: number): Beat => ({
-        angle: 0,
-        phase: episode.phases[turn],
-        reach: episode.reach[turn],
-        ink
-    });
+const pose = (arc: Arc, angle: number, ink: number, drift = 0): Beat => ({
+    angle,
+    phase: arc.phase + drift,
+    reach: arc.reach,
+    fan: arc.fan + drift,
+    ink: ink < 0 ? 0 : ink > 1 ? 1 : ink
+});
 
-    if (time <= episode.rest) return at(0, 0);
+export const episodeBeat = (episode: Episode, time: number, lead: number): Beat => {
+    const {arcs} = episode;
+    const first = arcs[0];
+
+    if (time <= episode.rest) return pose(first, 0, 0);
 
     const opening = time - episode.rest;
-    if (opening < lead) return at(0, smootherstep(opening / lead));
+    if (opening < lead) return pose(first, 0, glide(opening / lead));
 
-    const running = opening - lead;
-    if (running < episode.span) {
-        const p = running / episode.span;
-        const angle = episode.turns * Math.PI * smootherstep(p);
-        const turn = Math.min(last, Math.floor(angle / Math.PI));
-        return {angle, phase: episode.phases[turn], reach: episode.reach[turn], ink: 1};
+    let cursor = opening - lead;
+    let angle = 0;
+
+    for (const arc of arcs) {
+        const span = arcLength(arc);
+
+        if (cursor < span) {
+            const peak = arc.dir * arc.peak;
+            const close = arc.dir * HALF;
+            const drift = cursor * FAN_DRIFT;
+            let step = cursor;
+
+            if (step < arc.out.strike) {
+                return pose(arc, angle + peak * EASES[arc.out.ease](step / arc.out.strike), 1, drift);
+            }
+            step -= arc.out.strike;
+
+            if (step < arc.out.hold) return pose(arc, angle + peak, 1, drift);
+            step -= arc.out.hold;
+
+            if (step < arc.back.strike) {
+                const u = EASES[arc.back.ease](step / arc.back.strike);
+                return pose(arc, angle + peak + (close - peak) * u, 1, drift);
+            }
+
+            return pose(arc, angle + close, 1, drift);
+        }
+
+        cursor -= span;
+        angle += arc.dir * HALF;
     }
 
-    const closing = running - episode.span;
-    if (closing < lead) return at(last, 1 - smootherstep(closing / lead));
+    const tail = arcs[arcs.length - 1];
+    if (cursor < lead) return pose(tail, angle, 1 - glide(cursor / lead));
 
-    return at(last, 0);
+    return pose(tail, angle, 0);
 };
 
 export const toPath = (pts: Point[]): string =>
