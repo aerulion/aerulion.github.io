@@ -63,7 +63,7 @@ body {
     line-height: 1.6;
     color: var(--white);
     background: var(--black);
-    min-height: 100vh;
+    min-height: 100svh;
     position: relative;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;

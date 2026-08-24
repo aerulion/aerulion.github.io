@@ -3,6 +3,11 @@
 ---
 
 <div class="frame" aria-hidden="true">
+    <span class="bleed bleed-top" data-collide="none"></span>
+    <span class="bleed bleed-bottom" data-collide="none"></span>
+    <span class="bleed bleed-left" data-collide="none"></span>
+    <span class="bleed bleed-right" data-collide="none"></span>
+
     <span class="rule rule-top"></span>
     <span class="rule rule-bottom"></span>
     <span class="rule rule-left"></span>
@@ -19,7 +24,44 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        z-index: 0;
+        z-index: 40;
+    }
+
+    /* Opaque margin: the crop marks read as a true edge, so nothing scrolls
+       past them. The gauge tick sits after these and keeps its overhang. */
+    .bleed {
+        position: absolute;
+        background: var(--black);
+    }
+
+    .bleed-top,
+    .bleed-bottom {
+        left: 0;
+        right: 0;
+        height: var(--frame-inset);
+    }
+
+    .bleed-left,
+    .bleed-right {
+        top: 0;
+        bottom: 0;
+        width: var(--frame-inset);
+    }
+
+    .bleed-top {
+        top: 0;
+    }
+
+    .bleed-bottom {
+        bottom: 0;
+    }
+
+    .bleed-left {
+        left: 0;
+    }
+
+    .bleed-right {
+        right: 0;
     }
 
     .rule {

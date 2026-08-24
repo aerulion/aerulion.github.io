@@ -38,7 +38,7 @@ A 60° triangular grid on a canvas that bends around real page content. The chai
 2. `distance-field.ts` — `DistanceField` samples those boxes/capsules/hulls into an 8px grid; `BAND` is the clearance radius the lattice honours.
 3. `lattice-field.ts` — `mountLatticeField(canvas)` draws the grid, pulls vertices toward the pointer, and dithers segments in and out near obstacles. Falloff is density, never opacity.
 
-Opting an element in/out is done with data attributes, not by editing the scanner: `data-collide="logo"` uses `LOGO_HULL` from `logo-shape.ts` as the outline, `data-collide="lines"` + `data-segments` (JSON, 0–100 percentage coordinates) supplies explicit line capsules. The component is skipped entirely under `prefers-reduced-motion`.
+Opting an element in/out is done with data attributes, not by editing the scanner: `data-collide="logo"` uses `LOGO_HULL` from `logo-shape.ts` as the outline, `data-collide="lines"` + `data-segments` (JSON, 0–100 percentage coordinates) supplies explicit line capsules, `data-collide="none"` drops an element from the index entirely (used by the opaque frame margin, which paints over the lattice rather than deflecting it). The component is skipped entirely under `prefers-reduced-motion`.
 
 ### The morphing mark
 

@@ -11,42 +11,52 @@ import Button from '../components/Button.astro';
 <Layout title="404 - Page Not Found" description="This page does not exist." noindex>
     <ScreenFrame />
     <LatticeField />
-    <main class="not-found-section">
-        <div class="not-found-card panel-cut">
-            <div class="not-found-rail">
-                <p class="mono-label">aerulion / Route error</p>
-                <p class="mono-label" data-telemetry>Status / 404</p>
-            </div>
-
-            <div class="not-found-body">
-                <div class="not-found-logo" data-draw>
-                    <LogoMark drawDelay={200} fillDelay={1100} />
+    <div class="not-found-shell">
+        <main class="not-found-section">
+            <div class="not-found-card panel-cut">
+                <div class="not-found-rail">
+                    <p class="mono-label">aerulion / Route error</p>
+                    <p class="mono-label" data-telemetry>Status / 404</p>
                 </div>
-                <div class="not-found-copy">
-                    <h1>404</h1>
-                    <h2>Page not found</h2>
-                    <p>The page you're looking for doesn't exist or is no longer part of the current structure.</p>
-                    <Button href="/" variant="solid">Return to home</Button>
+
+                <div class="not-found-body">
+                    <div class="not-found-logo" data-draw>
+                        <LogoMark drawDelay={200} fillDelay={1100} />
+                    </div>
+                    <div class="not-found-copy">
+                        <h1>404</h1>
+                        <h2>Page not found</h2>
+                        <p>The page you're looking for doesn't exist or is no longer part of the current structure.</p>
+                        <Button href="/" variant="solid">Return to home</Button>
+                    </div>
+                </div>
+
+                <div class="not-found-rail not-found-rail-bottom">
+                    <p class="mono-label" data-telemetry>Node / 001</p>
+                    <p class="mono-label">Route / Unresolved</p>
                 </div>
             </div>
-
-            <div class="not-found-rail not-found-rail-bottom">
-                <p class="mono-label" data-telemetry>Node / 001</p>
-                <p class="mono-label">Route / Unresolved</p>
-            </div>
-        </div>
-    </main>
-    <Footer />
+        </main>
+        <Footer />
+    </div>
     <PageTransition />
 </Layout>
 
 <style>
+    /* Card and footer share one viewport-tall column, so a page that fits
+       has nothing to scroll to. */
+    .not-found-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100svh;
+    }
+
     .not-found-section {
         position: relative;
         z-index: 1;
+        flex: 1;
         display: grid;
         place-items: center;
-        min-height: 100svh;
         padding: clamp(1rem, 3vw, 2rem);
     }
 

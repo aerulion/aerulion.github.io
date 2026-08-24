@@ -155,6 +155,8 @@ const specOf = (el: Element, cs: CSSStyleDeclaration, pinned: boolean): Spec | n
     if (cs.display === 'none' || cs.visibility === 'hidden') return null;
 
     const data = (el as HTMLElement).dataset;
+    if (data?.collide === 'none') return null;
+
     const segments = data?.collide === 'lines' ? parseSegments(data.segments) : null;
     const hull = data?.collide === 'logo';
     const panel = el.classList.contains('panel-cut');
