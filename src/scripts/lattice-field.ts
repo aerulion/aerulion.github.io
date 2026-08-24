@@ -11,6 +11,8 @@ const EASE = 0.12;
 const OFF_POINTER = -9999;
 const MAX_DPR = 2;
 const RESURVEY_DELAY = 2200;
+const SCAN_GAP = 400;
+const MEASURE_GAP = 120;
 
 const BURST_MS = 1150;
 const RING_WIDTH = 0.42;
@@ -56,6 +58,8 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         fieldY = NaN,
         fieldScrollX = NaN,
         fieldScrollY = NaN;
+    let scannedAt = -Infinity,
+        measuredAt = -Infinity;
 
     const resize = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
@@ -66,18 +70,19 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    const syncField = (scrollX: number, scrollY: number): boolean => {
-        if (needScan) {
+    const syncField = (now: number, scrollX: number, scrollY: number): boolean => {
+        if (needScan && now - scannedAt >= SCAN_GAP) {
             needScan = false;
             needMeasure = true;
+            scannedAt = now;
             obstacles.scan();
         }
-        if (
-            needMeasure ||
+        const drifted =
             Math.abs(scrollX - obstacles.scrollX) > REMEASURE_STEP ||
-            Math.abs(scrollY - obstacles.scrollY) > REMEASURE_STEP
-        ) {
+            Math.abs(scrollY - obstacles.scrollY) > REMEASURE_STEP;
+        if ((needMeasure || drifted) && now - measuredAt >= MEASURE_GAP) {
             needMeasure = false;
+            measuredAt = now;
             fieldStale = true;
             obstacles.measure();
         }
@@ -190,7 +195,8 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         vy = new Float32Array(0);
     let alive = new Uint8Array(0),
         influence = new Float32Array(0);
-    let path = new Path2D();
+    let segments = new Float32Array(0);
+    let segmentCount = 0;
 
     const buildPath = () => {
         const rowStart = Math.floor((pointerY - VERTEX_REACH) / ROW);
@@ -206,6 +212,7 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
             vy = new Float32Array(total);
             alive = new Uint8Array(total);
             influence = new Float32Array(total);
+            segments = new Float32Array(total * 12);
         }
 
         const half = CELL / 2;
@@ -255,7 +262,7 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
             }
         }
 
-        path = new Path2D();
+        segmentCount = 0;
 
         const link = (i: number, j: number, gx: number, gy: number, salt: number) => {
             if (!alive[i] || !alive[j]) return;
@@ -271,8 +278,10 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
             if (clearance < 0) return;
             if (clearance < FADE && cap * fadeAt(clearance) < roll) return;
 
-            path.moveTo(vx[i], vy[i]);
-            path.lineTo(vx[j], vy[j]);
+            segments[segmentCount++] = vx[i];
+            segments[segmentCount++] = vy[i];
+            segments[segmentCount++] = vx[j];
+            segments[segmentCount++] = vy[j];
         };
 
         for (let r = rowStart; r < rowEnd; r++) {
@@ -321,7 +330,7 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         ctx.clearRect(0, 0, width, height);
 
         if (strength > 0.004) {
-            const rebuilt = syncField(window.scrollX, window.scrollY);
+            const rebuilt = syncField(now, window.scrollX, window.scrollY);
 
             if (
                 rebuilt ||
@@ -339,7 +348,12 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
 
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 1;
-            ctx.stroke(path);
+            ctx.beginPath();
+            for (let i = 0; i < segmentCount; i += 4) {
+                ctx.moveTo(segments[i], segments[i + 1]);
+                ctx.lineTo(segments[i + 2], segments[i + 3]);
+            }
+            ctx.stroke();
             frame = requestAnimationFrame(tick);
             return;
         }
@@ -399,6 +413,11 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
         drawnStrength = NaN;
     };
 
+    const markMoved = () => {
+        needMeasure = true;
+        drawnStrength = NaN;
+    };
+
     window.addEventListener(
         'pointermove',
         (e) => {
@@ -434,13 +453,14 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
             type,
             (e) => {
                 const name = (e as TransitionEvent).propertyName;
-                if (name === 'transform' || name === 'opacity') markDirty();
+                if (name === 'opacity') markDirty();
+                else if (name === 'transform') markMoved();
             },
             {capture: true, passive: true}
         );
     }
 
-    new ResizeObserver(markDirty).observe(document.body);
+    new ResizeObserver(markMoved).observe(document.body);
     new MutationObserver(markDirty).observe(document.body, {childList: true, subtree: true});
 
     document.addEventListener('visibilitychange', () => {

@@ -31,6 +31,7 @@ interface Rig {
     ladderAlpha: number;
     episode: Episode;
     clock: number;
+    written: Map<string, string>;
 }
 
 const readOptions = (svg: SVGSVGElement): UnfoldOptions => {
@@ -72,8 +73,21 @@ const rigOf = (svg: SVGSVGElement): Rig | null => {
         options: readOptions(svg),
         ladderAlpha: Number.isFinite(alpha) ? alpha : LADDER_ALPHA,
         episode: planEpisode(Math.random),
-        clock: 0
+        clock: 0,
+        written: new Map()
     };
+};
+
+const setAttr = (rig: Rig, key: string, node: Element, name: string, value: string) => {
+    if (rig.written.get(key) === value) return;
+    rig.written.set(key, value);
+    node.setAttribute(name, value);
+};
+
+const setStyle = (rig: Rig, key: string, node: SVGElement, name: 'opacity' | 'transform', value: string) => {
+    if (rig.written.get(key) === value) return;
+    rig.written.set(key, value);
+    node.style[name] = value;
 };
 
 const paint = (rig: Rig) => {
@@ -86,24 +100,36 @@ const paint = (rig: Rig) => {
     });
 
     const d = toPath(frame.base);
-    rig.outline.setAttribute('d', d);
-    rig.clip.setAttribute('d', d);
+    setAttr(rig, 'outline', rig.outline, 'd', d);
+    setAttr(rig, 'clip', rig.clip, 'd', d);
 
     const dy = beat.ink * INK_TRAVEL;
-    rig.bare.setAttribute('d', barePath(dy));
-    rig.ink.style.transform = `translateY(${dy.toFixed(4)}px)`;
+    setAttr(rig, 'bare', rig.bare, 'd', barePath(dy));
+    setStyle(rig, 'ink', rig.ink, 'transform', `translateY(${dy.toFixed(4)}px)`);
 
     if (rig.ladderAlpha > 0) {
-        rig.ladder.setAttribute('d', ladderPath(frame));
-        rig.ladder.style.opacity = String(frame.spread * rig.ladderAlpha);
+        setAttr(rig, 'ladder', rig.ladder, 'd', ladderPath(frame));
+        setStyle(rig, 'ladder-o', rig.ladder, 'opacity', String(frame.spread * rig.ladderAlpha));
     }
 
     frame.shells.forEach((shell, i) => {
         const node = rig.shells[i];
         if (!node) return;
-        node.setAttribute('d', d);
-        node.setAttribute('transform', `translate(${shell.offset[0].toFixed(3)} ${shell.offset[1].toFixed(3)})`);
-        node.style.opacity = String(frame.spread * SHELL_ALPHA * (1 - shell.level * SHELL_FADE));
+        setAttr(rig, `shell${i}`, node, 'd', d);
+        setAttr(
+            rig,
+            `shell${i}-t`,
+            node,
+            'transform',
+            `translate(${shell.offset[0].toFixed(3)} ${shell.offset[1].toFixed(3)})`
+        );
+        setStyle(
+            rig,
+            `shell${i}-o`,
+            node,
+            'opacity',
+            String(frame.spread * SHELL_ALPHA * (1 - shell.level * SHELL_FADE))
+        );
     });
 };
 
@@ -121,6 +147,7 @@ export function mountMorphingLogoMarks() {
 
     const rest = (rig: Rig) => {
         rig.svg.classList.remove('is-live');
+        rig.written.clear();
         rig.outline.setAttribute('d', rig.silhouette);
         rig.clip.setAttribute('d', rig.silhouette);
         rig.ladder.style.opacity = '0';

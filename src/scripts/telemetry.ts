@@ -80,14 +80,22 @@ export function mountTelemetry() {
 
         armed(node, () => {
             const start = performance.now();
-            const land = () => (node.textContent = roll.text);
+            let shown = roll.text;
+
+            const show = (text: string) => {
+                if (text === shown) return;
+                shown = text;
+                node.textContent = text;
+            };
+
+            const land = () => show(roll.text);
             const tick = (now: number) => {
                 const time = now - start;
                 if (time >= roll.length) {
                     land();
                     return;
                 }
-                node.textContent = rollAt(roll, time);
+                show(rollAt(roll, time));
                 requestAnimationFrame(tick);
             };
 

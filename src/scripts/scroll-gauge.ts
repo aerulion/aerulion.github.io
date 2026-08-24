@@ -31,6 +31,7 @@ export function mountScrollGauge() {
     const marks = Array.from(document.querySelectorAll<HTMLElement>('[data-station]'));
     let stations: Station[] = [];
     let shown = '';
+    let painted = '';
     let queued = 0;
 
     const measure = () => {
@@ -44,7 +45,11 @@ export function mountScrollGauge() {
         const viewport = window.innerHeight;
         const progress = progressAt(window.scrollY, viewport, document.documentElement.scrollHeight);
 
-        gauge.style.setProperty('--tick', progress.toFixed(5));
+        const tick = progress.toFixed(5);
+        if (tick !== painted) {
+            painted = tick;
+            gauge.style.setProperty('--tick', tick);
+        }
 
         if (!readout) return;
         const station = stationAt(stations, window.scrollY, viewport);
