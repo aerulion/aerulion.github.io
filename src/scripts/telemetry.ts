@@ -9,9 +9,9 @@ export interface RollShape {
 }
 
 export const ROLL_DEFAULTS: RollShape = {
-    settle: 240,
-    stagger: 55,
-    step: 45
+    settle: 950,
+    stagger: 140,
+    step: 55
 };
 
 export interface Roll {
