@@ -33,6 +33,9 @@
     --spacing-4xl: 5rem;
     --spacing-5xl: 7rem;
 
+    --reveal-shift: 18px;
+    --wipe-edge: linear-gradient(330deg, #000 0 50%, transparent 50% 100%);
+
     --transition-base: 0.25s linear;
     --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
     --ease-out-poster: cubic-bezier(0.22, 1, 0.36, 1);
@@ -328,15 +331,30 @@ html:not(.js) .draw-path {
 
 /* ---- Scroll reveal ------------------------------------------------------- */
 
-.js [data-reveal]:not(.is-revealed) {
-    opacity: 0;
-    transform: translate3d(0, 20px, 0);
+.js [data-reveal] {
+    -webkit-mask-image: var(--wipe-edge);
+    mask-image: var(--wipe-edge);
+    -webkit-mask-size: 260% 260%;
+    mask-size: 260% 260%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 85% 85%;
+    mask-position: 85% 85%;
+    transition:
+        -webkit-mask-position 0.8s var(--ease-out-poster) var(--reveal-delay, 0ms),
+        mask-position 0.8s var(--ease-out-poster) var(--reveal-delay, 0ms),
+        transform 0.8s var(--ease-out-poster) var(--reveal-delay, 0ms);
 }
 
-.js [data-reveal] {
-    transition:
-        opacity 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms),
-        transform 0.7s var(--ease-out-poster) var(--reveal-delay, 0ms);
+.js [data-reveal].is-settled {
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+.js [data-reveal]:not(.is-revealed) {
+    -webkit-mask-position: 0% 0%;
+    mask-position: 0% 0%;
+    transform: translate3d(var(--reveal-shift), calc(var(--reveal-shift) * var(--tan-30)), 0);
 }
 
 .js .section-rule,
@@ -437,8 +455,10 @@ html:not(.js) .draw-path {
         stroke-dashoffset: 0;
     }
 
+    .js [data-reveal],
     .js [data-reveal]:not(.is-revealed) {
-        opacity: 1;
+        -webkit-mask-image: none;
+        mask-image: none;
         transform: none;
     }
 
@@ -466,8 +486,10 @@ html:not(.js) .draw-path {
         stroke-dashoffset: 0;
     }
 
+    .js [data-reveal],
     .js [data-reveal]:not(.is-revealed) {
-        opacity: 1;
+        -webkit-mask-image: none;
+        mask-image: none;
         transform: none;
     }
 

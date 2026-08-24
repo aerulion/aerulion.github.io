@@ -7,6 +7,11 @@
     <span class="rule rule-bottom"></span>
     <span class="rule rule-left"></span>
     <span class="rule rule-right"></span>
+
+    <div class="gauge" data-gauge>
+        <p class="gauge-readout mono-label" data-gauge-readout>00 / 05</p>
+        <span class="gauge-tick"></span>
+    </div>
 </div>
 
 <style>
@@ -50,5 +55,53 @@
 
     .rule-right {
         right: var(--frame-inset);
+    }
+
+    .gauge {
+        --gauge-inset: clamp(3rem, 7vh, 5rem);
+
+        position: absolute;
+        top: calc(var(--frame-inset) + var(--gauge-inset));
+        bottom: calc(var(--frame-inset) + var(--gauge-inset));
+        right: var(--frame-inset);
+        width: 0;
+        opacity: 0;
+    }
+
+    .gauge[data-live='true'] {
+        opacity: 1;
+    }
+
+    .gauge-tick {
+        position: absolute;
+        top: calc(var(--tick, 0) * 100%);
+        right: 0;
+        width: 17px;
+        height: var(--hairline);
+        background: var(--white);
+        transform: translate(8px, -50%);
+    }
+
+    .gauge-readout {
+        position: absolute;
+        top: calc(var(--tick, 0) * 100%);
+        right: 24px;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        color: var(--white);
+        background: var(--black);
+        padding: 0.3rem 0.45rem;
+    }
+
+    @media (max-width: 1100px) {
+        .gauge-readout {
+            display: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .gauge {
+            display: none;
+        }
     }
 </style>

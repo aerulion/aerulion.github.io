@@ -1,5 +1,8 @@
 const REVEAL_STAGGER = 80;
 const MAX_STAGGERED = 3;
+const WIPE_MS = 800;
+const SETTLE_GRACE = 260;
+const SETTLE_AFTER = MAX_STAGGERED * REVEAL_STAGGER + WIPE_MS + SETTLE_GRACE;
 
 export function mountReveals() {
     document.documentElement.classList.add('motion-ready');
@@ -10,7 +13,7 @@ export function mountReveals() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reducedMotion || !('IntersectionObserver' in window)) {
-        reveals.forEach((el) => el.classList.add('is-revealed'));
+        reveals.forEach((el) => el.classList.add('is-revealed', 'is-settled'));
         draws.forEach((el) => el.classList.add('is-drawn'));
         return;
     }
@@ -19,7 +22,13 @@ export function mountReveals() {
         (entries) => {
             for (const entry of entries) {
                 if (!entry.isIntersecting) continue;
-                entry.target.classList.add(entry.target.hasAttribute('data-draw') ? 'is-drawn' : 'is-revealed');
+                if (entry.target.hasAttribute('data-draw')) {
+                    entry.target.classList.add('is-drawn');
+                } else {
+                    const target = entry.target;
+                    target.classList.add('is-revealed');
+                    window.setTimeout(() => target.classList.add('is-settled'), SETTLE_AFTER);
+                }
                 observer.unobserve(entry.target);
             }
         },
