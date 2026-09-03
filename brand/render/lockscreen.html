@@ -27,57 +27,88 @@
         inset: 0;
         width: 430px;
         height: 932px;
-        overflow: visible;
     }
-    path {
+    .ray {
         fill: none;
         stroke: #fff;
         stroke-width: 1;
-        stroke-linejoin: miter;
     }
-    .dash {
-        stroke-dasharray: 3 5;
+    .ink {
+        fill: #fff;
     }
 </style>
-<div id="stage">
-    <svg viewBox="0 0 430 932"><g id="art"></g></svg>
-</div>
+<div id="stage"><svg viewBox="0 0 430 932"><g id="art"></g></svg></div>
 <script type="module">
     import {SILHOUETTE} from './morphing-logo.js';
 
     const NS = 'http://www.w3.org/2000/svg';
-    const art = document.getElementById('art');
-    const CX = 215;
-    const CY = 549;
-    const X0 = 34;
-    const Y0 = 326;
-    const X1 = 396;
-    const Y1 = 772;
-    const CUT_X = 44;
-    const CUT_Y = CUT_X * 0.5773502692;
+    const W = 430;
+    const H = 932;
+    const q = new URLSearchParams(location.search);
 
-    const add = (d, cls) => {
-        const path = document.createElementNS(NS, 'path');
-        path.setAttribute('d', d);
-        if (cls) path.setAttribute('class', cls);
-        art.append(path);
-        return path;
+    /* Clear of the clock and the widget row above, and of the two controls
+       below. Nothing else is on the ground, so both stay legible. */
+    const CX = W / 2;
+    const CY = Number(q.get('cy') ?? 508);
+    const SIZE = Number(q.get('s') ?? 192);
+    const BOX = 27.712813;
+    const BLEED = 40;
+
+    const art = document.getElementById('art');
+    const el = (name, attrs, parent = art) => {
+        const node = document.createElementNS(NS, name);
+        for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, String(v));
+        parent.append(node);
+        return node;
     };
 
-    add(`M${X0 + CUT_X} ${Y0}H${X1}V${Y1 - CUT_Y}L${X1 - CUT_X} ${Y1}H${X0}V${Y0 + CUT_Y}Z`);
+    const at = (ux, uy) => [CX + (ux - BOX / 2) * (SIZE / BOX), CY + (uy - BOX / 2) * (SIZE / BOX)];
+    const APEX = at(13.856406, 0);
+    const RIGHT = at(25.856406, 20.78461);
+    const TAIL = at(13.856406, 27.712813);
+    const LEFT = at(1.856406, 20.78461);
 
-    const mark = document.createElementNS(NS, 'svg');
-    mark.setAttribute('viewBox', '0 0 27.712813 27.712813');
-    const MW = 205;
-    mark.setAttribute('x', String(CX - MW / 2));
-    mark.setAttribute('y', String(CY - MW / 2));
-    mark.setAttribute('width', String(MW));
-    mark.setAttribute('height', String(MW));
-    const inner = document.createElementNS(NS, 'path');
-    inner.setAttribute('d', SILHOUETTE);
-    inner.setAttribute('vector-effect', 'non-scaling-stroke');
-    mark.append(inner);
-    art.append(mark);
+    /* Each outer edge of the mark, carried on past the figure and off the
+       plate. Only downward: the clock and the widget row sit on the top half
+       and nothing is drawn under them. Every ray runs off an edge, so no crop
+       can sever a frame. */
+    const ray = ([ax, ay], [bx, by]) => {
+        const len = Math.hypot(bx - ax, by - ay);
+        const dx = (bx - ax) / len;
+        const dy = (by - ay) / len;
+        let far = 0;
+        for (const [reach, step, from] of [
+            [-BLEED, dx, bx],
+            [W + BLEED, dx, bx],
+            [H + BLEED, dy, by]
+        ]) {
+            if (Math.abs(step) < 1e-9) continue;
+            const t = (reach - from) / step;
+            if (t > far) far = t;
+        }
+        el('path', {
+            class: 'ray',
+            d: `M${bx.toFixed(2)} ${by.toFixed(2)} ${(bx + dx * far).toFixed(2)} ${(by + dy * far).toFixed(2)}`
+        });
+    };
+
+    for (const [a, b] of [
+        [APEX, RIGHT],
+        [APEX, LEFT],
+        [RIGHT, TAIL],
+        [LEFT, TAIL]
+    ]) {
+        ray(a, b);
+    }
+
+    const mark = el('svg', {
+        viewBox: `0 0 ${BOX} ${BOX}`,
+        x: CX - SIZE / 2,
+        y: CY - SIZE / 2,
+        width: SIZE,
+        height: SIZE
+    });
+    el('path', {class: 'ink', d: SILHOUETTE}, mark);
 
     window.render = () => {};
     document.documentElement.dataset.ready = '1';

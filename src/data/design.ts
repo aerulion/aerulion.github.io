@@ -773,12 +773,12 @@ export const applications: Application[] = [
         image: '/assets/brand/lockscreen-preview.png',
         width: 430,
         height: 932,
-        alt: 'A phone wallpaper: a single bevelled hairline panel with the mark drawn in outline at its centre',
+        alt: 'A phone wallpaper: the mark inked on black, its four outer edges carried on downward and off the sides of the screen',
         orientation: 'tall',
         notes: [
-            'One cut panel and the mark, centred. No wordmark and no address, a wallpaper rather than an advert.',
-            'The panel clears the widget row above and the controls below.',
-            'Drawn, not inked: at this size the outline is the quieter of the two states.'
+            'The mark inked, and nothing else drawn. No wordmark and no address, a wallpaper rather than an advert.',
+            'Its four outer edges are carried on past the figure and off the plate. The mark sets the angles; the ground only shows where they go, which is the whole system in one move.',
+            'They run downward alone, so the clock, the widget row and the two controls all sit on untouched ground. Every ray leaves by an edge, so the crop the phone applies can never sever a frame.'
         ]
     }
 ];
