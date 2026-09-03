@@ -1,5 +1,14 @@
 import {expect, test} from 'bun:test';
-import {collide, frameSegments, parseViewBox, pathSegments, percentSegments, ringPath} from './figure-collide';
+import {
+    clipToConvex,
+    collide,
+    frameSegments,
+    parseViewBox,
+    pathSegments,
+    percentSegments,
+    ringPath,
+    scaleSegments
+} from './figure-collide';
 import {SILHOUETTE, VIEW} from './mark-geometry';
 
 test('parses a viewBox with spaces or commas', () => {
@@ -137,4 +146,48 @@ test('every ring edge sits on a lattice direction', () => {
         const off = Math.min(...[0, 30, 60, 90, 120, 150, 180].map((axis) => Math.abs(deg - axis)));
         expect(off).toBeLessThan(0.001);
     }
+});
+
+const SQUARE: [number, number][] = [
+    [0, 0],
+    [10, 0],
+    [10, 10],
+    [0, 10]
+];
+
+test('trims a line back to the shape it is drawn inside', () => {
+    expect(clipToConvex([-5, 5, 15, 5], SQUARE)).toEqual([0, 5, 10, 5]);
+});
+
+test('leaves a segment that already fits alone', () => {
+    expect(clipToConvex([2, 2, 8, 8], SQUARE)).toEqual([2, 2, 8, 8]);
+});
+
+test('drops a segment that never enters the shape', () => {
+    expect(clipToConvex([-5, -5, -1, -1], SQUARE)).toBeNull();
+    expect(clipToConvex([-5, 20, 15, 20], SQUARE)).toBeNull();
+});
+
+test('clips the same either way the shape is wound', () => {
+    const reversed = [...SQUARE].reverse();
+    expect(clipToConvex([-5, 5, 15, 5], reversed)).toEqual([0, 5, 10, 5]);
+});
+
+test('keeps a diagonal inside a kite', () => {
+    const kite: [number, number][] = [
+        [5, 0],
+        [10, 6],
+        [5, 12],
+        [0, 6]
+    ];
+    const cut = clipToConvex([-20, 6, 20, 6], kite);
+    expect(cut).not.toBeNull();
+    expect(cut![0]).toBeCloseTo(0, 6);
+    expect(cut![2]).toBeCloseTo(10, 6);
+});
+
+test('scaleSegments maps the same way percentSegments does', () => {
+    expect(scaleSegments(pathSegments('M0 0H200'), '0 0 200 118')).toEqual(
+        percentSegments(['M0 0H200'], '0 0 200 118')
+    );
 });

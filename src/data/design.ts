@@ -188,6 +188,29 @@ export const construction: Step[] = [
     }
 ];
 
+export const bandRules: Part[] = [
+    {
+        name: 'The band',
+        kind: 'w',
+        note: 'One width, measured square off an edge. Every filled stroke in the mark is exactly this wide, and so is every cut between them, which is the whole reason the figure reads as one continuous ribbon rather than a drawing of one.'
+    },
+    {
+        name: 'The families',
+        kind: '4 × 3',
+        note: 'Each of the four boundary edges is offset inward by one, two and three bands. Twelve lines, and the outline is allowed to turn on those and on nothing else. Offset zero is the boundary itself.'
+    },
+    {
+        name: 'The constraint',
+        kind: 'X = (3 + 2√3) w',
+        note: 'Two corners of the cut sit on the axis of symmetry, at 2w and 4w below the apex, where the lines one and two bands inside the triangle meet. Asking the third line to pass through the lower one leaves a single ratio between the side and the band. It is solved, not chosen.'
+    },
+    {
+        name: 'What follows',
+        kind: 'Exact',
+        note: 'At a side of 24 every vertex is a whole number plus a whole multiple of √3. The side has to be a multiple of six for that: the apex needs the two, the band needs the three.'
+    }
+];
+
 export interface Census {
     axis: string;
     count: number;

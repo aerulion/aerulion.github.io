@@ -11,6 +11,7 @@ import Glyph from '../components/Glyph.astro';
 import {
     access,
     applications,
+    bandRules,
     census,
     chapters,
     breakpoints,
@@ -38,8 +39,17 @@ import {
     tokens,
     typeTokens
 } from '../data/design';
-import {SIDE, SILHOUETTE, VIEW} from '../scripts/mark-geometry';
-import {collide, parseViewBox, percentSegments, ringPath} from '../scripts/figure-collide';
+import {BAND_FAMILIES, bandGap, bandLine, EDGES, SIDE, SILHOUETTE, VIEW} from '../scripts/mark-geometry';
+import {uid} from '../utils/uid';
+import {
+    clipToConvex,
+    collide,
+    parseViewBox,
+    pathSegments,
+    percentSegments,
+    ringPath,
+    scaleSegments
+} from '../scripts/figure-collide';
 import {GLYPH_BOX, GLYPH_CELL} from '../data/glyphs';
 
 const title = 'Nyx - the aerulion design language';
@@ -74,6 +84,44 @@ const LEFT_BASE = (VIEW - SIDE) / 2;
 const RIGHT_BASE = LEFT_BASE + SIDE;
 const MOD = VIEW / 4;
 const WORD = 84.8;
+
+const REACH = VIEW * 1.4;
+const bodyPath = `M${n(AXIS)} 0 ${n(RIGHT_BASE)} ${n(BASE)} ${n(AXIS)} ${n(VIEW)} ${n(LEFT_BASE)} ${n(BASE)}Z`;
+const line = (axis: number, band: number): string => {
+    const [a, b] = bandLine(axis, band, REACH);
+    return `M${n(a[0])} ${n(a[1])} ${n(b[0])} ${n(b[1])}`;
+};
+const families = BAND_FAMILIES.flatMap(([axis, bands]) => bands.map((band) => line(axis, band)));
+const walked = [...new Map(EDGES.map(([axis, band]) => [`${axis}:${band}`, [axis, band] as const])).values()]
+    .filter(([, band]) => band !== 0)
+    .map(([axis, band]) => line(axis, band));
+const gapMark = (() => {
+    const [a, b] = bandGap(60, 1);
+    return {d: `M${n(a[0])} ${n(a[1])} ${n(b[0])} ${n(b[1])}`, x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2};
+})();
+const bodyPoints: [number, number][] = [
+    [AXIS, 0],
+    [RIGHT_BASE, BASE],
+    [AXIS, VIEW],
+    [LEFT_BASE, BASE]
+];
+const insideBody = (paths: string[]) =>
+    paths.flatMap(pathSegments).flatMap((segment) => {
+        const kept = clipToConvex(segment, bodyPoints);
+        return kept ? [kept] : [];
+    });
+const traced = (paths: string[], drawn: string[]): string =>
+    JSON.stringify([...percentSegments(drawn, STEP), ...scaleSegments(insideBody(paths), STEP)]);
+
+const bandClip = uid('band-clip');
+const familyClip = uid('family-clip');
+const walkClip = uid('walk-clip');
+const lineRows = EDGES.map(([axis, band], i) => ({
+    edge: `e${i}`,
+    axis,
+    band,
+    from: axis === 30 ? 'Tail, left' : axis === 150 ? 'Tail, right' : axis === 60 ? 'Apex, right' : 'Apex, left'
+}));
 
 const WIDE = '0 0 200 118';
 const STEP = `${n(LEFT_BASE - 3.9)} -2.1 ${n(SIDE + 8)} ${n(VIEW + 7.9)}`;
@@ -505,6 +553,118 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         ))
                     }
                 </ol>
+
+                <div class="mark-prose prose" data-reveal>
+                    <h3 class="prose-head">The lines the cut turns on</h3>
+                    <p>
+                        The bolt is not drawn freehand inside the silhouette. Each of the four boundary edges is offset
+                        inward by whole multiples of one band width, and every edge of the finished outline runs along
+                        one of those twelve lines. That is what makes each stroke and each cut come out the same width,
+                        and it is what leaves the mark with no measurement in it that was taken by eye.
+                    </p>
+                </div>
+
+                <div class="figure-row" data-reveal>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="One band width, measured square off the triangle's right edge"
+                            data-collide="lines"
+                            data-segments={traced([line(60, 1)], [bodyPath, gapMark.d])}
+                        >
+                            <defs>
+                                <clipPath id={bandClip}><path d={bodyPath}></path></clipPath>
+                            </defs>
+                            <g clip-path={`url(#${bandClip})`}>
+                                <path class="fig-trace" d={line(60, 1)}></path>
+                            </g>
+                            <path class="fig-line" d={bodyPath}></path>
+                            <path class="fig-gauge" d={gapMark.d}></path>
+                            <text class="fig-text fig-text-band" x={n(gapMark.x + 2.2)} y={n(gapMark.y - 0.6)}>w</text>
+                        </svg>
+                        <figcaption class="mono-label">One band</figcaption>
+                        <p class="figure-note">The width every stroke and every cut in the mark is held to.</p>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="Each of the four edges offset inward by one, two and three bands"
+                            data-collide="lines"
+                            data-segments={traced(families, [bodyPath])}
+                        >
+                            <defs>
+                                <clipPath id={familyClip}><path d={bodyPath}></path></clipPath>
+                            </defs>
+                            <g class="fig-trace" clip-path={`url(#${familyClip})`}>
+                                {families.map((d) => <path d={d} />)}
+                            </g>
+                            <path class="fig-line" d={bodyPath}></path>
+                        </svg>
+                        <figcaption class="mono-label">Twelve lines</figcaption>
+                        <p class="figure-note">Four families of three, one family square to each boundary edge.</p>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="The finished outline running along the lines it turns on"
+                            data-collide="lines"
+                            data-segments={traced(walked, [SILHOUETTE])}
+                        >
+                            <defs>
+                                <clipPath id={walkClip}><path d={bodyPath}></path></clipPath>
+                            </defs>
+                            <g class="fig-trace" clip-path={`url(#${walkClip})`}>
+                                {walked.map((d) => <path d={d} />)}
+                            </g>
+                            <path class="mark-hollow" d={SILHOUETTE}></path>
+                        </svg>
+                        <figcaption class="mono-label">The walk</figcaption>
+                        <p class="figure-note">Fifteen edges, each one running along a line from that set.</p>
+                    </figure>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        bandRules.map((rule) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{rule.name}</span>
+                                    <span class="part-kind mono-label">{rule.kind}</span>
+                                </dt>
+                                <dd class="part-note">{rule.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Line set</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Edge</th>
+                                <th scope="col">Axis</th>
+                                <th scope="col">Bands in</th>
+                                <th scope="col">Measured from</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                lineRows.map((row) => (
+                                    <tr>
+                                        <td class="cell-code">{row.edge}</td>
+                                        <td class="cell-code">{row.axis}°</td>
+                                        <td class="cell-code">{row.band}</td>
+                                        <td>{row.from}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="census" data-reveal>
                     <h3 class="prose-head">Every edge, on an axis</h3>
@@ -1587,7 +1747,24 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         vector-effect: non-scaling-stroke;
     }
 
-    .fig-dash {
+    .fig-gauge {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 1.4;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .fig-trace,
+    .fig-trace path {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 1;
+        stroke-dasharray: 1.5 6.5;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .fig-dash,
+    .fig-dash path {
         fill: none;
         stroke: var(--white);
         stroke-width: 1;
@@ -1648,6 +1825,10 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
 
     .fig-text-mark {
         font-size: 1.5px;
+    }
+
+    .fig-text-band {
+        font-size: 1.6px;
     }
 
     .fig-text-module {

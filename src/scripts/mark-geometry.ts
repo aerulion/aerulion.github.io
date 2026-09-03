@@ -16,7 +16,7 @@ const NORMALS: Record<number, Point> = {
     150: [-0.5, -ROOT3 / 2]
 };
 
-const EDGES: [axis: number, band: number][] = [
+export const EDGES: [axis: number, band: number][] = [
     [150, 0],
     [60, 1],
     [150, 2],
@@ -52,6 +52,36 @@ const LOGO_OUTLINE: Point[] = (() => {
     const corners = lines.map((line, i) => meet(line, lines[(i + 1) % lines.length]));
     return [corners[corners.length - 1], ...corners.slice(0, -1)];
 })();
+
+export const BAND_FAMILIES: [axis: number, bands: number[]][] = [
+    [60, [1, 2, 3]],
+    [120, [-1, -2, -3]],
+    [30, [-1, -2, -3]],
+    [150, [1, 2, 3]]
+];
+
+export const bandLine = (axis: number, band: number, reach: number): [Point, Point] => {
+    const [nx, ny] = NORMALS[axis];
+    const anchor = axis === 30 || axis === 150 ? TAIL : APEX;
+    const c = nx * anchor[0] + ny * anchor[1] + band * BAND;
+    const mid = VIEW / 2;
+    const drop = c - (nx * mid + ny * mid);
+    const px = mid + nx * drop;
+    const py = mid + ny * drop;
+    return [
+        [px + ny * reach, py - nx * reach],
+        [px - ny * reach, py + nx * reach]
+    ];
+};
+
+export const bandGap = (axis: number, band: number): [Point, Point] => {
+    const [nx, ny] = NORMALS[axis];
+    const [a] = bandLine(axis, band, 0);
+    return [
+        [a[0] - nx * BAND, a[1] - ny * BAND],
+        [a[0], a[1]]
+    ];
+};
 
 const trim = (n: number): string => String(Number(n.toFixed(6)));
 

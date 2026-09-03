@@ -76,20 +76,59 @@ export const pathSegments = (d: string): Segment[] => {
 
 const round = (n: number): number => Math.round(n * 100) / 100;
 
-export const percentSegments = (paths: string[], viewBox: string, scale = 1): Segment[] => {
+export const clipToConvex = (segment: Segment, polygon: Point[]): Segment | null => {
+    const [x0, y0, x1, y1] = segment;
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+
+    let area = 0;
+    for (let i = 0; i < polygon.length; i++) {
+        const a = polygon[i];
+        const b = polygon[(i + 1) % polygon.length];
+        area += a[0] * b[1] - b[0] * a[1];
+    }
+    const wind = area >= 0 ? 1 : -1;
+
+    let lo = 0;
+    let hi = 1;
+
+    for (let i = 0; i < polygon.length; i++) {
+        const a = polygon[i];
+        const b = polygon[(i + 1) % polygon.length];
+        const nx = (b[1] - a[1]) * wind;
+        const ny = -(b[0] - a[0]) * wind;
+        const reach = nx * (x0 - a[0]) + ny * (y0 - a[1]);
+        const along = nx * dx + ny * dy;
+
+        if (Math.abs(along) < 1e-12) {
+            if (reach > 0) return null;
+            continue;
+        }
+
+        const t = -reach / along;
+        if (along > 0) hi = Math.min(hi, t);
+        else lo = Math.max(lo, t);
+        if (lo > hi) return null;
+    }
+
+    return [x0 + dx * lo, y0 + dy * lo, x0 + dx * hi, y0 + dy * hi];
+};
+
+export const scaleSegments = (segments: Segment[], viewBox: string, scale = 1): Segment[] => {
     const [x, y, width, height] = parseViewBox(viewBox);
     const cx = x + width / 2;
     const cy = y + height / 2;
 
-    return paths
-        .flatMap(pathSegments)
-        .map(([x0, y0, x1, y1]) => [
-            round(((cx + (x0 - cx) * scale - x) / width) * 100),
-            round(((cy + (y0 - cy) * scale - y) / height) * 100),
-            round(((cx + (x1 - cx) * scale - x) / width) * 100),
-            round(((cy + (y1 - cy) * scale - y) / height) * 100)
-        ]);
+    return segments.map(([x0, y0, x1, y1]) => [
+        round(((cx + (x0 - cx) * scale - x) / width) * 100),
+        round(((cy + (y0 - cy) * scale - y) / height) * 100),
+        round(((cx + (x1 - cx) * scale - x) / width) * 100),
+        round(((cy + (y1 - cy) * scale - y) / height) * 100)
+    ]);
 };
+
+export const percentSegments = (paths: string[], viewBox: string, scale = 1): Segment[] =>
+    scaleSegments(paths.flatMap(pathSegments), viewBox, scale);
 
 export const collide = (viewBox: string, paths: string[], scale = 1): string =>
     JSON.stringify(percentSegments(paths, viewBox, scale));
