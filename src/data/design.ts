@@ -780,5 +780,20 @@ export const applications: Application[] = [
             'Its four outer edges are carried on past the figure and off the plate. The mark sets the angles; the ground only shows where they go, which is the whole system in one move.',
             'They run downward alone, so the clock, the widget row and the two controls all sit on untouched ground. Every ray leaves by an edge, so the crop the phone applies can never sever a frame.'
         ]
+    },
+    {
+        name: 'Desktop',
+        format: '1920 → 6016',
+        image: '/assets/brand/desktop-preview.png',
+        still: '/assets/brand/desktop-preview.png',
+        width: 1600,
+        height: 900,
+        alt: 'A desktop wallpaper: the mark inked at the centre, its four outer edges carried on across the full width and off every side',
+        orientation: 'wide',
+        notes: [
+            'The same move as the lockscreen, opened both ways. With no clock to keep clear the rays run in both directions, and the two shallow ones cross almost the whole width.',
+            'Everything is a share of the plate rather than a pixel count, so a 1080p screen and a Pro Display XDR get the same drawing rather than the same file scaled.',
+            'Six sizes, and the two MacBook Pro displays are drawn at their own 3456 × 2234 and 3024 × 1964 rather than cropped out of a 16 : 9 sheet.'
+        ]
     }
 ];

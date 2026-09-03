@@ -11,6 +11,12 @@ jobs='[
   {"page":"avatar.html","width":128,"height":128,"scale":4,"out":"../discord-avatar-512.png"},
   {"page":"lockscreen.html","width":430,"height":932,"scale":3,"out":"../lockscreen-1290x2796.png"},
   {"page":"lockscreen.html","width":430,"height":932,"scale":6,"out":"../lockscreen-2580x5592.png"},
+  {"page":"desktop.html","width":1920,"height":1080,"scale":1,"out":"../desktop-1920x1080.png"},
+  {"page":"desktop.html","width":1920,"height":1080,"scale":2,"out":"../desktop-3840x2160.png"},
+  {"page":"desktop.html","width":2560,"height":1440,"scale":2,"out":"../desktop-5120x2880.png"},
+  {"page":"desktop.html","width":3008,"height":1692,"scale":2,"out":"../desktop-6016x3384.png"},
+  {"page":"desktop.html","width":1728,"height":1117,"scale":2,"out":"../desktop-3456x2234.png"},
+  {"page":"desktop.html","width":1512,"height":982,"scale":2,"out":"../desktop-3024x1964.png"},
   {"page":"banner.html","width":600,"height":240,"scale":4,"frames":112,"out":".frames-banner/%d.png"},
   {"page":"avatar.html","width":128,"height":128,"scale":4,"frames":140,"out":".frames-avatar/%d.png"}
 ]'

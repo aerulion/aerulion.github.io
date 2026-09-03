@@ -1,0 +1,121 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>desktop</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        background: #000;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    #stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+    }
+    svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .ray {
+        fill: none;
+        stroke: #fff;
+    }
+    .ink {
+        fill: #fff;
+    }
+</style>
+<div id="stage"><svg id="sheet"><g id="art"></g></svg></div>
+<script type="module">
+    import {SILHOUETTE} from './morphing-logo.js';
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const q = new URLSearchParams(location.search);
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const BOX = 27.712813;
+
+    /* Everything is a share of the plate, so every screen gets the same
+       drawing rather than the same pixels. */
+    const CX = W * Number(q.get('cx') ?? 0.5);
+    const CY = H * Number(q.get('cy') ?? 0.47);
+    const SIZE = H * Number(q.get('s') ?? 0.3);
+    const HAIR = Math.max(1, Math.round(H / 1080));
+    const BLEED = H * 0.06;
+
+    const sheet = document.getElementById('sheet');
+    sheet.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const art = document.getElementById('art');
+    const el = (name, attrs, parent = art) => {
+        const node = document.createElementNS(NS, name);
+        for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, String(v));
+        parent.append(node);
+        return node;
+    };
+
+    const at = (ux, uy) => [CX + (ux - BOX / 2) * (SIZE / BOX), CY + (uy - BOX / 2) * (SIZE / BOX)];
+    const APEX = at(13.856406, 0);
+    const RIGHT = at(25.856406, 20.78461);
+    const TAIL = at(13.856406, 27.712813);
+    const LEFT = at(1.856406, 20.78461);
+
+    /* Each outer edge of the mark, carried on past the figure and off the
+       plate in both directions. The mark sets the angles; the ground only
+       shows where they go. */
+    const ray = ([ax, ay], [bx, by]) => {
+        const len = Math.hypot(bx - ax, by - ay);
+        const dx = (bx - ax) / len;
+        const dy = (by - ay) / len;
+        const ends = [];
+        for (const dir of [1, -1]) {
+            let far = 0;
+            for (const [edge, step, from] of [
+                [dir > 0 ? W + BLEED : -BLEED, dx * dir, bx],
+                [dir > 0 ? H + BLEED : -BLEED, dy * dir, by],
+                [dir > 0 ? -BLEED : W + BLEED, dx * dir, bx],
+                [dir > 0 ? H + BLEED : -BLEED, dy * dir, by]
+            ]) {
+                if (Math.abs(step) < 1e-9) continue;
+                const t = (edge - from) / step;
+                if (t > 0 && (far === 0 || t < far)) far = t;
+            }
+            ends.push([bx + dx * dir * far, by + dy * dir * far]);
+        }
+        el('path', {
+            class: 'ray',
+            'stroke-width': HAIR,
+            d: `M${ends[0][0].toFixed(2)} ${ends[0][1].toFixed(2)} ${ends[1][0].toFixed(2)} ${ends[1][1].toFixed(2)}`
+        });
+    };
+
+    for (const [a, b] of [
+        [APEX, RIGHT],
+        [APEX, LEFT],
+        [RIGHT, TAIL],
+        [LEFT, TAIL]
+    ]) {
+        ray(a, b);
+    }
+
+    const mark = el('svg', {
+        viewBox: `0 0 ${BOX} ${BOX}`,
+        x: CX - SIZE / 2,
+        y: CY - SIZE / 2,
+        width: SIZE,
+        height: SIZE
+    });
+    el('path', {class: 'ink', d: SILHOUETTE}, mark);
+
+    window.render = () => {};
+    document.documentElement.dataset.ready = '1';
+</script>

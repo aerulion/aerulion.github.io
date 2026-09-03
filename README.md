@@ -137,10 +137,12 @@ covered by `astro check` plus the linter instead.
 Everything that shows the mark is generated from `src/scripts/mark-geometry.ts`, so nothing is drawn by hand and nothing
 can drift. Both scripts shoot real pages in headless Chrome and need Chrome plus `ffmpeg` on the machine.
 
-| Command                       | Writes                                                                              |
-| ----------------------------- | ----------------------------------------------------------------------------------- |
-| `bash brand/render/icons.sh`  | Every favicon, the maskable and apple icons, and the OG card, straight to `public/` |
-| `bash brand/render/render.sh` | The Discord banner and avatar (PNG + GIF) and the lockscreen, to `brand/`           |
+| Command                       | Writes                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| `bash brand/render/icons.sh`  | Every favicon, the maskable and apple icons, and the OG card, straight to `public/`               |
+| `bash brand/render/render.sh` | The Discord banner and avatar (PNG + GIF), the lockscreen and the desktop wallpapers, to `brand/` |
+
+`desktop.html` and `lockscreen.html` size everything as a share of the plate rather than in pixels, so every screen gets the same drawing at its own aspect. The two MacBook Pro displays are not 16:9 (3456 × 2234 and 3024 × 1964) and are rendered at their own proportions rather than cropped out of a 16:9 sheet.
 
 `icons.sh` sizes each icon by one number: `box`, the mark's square box as a fraction of the canvas. The favicons and the
 Android icons use `0.86`, the Apple icon `0.78` because iOS rounds the corners, and the maskable icon `0.56` so the
