@@ -455,9 +455,13 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 tokens.map((row) => (
                                     <tr>
-                                        <td class="cell-code">{row.token}</td>
-                                        <td class="cell-code">{row.value}</td>
-                                        <td>{row.governs}</td>
+                                        <td class="cell-code" data-col="Token">
+                                            {row.token}
+                                        </td>
+                                        <td class="cell-code" data-col="Value">
+                                            {row.value}
+                                        </td>
+                                        <td data-col="Governs">{row.governs}</td>
                                     </tr>
                                 ))
                             }
@@ -659,10 +663,16 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 lineRows.map((row) => (
                                     <tr>
-                                        <td class="cell-code">{row.edge}</td>
-                                        <td class="cell-code">{row.axis}°</td>
-                                        <td class="cell-code">{row.band}</td>
-                                        <td>{row.from}</td>
+                                        <td class="cell-code" data-col="Edge">
+                                            {row.edge}
+                                        </td>
+                                        <td class="cell-code" data-col="Axis">
+                                            {row.axis}°
+                                        </td>
+                                        <td class="cell-code" data-col="Bands in">
+                                            {row.band}
+                                        </td>
+                                        <td data-col="Measured from">{row.from}</td>
                                     </tr>
                                 ))
                             }
@@ -763,9 +773,11 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 metrics.map((row) => (
                                     <tr>
-                                        <td>{row.label}</td>
-                                        <td class="cell-code">{row.value}</td>
-                                        <td>{row.note}</td>
+                                        <td data-col="Measure">{row.label}</td>
+                                        <td class="cell-code" data-col="Value">
+                                            {row.value}
+                                        </td>
+                                        <td data-col="Note">{row.note}</td>
                                     </tr>
                                 ))
                             }
@@ -787,9 +799,11 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 sizes.map((row) => (
                                     <tr>
-                                        <td>{row.context}</td>
-                                        <td class="cell-code">{row.minimum}</td>
-                                        <td>{row.state}</td>
+                                        <td data-col="Context">{row.context}</td>
+                                        <td class="cell-code" data-col="Minimum">
+                                            {row.minimum}
+                                        </td>
+                                        <td data-col="State">{row.state}</td>
                                     </tr>
                                 ))
                             }
@@ -1053,9 +1067,13 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 layers.map((row) => (
                                     <tr>
-                                        <td class="cell-code">{row.token}</td>
-                                        <td class="cell-code">{row.value}</td>
-                                        <td>{row.governs}</td>
+                                        <td class="cell-code" data-col="Token">
+                                            {row.token}
+                                        </td>
+                                        <td class="cell-code" data-col="Value">
+                                            {row.value}
+                                        </td>
+                                        <td data-col="Governs">{row.governs}</td>
                                     </tr>
                                 ))
                             }
@@ -1077,9 +1095,13 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 plateTokens.map((row) => (
                                     <tr>
-                                        <td class="cell-code">{row.token}</td>
-                                        <td class="cell-code">{row.value}</td>
-                                        <td>{row.governs}</td>
+                                        <td class="cell-code" data-col="Token">
+                                            {row.token}
+                                        </td>
+                                        <td class="cell-code" data-col="Value">
+                                            {row.value}
+                                        </td>
+                                        <td data-col="Governs">{row.governs}</td>
                                     </tr>
                                 ))
                             }
@@ -1111,10 +1133,16 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 filing.map((row) => (
                                     <tr>
-                                        <td>{row.part}</td>
-                                        <td class="cell-code">{row.component}</td>
-                                        <td class="cell-code">{row.module}</td>
-                                        <td class="cell-code">{row.token}</td>
+                                        <td data-col="Part">{row.part}</td>
+                                        <td class="cell-code" data-col="Component or class">
+                                            {row.component}
+                                        </td>
+                                        <td class="cell-code" data-col="Module">
+                                            {row.module}
+                                        </td>
+                                        <td class="cell-code" data-col="Attribute or token">
+                                            {row.token}
+                                        </td>
                                     </tr>
                                 ))
                             }
@@ -1284,9 +1312,13 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 typeTokens.map((row) => (
                                     <tr>
-                                        <td class="cell-code">{row.token}</td>
-                                        <td class="cell-code">{row.value}</td>
-                                        <td>{row.governs}</td>
+                                        <td class="cell-code" data-col="Token">
+                                            {row.token}
+                                        </td>
+                                        <td class="cell-code" data-col="Value">
+                                            {row.value}
+                                        </td>
+                                        <td data-col="Governs">{row.governs}</td>
                                     </tr>
                                 ))
                             }
@@ -1328,9 +1360,13 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             {
                                 durations.map((row) => (
                                     <tr>
-                                        <td class="cell-code">{row.token}</td>
-                                        <td class="cell-code">{row.value}</td>
-                                        <td>{row.governs}</td>
+                                        <td class="cell-code" data-col="Token">
+                                            {row.token}
+                                        </td>
+                                        <td class="cell-code" data-col="Value">
+                                            {row.value}
+                                        </td>
+                                        <td data-col="Governs">{row.governs}</td>
                                     </tr>
                                 ))
                             }
@@ -1949,7 +1985,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
 
     .ramp-row {
         display: grid;
-        grid-template-columns: clamp(7rem, 12vw, 10rem) minmax(0, 1fr) auto auto;
+        grid-template-columns: clamp(7.5rem, 12vw, 10rem) minmax(0, 1fr) auto auto;
         align-items: center;
         gap: var(--spacing-md);
         padding: var(--spacing-xs) 0;
@@ -2235,6 +2271,12 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         font-family: var(--font-family-mono), monospace;
     }
 
+    @media (max-width: 1799px) {
+        .spec-table .cell-code {
+            white-space: normal;
+        }
+    }
+
     @media (max-width: 900px) {
         .contents-list {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2302,6 +2344,91 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
 
         .application-body {
             grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    @media (max-width: 560px) {
+        .spec-table,
+        .spec-table tbody,
+        .spec-table tr,
+        .spec-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .spec-table {
+            min-width: 0;
+        }
+
+        .spec-table thead {
+            display: none;
+        }
+
+        .spec-table caption {
+            display: block;
+        }
+
+        .spec-table .cell-code {
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .spec-table tr {
+            padding: var(--spacing-md) 0;
+            border-bottom: var(--hairline) solid var(--white);
+        }
+
+        .spec-table td {
+            padding: 0;
+            border: 0;
+        }
+
+        .spec-table td + td {
+            padding-top: var(--spacing-sm);
+        }
+
+        .spec-table td + td::before {
+            content: attr(data-col);
+            display: block;
+            padding-bottom: var(--spacing-3xs);
+            font-family: var(--font-family-mono), monospace;
+            font-size: var(--label-size);
+            letter-spacing: var(--label-tracking);
+            text-transform: uppercase;
+        }
+
+        .spec-table td:first-child {
+            font-family: var(--font-family-display), sans-serif;
+            font-size: var(--font-size-lg);
+            letter-spacing: 0.02em;
+        }
+
+        .spec-table .cell-code:first-child {
+            font-family: var(--font-family-mono), monospace;
+            font-size: var(--font-size-base);
+            letter-spacing: 0;
+        }
+
+        .ramp:not(.ladder) .ramp-row:not(.breakpoint-row) {
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas: 'token value' 'bar bar';
+            row-gap: var(--spacing-2xs);
+        }
+
+        .ramp:not(.ladder) .ramp-row:not(.breakpoint-row) .ramp-token {
+            grid-area: token;
+        }
+
+        .ramp:not(.ladder) .ramp-row:not(.breakpoint-row) .ramp-value {
+            grid-area: value;
+        }
+
+        .ramp:not(.ladder) .ramp-row:not(.breakpoint-row) .ramp-bar {
+            grid-area: bar;
+        }
+
+        .page-hero-mark {
+            margin-inline: auto;
         }
     }
 </style>
