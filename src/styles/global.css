@@ -127,6 +127,7 @@ a:focus-visible {
     position: relative;
     z-index: var(--layer-page);
     padding-bottom: var(--spacing-5xl);
+    overflow-x: clip;
 }
 
 .main-content:focus {
