@@ -1,5 +1,6 @@
 ---
-import {glyphs, type GlyphName} from '../data/glyphs';
+import {GLYPH_BOX, glyphs, type GlyphName} from '../data/glyphs';
+import {collide} from '../scripts/figure-collide';
 
 interface Props {
     name: GlyphName;
@@ -7,10 +8,20 @@ interface Props {
 }
 
 const {name, class: className} = Astro.props;
+
+const box = `0 0 ${GLYPH_BOX} ${GLYPH_BOX}`;
+const strokes = [...glyphs[name]];
 ---
 
-<svg class:list={['glyph', className]} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-    {glyphs[name].map((d) => <path d={d} />)}
+<svg
+    class:list={['glyph', className]}
+    viewBox={box}
+    aria-hidden="true"
+    focusable="false"
+    data-collide="lines"
+    data-segments={collide(box, strokes)}
+>
+    {strokes.map((d) => <path d={d} />)}
 </svg>
 
 <style>

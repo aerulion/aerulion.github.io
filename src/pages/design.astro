@@ -76,6 +76,10 @@ const iconVertices = Array.from({length: ICON_ROWS}, (_, r) => r).flatMap((r) =>
     return Array.from({length: count}, (_, c) => ({x: start + c * GLYPH_CELL, y}));
 });
 const iconGrid = iconVertices.map((v) => `M${at(v.x - DOT / 2)} ${at(v.y - DOT / 2)}h${DOT}v${DOT}h${-DOT}z`).join('');
+const gridRows = [...new Set(iconVertices.map((v) => v.y))].map((y) => {
+    const row = iconVertices.filter((v) => v.y === y).map((v) => v.x);
+    return `M${at(Math.min(...row))} ${at(y)}H${at(Math.max(...row))}`;
+});
 
 const n = (v: number): string => String(Number(v.toFixed(4)));
 const AXIS = VIEW / 2;
@@ -1145,6 +1149,8 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             viewBox={ICON_BOX}
                             role="img"
                             aria-label={`The icon grid: ${ICON_ROWS} rows of a 60 degree lattice inside a 48 unit box`}
+                            data-collide="lines"
+                            data-segments={collide(ICON_BOX, gridRows)}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
                             <text class="fig-text fig-text-icon" x="0" y="49">{GLYPH_BOX} / CELL {GLYPH_CELL}</text>
@@ -1157,7 +1163,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             role="img"
                             aria-label="The Erenos glyph drawn on the icon grid"
                             data-collide="lines"
-                            data-segments={collide(ICON_BOX, erenos)}
+                            data-segments={collide(ICON_BOX, [...erenos, ...gridRows])}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
                             <g class="fig-line">{erenos.map((d) => <path d={d} />)}</g>
@@ -1171,7 +1177,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             role="img"
                             aria-label="The CloudStorage glyph drawn on the icon grid"
                             data-collide="lines"
-                            data-segments={collide(ICON_BOX, cloudstorage)}
+                            data-segments={collide(ICON_BOX, [...cloudstorage, ...gridRows])}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
                             <g class="fig-line">{cloudstorage.map((d) => <path d={d} />)}</g>
