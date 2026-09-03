@@ -11,7 +11,7 @@ import {
     unfold,
     UNFOLD_DEFAULTS,
     type UnfoldOptions
-} from './morphing-logo';
+} from './mark-geometry';
 
 const SHELL_ALPHA = 0.3;
 const SHELL_FADE = 0.5;
@@ -133,8 +133,8 @@ const paint = (rig: Rig) => {
     });
 };
 
-export function mountMorphingLogoMarks() {
-    const marks = Array.from(document.querySelectorAll<SVGSVGElement>('[data-morphing-logo]'));
+export function mountMorphingMarks() {
+    const marks = Array.from(document.querySelectorAll<SVGSVGElement>('[data-morphing-mark]'));
     if (!marks.length) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');

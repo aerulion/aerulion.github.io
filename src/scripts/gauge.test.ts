@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'bun:test';
-import {progressAt, type Station, stationAt} from './scroll-gauge';
+import {progressAt, type Station, stationAt} from './gauge';
 
 const STATIONS: Station[] = [
     {top: 0, label: '00 / 05'},

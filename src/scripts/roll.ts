@@ -70,8 +70,8 @@ const armed = (node: HTMLElement, run: () => void) => {
     watch.observe(host, {attributes: true, attributeFilter: ['class']});
 };
 
-export function mountTelemetry() {
-    const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-telemetry]'));
+export function mountRoll() {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-roll]'));
     if (!nodes.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     for (const node of nodes) {

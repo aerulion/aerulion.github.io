@@ -1,19 +1,19 @@
 ---
 import {skills} from '../data/skills';
 import Button from './Button.astro';
-import MorphingLogoMark from './MorphingLogoMark.astro';
+import MorphingMark from './MorphingMark.astro';
 import LineConstruct from './LineConstruct.astro';
 
 const TICKS = 12;
 const TICK_PERIOD = 2.8;
 ---
 
-<header class="hero-section" data-station="00 / 05">
+<header class="hero-section" data-station="00 / 06">
     <div class="container">
-        <div class="poster-shell panel-cut">
-            <div class="poster-rail poster-rail-top">
+        <div class="hero-shell panel-cut">
+            <div class="hero-rail hero-rail-top">
                 <p class="mono-label">Java / Systems / Plugin architecture</p>
-                <div class="poster-ticks" aria-hidden="true" style={`--tick-period:${TICK_PERIOD}s`}>
+                <div class="hero-ticks" aria-hidden="true" style={`--tick-period:${TICK_PERIOD}s`}>
                     {
                         Array.from({length: TICKS}, (_, i) => (
                             <span style={`--tick-delay:${((-i * TICK_PERIOD) / TICKS).toFixed(3)}s`} />
@@ -30,7 +30,7 @@ const TICK_PERIOD = 2.8;
                             <LineConstruct />
                         </div>
                         <div class="stage-mark">
-                            <MorphingLogoMark drawDelay={520} fillDelay={1500} shells={2} depth={0.4} ladder={0} />
+                            <MorphingMark drawDelay={520} fillDelay={1500} shells={2} depth={0.4} ladder={0} />
                         </div>
                         <span class="construct-label construct-label-a">Core / Aerulion</span>
                         <span class="construct-label construct-label-b">Lattice / 30° / 60°</span>
@@ -51,18 +51,18 @@ const TICK_PERIOD = 2.8;
                         <span>Data layer</span>
                     </div>
                     <div class="hero-actions">
-                        <Button href="#work" glyph="↓">Selected work</Button>
-                        <Button href="#context" glyph="↓">Context</Button>
+                        <Button href="#work" glyph="descend">Selected work</Button>
+                        <Button href="#context" glyph="descend">Context</Button>
                     </div>
                 </div>
             </div>
 
-            <div class="poster-rail poster-rail-bottom">
-                <div class="poster-index" aria-hidden="true">
+            <div class="hero-rail hero-rail-bottom">
+                <div class="hero-index" aria-hidden="true">
                     <span>Node / 001</span>
                     <span>Status / Active</span>
                 </div>
-                <div class="poster-index rail-end" aria-hidden="true">
+                <div class="hero-index rail-end" aria-hidden="true">
                     <span>Developing since / 2012</span>
                     <span>Selected work / below</span>
                 </div>
@@ -85,36 +85,36 @@ const TICK_PERIOD = 2.8;
 <style>
     .hero-section {
         position: relative;
-        z-index: 1;
-        padding: clamp(1rem, 2vw, 2rem) 0 var(--spacing-4xl);
+        z-index: var(--layer-page);
+        padding: var(--flow-xl) 0 var(--spacing-4xl);
     }
 
-    .poster-shell {
+    .hero-shell {
         display: flex;
         flex-direction: column;
         min-height: min(calc(100svh - clamp(2rem, 4vw, 4rem)), 980px);
-        padding: clamp(1.4rem, 2.4vw, 2.2rem) var(--poster-gutter) var(--poster-gutter);
+        padding: var(--flow-xl) var(--plate-gutter) var(--plate-gutter);
         overflow: hidden;
     }
 
     /* ---- Rails ---- */
 
-    .poster-rail {
+    .hero-rail {
         position: relative;
-        z-index: 2;
+        z-index: var(--layer-raised);
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         gap: var(--spacing-lg);
     }
 
-    .poster-rail-top {
+    .hero-rail-top {
         align-items: center;
-        padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+        padding-bottom: var(--flow-2xl);
     }
 
-    .poster-rail-bottom {
-        padding: clamp(1.25rem, 2.5vw, 2rem) 0 clamp(1rem, 2vw, 1.5rem);
+    .hero-rail-bottom {
+        padding: var(--flow-xl) 0 var(--flow-lg);
         margin-top: auto;
     }
 
@@ -122,24 +122,24 @@ const TICK_PERIOD = 2.8;
         text-align: right;
     }
 
-    .poster-index {
+    .hero-index {
         display: grid;
-        gap: 0.3rem;
+        gap: var(--spacing-3xs);
         font-family: var(--font-family-mono), monospace;
         font-size: var(--label-size);
         letter-spacing: var(--label-tracking);
         text-transform: uppercase;
     }
 
-    .poster-ticks {
+    .hero-ticks {
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        gap: var(--spacing-3xs);
         height: 2.4rem;
         flex-shrink: 0;
     }
 
-    .poster-ticks span {
+    .hero-ticks span {
         display: block;
         width: var(--hairline);
         height: 100%;
@@ -148,11 +148,11 @@ const TICK_PERIOD = 2.8;
         animation: tickWave var(--tick-period) ease-in-out infinite var(--tick-delay, 0s);
     }
 
-    .poster-ticks span:nth-child(3n) {
+    .hero-ticks span:nth-child(3n) {
         height: 66%;
     }
 
-    .poster-ticks span:nth-child(4n) {
+    .hero-ticks span:nth-child(4n) {
         height: 40%;
     }
 
@@ -170,11 +170,11 @@ const TICK_PERIOD = 2.8;
 
     .hero-content {
         position: relative;
-        z-index: 1;
+        z-index: var(--layer-page);
         flex: 1;
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(min(100%, 26rem), 0.92fr);
-        gap: clamp(2rem, 5vw, 4.5rem);
+        gap: var(--flow-3xl);
         align-items: center;
     }
 
@@ -251,7 +251,7 @@ const TICK_PERIOD = 2.8;
     .hero-meta-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.5rem;
+        gap: var(--spacing-xs);
         padding-top: var(--spacing-xs);
         border-top: var(--hairline) solid var(--white);
         font-family: var(--font-family-mono), monospace;
@@ -261,7 +261,7 @@ const TICK_PERIOD = 2.8;
     }
 
     .hero-meta-grid span {
-        padding: 0.5rem 0.6rem;
+        padding: var(--spacing-xs) var(--spacing-xs);
         border: var(--hairline) solid var(--white);
     }
 
@@ -275,7 +275,7 @@ const TICK_PERIOD = 2.8;
 
     .skill-strip {
         position: relative;
-        z-index: 2;
+        z-index: var(--layer-raised);
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: var(--spacing-sm);
@@ -286,8 +286,8 @@ const TICK_PERIOD = 2.8;
         min-height: 4.5rem;
         display: grid;
         align-content: end;
-        gap: 0.35rem;
-        padding: 0.85rem 0.95rem;
+        gap: var(--spacing-2xs);
+        padding: var(--spacing-sm) var(--spacing-md);
         border: var(--hairline) solid var(--white);
     }
 
@@ -304,7 +304,7 @@ const TICK_PERIOD = 2.8;
     }
 
     @media (max-width: 1100px) {
-        .poster-shell {
+        .hero-shell {
             min-height: 0;
         }
 
@@ -324,12 +324,12 @@ const TICK_PERIOD = 2.8;
     }
 
     @media (max-width: 768px) {
-        .poster-rail-top .mono-label,
-        .poster-ticks {
+        .hero-rail-top .mono-label,
+        .hero-ticks {
             display: none;
         }
 
-        .poster-rail-top {
+        .hero-rail-top {
             padding-bottom: var(--spacing-md);
         }
 
@@ -355,7 +355,7 @@ const TICK_PERIOD = 2.8;
     }
 
     @media (max-width: 560px) {
-        .poster-rail-bottom {
+        .hero-rail-bottom {
             display: none;
         }
 

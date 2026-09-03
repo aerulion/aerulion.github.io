@@ -7,7 +7,6 @@ export interface Project {
     title: string;
     tagline: string;
     iconUrl: string;
-    iconAlt: string;
     meta: ProjectMeta[];
     description: string[];
     capabilities: string[];
@@ -18,10 +17,9 @@ export const projects: Project[] = [
         title: 'Erenos',
         tagline: 'The platform the rest of Corpium is built on.',
         iconUrl: '/assets/images/erenos-icon.svg',
-        iconAlt: 'Erenos project icon',
         meta: [
             {label: 'Type', value: 'Server platform & plugin API'},
-            {label: 'Scale', value: '44 subsystems, 100.000+ lines'},
+            {label: 'Scale', value: '44 subsystems, 100,000+ lines'},
             {label: 'Platform', value: 'Paper / Java 25'}
         ],
         description: [
@@ -41,7 +39,6 @@ export const projects: Project[] = [
         title: 'CloudStorage',
         tagline: 'A server-wide logistics backbone for items and experience.',
         iconUrl: '/assets/images/cloudstorage-icon.svg',
-        iconAlt: 'CloudStorage project icon',
         meta: [
             {label: 'Type', value: 'Virtual storage system'},
             {label: 'Scale', value: 'Server-wide item & XP pool'},

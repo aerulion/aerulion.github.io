@@ -1,12 +1,16 @@
 ---
+import Glyph from './Glyph.astro';
+import type {GlyphName} from '../data/glyphs';
+
 interface Props {
     href: string;
     variant?: 'outline' | 'solid';
-    glyph?: string;
+    glyph?: GlyphName;
 }
 
 const {href, variant = 'outline', glyph} = Astro.props;
 const external = /^https?:/.test(href);
+const mark = glyph ?? (external ? 'external' : undefined);
 ---
 
 <a
@@ -16,11 +20,5 @@ const external = /^https?:/.test(href);
     rel={external ? 'noopener noreferrer' : undefined}
 >
     <slot />
-    {
-        glyph && (
-            <span class="btn-glyph" aria-hidden="true">
-                {glyph}
-            </span>
-        )
-    }
+    {mark && <Glyph name={mark} class="btn-glyph" />}
 </a>

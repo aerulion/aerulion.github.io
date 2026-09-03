@@ -11,14 +11,14 @@ const facts = [
 ];
 ---
 
-<section class="about-section" id="context" data-station="01 / 05">
+<section class="about-section" id="context" data-station="01 / 06">
     <div class="container">
         <div class="about-wrapper panel-cut" data-reveal>
             <div class="section-header">
                 <div class="section-rail">
                     <p class="section-eyebrow">Context</p>
                     <span class="section-rule" aria-hidden="true"></span>
-                    <p class="section-count" data-telemetry>01 / 05</p>
+                    <p class="section-count" data-roll>01 / 06</p>
                 </div>
                 <h2 class="section-title">Precision under load.</h2>
                 <div class="section-lede">
@@ -76,26 +76,26 @@ const facts = [
     }
 
     .about-wrapper {
-        padding: clamp(2rem, 4vw, 4rem);
+        padding: var(--flow-3xl);
     }
 
     .about-content {
         display: grid;
         grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
-        gap: clamp(2rem, 5vw, 5rem);
+        gap: var(--flow-3xl);
         align-items: start;
     }
 
     .about-facts {
         display: grid;
-        padding-top: 0.2rem;
+        padding-top: var(--spacing-3xs);
         border-top: var(--hairline) solid var(--white);
     }
 
     .fact-row {
         display: grid;
-        gap: 0.3rem;
-        padding: 0.9rem 0;
+        gap: var(--spacing-3xs);
+        padding: var(--spacing-md) 0;
         border-bottom: var(--hairline) solid var(--white);
     }
 
@@ -134,7 +134,7 @@ const facts = [
         }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 560px) {
         .about-wrapper {
             padding: var(--spacing-xl) var(--spacing-lg);
         }

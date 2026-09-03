@@ -1,5 +1,10 @@
 ---
+interface Props {
+    stations?: number;
+}
 
+const {stations = 6} = Astro.props;
+const readout = `00 / ${String(stations).padStart(2, '0')}`;
 ---
 
 <div class="frame" aria-hidden="true">
@@ -14,7 +19,7 @@
     <span class="rule rule-right"></span>
 
     <div class="gauge" data-gauge>
-        <p class="gauge-readout mono-label" data-gauge-readout>00 / 05</p>
+        <p class="gauge-readout mono-label" data-gauge-readout>{readout}</p>
         <span class="gauge-tick"></span>
     </div>
 </div>
@@ -24,7 +29,7 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        z-index: 40;
+        z-index: var(--layer-plate);
     }
 
     /* Opaque margin: the crop marks read as a true edge, so nothing scrolls
@@ -38,14 +43,14 @@
     .bleed-bottom {
         left: 0;
         right: 0;
-        height: var(--frame-inset);
+        height: var(--plate-inset);
     }
 
     .bleed-left,
     .bleed-right {
         top: 0;
         bottom: 0;
-        width: var(--frame-inset);
+        width: var(--plate-inset);
     }
 
     .bleed-top {
@@ -84,28 +89,28 @@
     }
 
     .rule-top {
-        top: var(--frame-inset);
+        top: var(--plate-inset);
     }
 
     .rule-bottom {
-        bottom: var(--frame-inset);
+        bottom: var(--plate-inset);
     }
 
     .rule-left {
-        left: var(--frame-inset);
+        left: var(--plate-inset);
     }
 
     .rule-right {
-        right: var(--frame-inset);
+        right: var(--plate-inset);
     }
 
     .gauge {
         --gauge-inset: clamp(3rem, 7vh, 5rem);
 
         position: absolute;
-        top: calc(var(--frame-inset) + var(--gauge-inset));
-        bottom: calc(var(--frame-inset) + var(--gauge-inset));
-        right: var(--frame-inset);
+        top: calc(var(--plate-inset) + var(--gauge-inset));
+        bottom: calc(var(--plate-inset) + var(--gauge-inset));
+        right: var(--plate-inset);
         width: 0;
         opacity: 0;
     }

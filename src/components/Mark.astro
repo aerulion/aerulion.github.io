@@ -1,6 +1,6 @@
 ---
 import {uid} from '../utils/uid';
-import {inkPoints, INK_TRAVEL, SILHOUETTE} from '../scripts/morphing-logo';
+import {inkPoints, INK_TRAVEL, SILHOUETTE, VIEW} from '../scripts/mark-geometry';
 
 interface Props {
     class?: string;
@@ -17,10 +17,10 @@ const INK = inkPoints();
 
 <svg
     class:list={['logo-mark', className]}
-    viewBox="0 0 26.458333 26.458333"
+    viewBox={`0 0 ${VIEW} ${VIEW}`}
     role="img"
     aria-label="aerulion logo"
-    data-collide="logo"
+    data-collide="mark"
     style={`--draw-delay:${drawDelay}ms; --fill-delay:${fillDelay}ms; --ink-travel:${INK_TRAVEL}px;`}
 >
     <defs>
@@ -29,7 +29,9 @@ const INK = inkPoints();
         </clipPath>
     </defs>
 
-    <path class="draw-path logo-outline" d={SILHOUETTE} pathLength="1"></path>
+    <g clip-path={`url(#${clipId})`}>
+        <path class="draw-path logo-outline" d={SILHOUETTE} pathLength="1"></path>
+    </g>
 
     <g clip-path={`url(#${clipId})`}>
         <polygon class="logo-ink" points={INK}></polygon>
@@ -45,7 +47,7 @@ const INK = inkPoints();
     }
 
     .logo-outline {
-        stroke-width: 0.4;
+        stroke-width: 0.8;
     }
 
     .logo-ink {
@@ -54,7 +56,7 @@ const INK = inkPoints();
     }
 
     :global(.js) .logo-ink {
-        transition: transform 0.9s var(--ease-draw) var(--fill-delay, 900ms);
+        transition: transform var(--dur-lg) var(--ease-draw) var(--fill-delay, 900ms);
     }
 
     :global(.is-drawn) .logo-ink,
@@ -62,11 +64,12 @@ const INK = inkPoints();
         transform: translateY(0);
     }
 
-    /* Half the stroke sits outside the silhouette, so it goes once inked. */
+    /* Clipped to the silhouette, so the ink arrives flush with the stroke rather than
+       a half-stroke inside it. It goes once inked either way. */
     :global(.js) .logo-outline {
         transition:
-            stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
-            stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
+            stroke-dashoffset var(--dur-xl) var(--ease-draw) var(--draw-delay, 0ms),
+            stroke-opacity var(--dur-sm) linear calc(var(--fill-delay, 900ms) + 700ms);
     }
 
     :global(.is-drawn) .logo-outline {

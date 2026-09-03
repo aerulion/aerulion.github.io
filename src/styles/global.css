@@ -11,7 +11,7 @@
 
     --hairline: 1px;
 
-    --frame-inset: clamp(0.5rem, 1vw, 1.15rem);
+    --plate-inset: clamp(0.5rem, 1vw, 1.15rem);
 
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
@@ -19,10 +19,12 @@
     --font-size-lg: 1.125rem;
     --font-size-xl: 1.25rem;
     --font-size-2xl: 1.5rem;
-    --font-size-4xl: 2.4rem;
+    --font-size-3xl: 2.25rem;
     --label-size: 0.6875rem;
     --label-tracking: 0.2em;
 
+    --spacing-3xs: 0.25rem;
+    --spacing-2xs: 0.375rem;
     --spacing-xs: 0.5rem;
     --spacing-sm: 0.75rem;
     --spacing-md: 1rem;
@@ -30,18 +32,44 @@
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
     --spacing-3xl: 4rem;
-    --spacing-4xl: 5rem;
-    --spacing-5xl: 7rem;
+    --spacing-4xl: 6rem;
+    --spacing-5xl: 8rem;
+
+    --flow-lg: clamp(0.75rem, 1.875vw, 1.5rem);
+    --flow-xl: clamp(1rem, 2.5vw, 2rem);
+    --flow-2xl: clamp(1.5rem, 3.75vw, 3rem);
+    --flow-3xl: clamp(2rem, 5vw, 4rem);
+    --flow-4xl: clamp(3rem, 7.5vw, 6rem);
+
+    /* Six layers, named so a new one has to say where it belongs. The gaps
+       are deliberate: anything that needs to sit between two of these is
+       probably a seventh layer and should be given a name here. */
+    --layer-field: 0;
+    --layer-page: 1;
+    --layer-raised: 2;
+    --layer-plate: 40;
+    --layer-entry: 60;
+    --layer-curtain: 90;
 
     --reveal-shift: 18px;
     --wipe-edge: linear-gradient(330deg, #000 0 50%, transparent 50% 100%);
 
-    --transition-base: 0.25s linear;
-    --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
-    --ease-out-poster: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Durations are the ramp again, in milliseconds: x1.5 and x1.333 by
+       turns, doubling every second step. The ambient loops in
+       LineConstruct are deliberately long and irregular so they never
+       resynchronise, and are not on this scale. */
+    --dur-xs: 250ms;
+    --dur-sm: 375ms;
+    --dur-md: 500ms;
+    --dur-lg: 750ms;
+    --dur-xl: 1000ms;
 
-    --poster-max-width: 1600px;
-    --poster-gutter: clamp(1.25rem, 3vw, 2.75rem);
+    --transition-base: var(--dur-xs) linear;
+    --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --plate-width: 1600px;
+    --plate-gutter: var(--flow-xl);
 }
 
 *,
@@ -90,14 +118,14 @@ a:focus-visible {
 }
 
 .container {
-    width: min(100%, var(--poster-max-width));
+    width: min(100%, var(--plate-width));
     margin: 0 auto;
-    padding: 0 clamp(1rem, 2vw + 0.5rem, 2.5rem);
+    padding: 0 var(--plate-gutter);
 }
 
 .main-content {
     position: relative;
-    z-index: 1;
+    z-index: var(--layer-page);
     padding-bottom: var(--spacing-5xl);
 }
 
@@ -109,8 +137,8 @@ a:focus-visible {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 60;
-    padding: 0.85rem 1.2rem;
+    z-index: var(--layer-entry);
+    padding: var(--spacing-sm) var(--spacing-md);
     background: var(--black);
     border: var(--hairline) solid var(--white);
     transform: translateY(-140%);
@@ -141,25 +169,25 @@ a:focus-visible {
 .panel-cut::before {
     content: '';
     position: absolute;
-    inset: 0;
+    inset: calc(-1 * var(--hairline));
     pointer-events: none;
     background: var(--white);
     clip-path: polygon(
         nonzero,
-        var(--cut-x) 0,
-        100% 0,
-        100% calc(100% - var(--cut-y)),
-        calc(100% - var(--cut-x)) 100%,
-        0 100%,
-        0 var(--cut-y),
-        var(--cut-x) 0,
-        calc(var(--cut-x) + 0.27px) var(--hairline),
-        var(--hairline) calc(var(--cut-y) + 0.58px),
-        var(--hairline) calc(100% - var(--hairline)),
-        calc(100% - var(--cut-x) - 0.27px) calc(100% - var(--hairline)),
-        calc(100% - var(--hairline)) calc(100% - var(--cut-y) - 0.58px),
+        calc(var(--cut-x) + var(--hairline)) var(--hairline),
         calc(100% - var(--hairline)) var(--hairline),
-        calc(var(--cut-x) + 0.27px) var(--hairline)
+        calc(100% - var(--hairline)) calc(100% - var(--hairline) - var(--cut-y)),
+        calc(100% - var(--hairline) - var(--cut-x)) calc(100% - var(--hairline)),
+        var(--hairline) calc(100% - var(--hairline)),
+        var(--hairline) calc(var(--cut-y) + var(--hairline)),
+        calc(var(--cut-x) + var(--hairline)) var(--hairline),
+        calc(var(--cut-x) + var(--hairline) + 0.27px) calc(2 * var(--hairline)),
+        calc(2 * var(--hairline)) calc(var(--cut-y) + var(--hairline) + 0.58px),
+        calc(2 * var(--hairline)) calc(100% - 2 * var(--hairline)),
+        calc(100% - var(--cut-x) - var(--hairline) - 0.27px) calc(100% - 2 * var(--hairline)),
+        calc(100% - 2 * var(--hairline)) calc(100% - var(--cut-y) - var(--hairline) - 0.58px),
+        calc(100% - 2 * var(--hairline)) calc(2 * var(--hairline)),
+        calc(var(--cut-x) + var(--hairline) + 0.27px) calc(2 * var(--hairline))
     );
 }
 
@@ -168,7 +196,7 @@ a:focus-visible {
 .section-header {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    column-gap: clamp(2rem, 5vw, 5rem);
+    column-gap: var(--flow-3xl);
     row-gap: var(--spacing-lg);
     align-items: start;
     margin-bottom: var(--spacing-3xl);
@@ -216,7 +244,7 @@ a:focus-visible {
     display: grid;
     gap: var(--spacing-md);
     align-content: start;
-    padding-top: 0.4rem;
+    padding-top: var(--spacing-2xs);
 }
 
 .section-subtitle {
@@ -250,7 +278,7 @@ a:focus-visible {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs);
-    padding: 0.85rem 1.4rem;
+    padding: var(--spacing-sm) var(--spacing-lg);
     border: var(--hairline) solid var(--white);
     background: var(--black);
     color: var(--white);
@@ -282,7 +310,7 @@ a:focus-visible {
 }
 
 .btn-glyph {
-    font-size: 0.9em;
+    font-size: 1.2em;
 }
 
 /* ---- Links --------------------------------------------------------------- */
@@ -317,7 +345,7 @@ a:focus-visible {
 }
 
 .js .draw-path {
-    transition: stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms);
+    transition: stroke-dashoffset var(--dur-xl) var(--ease-draw) var(--draw-delay, 0ms);
 }
 
 .is-drawn .draw-path,
@@ -341,9 +369,9 @@ html:not(.js) .draw-path {
     -webkit-mask-position: 85% 85%;
     mask-position: 85% 85%;
     transition:
-        -webkit-mask-position 0.8s var(--ease-out-poster) var(--reveal-delay, 0ms),
-        mask-position 0.8s var(--ease-out-poster) var(--reveal-delay, 0ms),
-        transform 0.8s var(--ease-out-poster) var(--reveal-delay, 0ms);
+        -webkit-mask-position var(--dur-lg) var(--ease-settle) var(--reveal-delay, 0ms),
+        mask-position var(--dur-lg) var(--ease-settle) var(--reveal-delay, 0ms),
+        transform var(--dur-lg) var(--ease-settle) var(--reveal-delay, 0ms);
 }
 
 .js [data-reveal].is-settled {
@@ -359,31 +387,31 @@ html:not(.js) .draw-path {
 
 .js .section-rule,
 .js .section-line,
-.js .mark-node {
+.js .node {
     transform-origin: left center;
-    transition: transform 0.85s var(--ease-draw) calc(var(--reveal-delay, 0ms) + var(--mark-delay, 0ms) + 200ms);
+    transition: transform var(--dur-lg) var(--ease-draw) calc(var(--reveal-delay, 0ms) + var(--node-delay, 0ms) + 200ms);
 }
 
 .js [data-reveal]:not(.is-revealed) .section-rule,
 .js [data-reveal]:not(.is-revealed) .section-line,
-.js [data-reveal]:not(.is-revealed) .mark-node {
+.js [data-reveal]:not(.is-revealed) .node {
     transform: scaleX(0);
 }
 
-.js .mark-line {
+.js .node-line {
     transform-origin: top center;
-    transition: transform 0.5s var(--ease-draw) calc(var(--reveal-delay, 0ms) + var(--mark-delay, 0ms));
+    transition: transform var(--dur-md) var(--ease-draw) calc(var(--reveal-delay, 0ms) + var(--node-delay, 0ms));
 }
 
-.js [data-reveal]:not(.is-revealed) .mark-line {
+.js [data-reveal]:not(.is-revealed) .node-line {
     transform: scaleY(0);
 }
 
-.js .mark-node-now {
+.js .node-now {
     transform-origin: center;
 }
 
-.js [data-reveal]:not(.is-revealed) .mark-node-now {
+.js [data-reveal]:not(.is-revealed) .node-now {
     transform: translateX(-50%) scale(0);
 }
 
@@ -395,19 +423,21 @@ html:not(.js) .draw-path {
     }
 }
 
-@keyframes dashCrawl {
-    to {
-        stroke-dashoffset: -0.15;
-    }
-}
-
-@keyframes nodeTurn {
-    0%,
-    100% {
+@keyframes nodeSnap {
+    0% {
         transform: rotate(0deg);
     }
     50% {
         transform: rotate(60deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes dashCrawl {
+    to {
+        stroke-dashoffset: -0.15;
     }
 }
 
@@ -464,12 +494,12 @@ html:not(.js) .draw-path {
 
     .js [data-reveal]:not(.is-revealed) .section-rule,
     .js [data-reveal]:not(.is-revealed) .section-line,
-    .js [data-reveal]:not(.is-revealed) .mark-line,
-    .js [data-reveal]:not(.is-revealed) .mark-node {
+    .js [data-reveal]:not(.is-revealed) .node-line,
+    .js [data-reveal]:not(.is-revealed) .node {
         transform: none;
     }
 
-    .js [data-reveal]:not(.is-revealed) .mark-node-now {
+    .js [data-reveal]:not(.is-revealed) .node-now {
         transform: translateX(-50%);
     }
 }
@@ -495,12 +525,12 @@ html:not(.js) .draw-path {
 
     .js [data-reveal]:not(.is-revealed) .section-rule,
     .js [data-reveal]:not(.is-revealed) .section-line,
-    .js [data-reveal]:not(.is-revealed) .mark-line,
-    .js [data-reveal]:not(.is-revealed) .mark-node {
+    .js [data-reveal]:not(.is-revealed) .node-line,
+    .js [data-reveal]:not(.is-revealed) .node {
         transform: none;
     }
 
-    .js [data-reveal]:not(.is-revealed) .mark-node-now {
+    .js [data-reveal]:not(.is-revealed) .node-now {
         transform: translateX(-50%);
     }
 }

@@ -102,14 +102,16 @@ const person = {
 
         <script>
             import {mountReveals} from '../scripts/reveal';
-            import {mountMorphingLogoMarks} from '../scripts/morphing-logo-mark';
-            import {mountScrollGauge} from '../scripts/scroll-gauge';
-            import {mountTelemetry} from '../scripts/telemetry';
+            import {mountMorphingMarks} from '../scripts/morphing-mark';
+            import {mountGauge} from '../scripts/gauge';
+            import {mountRoll} from '../scripts/roll';
+            import {mountFigureText} from '../scripts/figure-collide';
 
             mountReveals();
-            mountMorphingLogoMarks();
-            mountScrollGauge();
-            mountTelemetry();
+            mountMorphingMarks();
+            mountGauge();
+            mountRoll();
+            mountFigureText();
         </script>
     </body>
 </html>

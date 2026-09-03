@@ -1,0 +1,2119 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Plate from '../components/Plate.astro';
+import LatticeField from '../components/LatticeField.astro';
+import Curtain from '../components/Curtain.astro';
+import MorphingMark from '../components/MorphingMark.astro';
+import Mark from '../components/Mark.astro';
+import Footer from '../components/Footer.astro';
+import Button from '../components/Button.astro';
+import Glyph from '../components/Glyph.astro';
+import {
+    access,
+    applications,
+    census,
+    chapters,
+    breakpoints,
+    clearSpace,
+    durations,
+    filing,
+    flow,
+    layers,
+    glyph,
+    glyphSet,
+    construction,
+    faces,
+    laws,
+    measureLadder,
+    metrics,
+    misuse,
+    motion,
+    nomenclature,
+    parts,
+    plate,
+    plateTokens,
+    sizes,
+    spacing,
+    system,
+    tokens,
+    typeTokens
+} from '../data/design';
+import {SIDE, SILHOUETTE, VIEW} from '../scripts/mark-geometry';
+import {collide, parseViewBox, percentSegments, ringPath} from '../scripts/figure-collide';
+import {GLYPH_BOX, GLYPH_CELL} from '../data/glyphs';
+
+const title = 'Nyx - the aerulion design language';
+const description =
+    'Nyx: the design language behind aerulion.net. Two inks, two angles taken from the mark, hairlines instead of boxes, and density instead of dimming.';
+
+const pad = (n: number): string => String(n).padStart(2, '0');
+const total = pad(chapters.length);
+const contents = chapters.map((chapter, i) => ({...chapter, number: pad(i + 1)}));
+const station = (id: string): string => `${pad(chapters.findIndex((chapter) => chapter.id === id) + 1)} / ${total}`;
+const longest = Math.max(...measureLadder.map((stop) => stop.ch));
+
+const ROW = GLYPH_CELL * Math.sin(Math.PI / 3);
+const LEFT = 4;
+const TOP = 24 - 20 * Math.sin(Math.PI / 3);
+const DOT = 0.5;
+const ICON_ROWS = 11;
+const at = (n: number): string => Number(n.toFixed(4)).toString();
+const iconVertices = Array.from({length: ICON_ROWS}, (_, r) => r).flatMap((r) => {
+    const y = TOP + r * ROW;
+    const staggered = r % 2 === 0;
+    const start = staggered ? LEFT + GLYPH_CELL / 2 : LEFT;
+    const count = staggered ? 10 : 11;
+    return Array.from({length: count}, (_, c) => ({x: start + c * GLYPH_CELL, y}));
+});
+const iconGrid = iconVertices.map((v) => `M${at(v.x - DOT / 2)} ${at(v.y - DOT / 2)}h${DOT}v${DOT}h${-DOT}z`).join('');
+
+const n = (v: number): string => String(Number(v.toFixed(4)));
+const AXIS = VIEW / 2;
+const BASE = (VIEW * 3) / 4;
+const LEFT_BASE = (VIEW - SIDE) / 2;
+const RIGHT_BASE = LEFT_BASE + SIDE;
+const MOD = VIEW / 4;
+const WORD = 84.8;
+
+const WIDE = '0 0 200 118';
+const STEP = `${n(LEFT_BASE - 3.9)} -2.1 ${n(SIDE + 8)} ${n(VIEW + 7.9)}`;
+const MARK_BOX = `0 0 ${VIEW} ${VIEW}`;
+const cropCollide = JSON.stringify([
+    ...percentSegments([SILHOUETTE], MARK_BOX, 0.84),
+    ...percentSegments([ringPath(VIEW / 2, VIEW / 2, VIEW / 2 - 0.05)], MARK_BOX)
+]);
+const ICON_BOX = '-2 -2 52 52';
+
+const axes = {
+    base: 'M20 92H180',
+    rays: ['M100 60 151.9615 30', 'M100 60 130 8.0385', 'M100 60 70 8.0385', 'M100 60 48.0385 30']
+};
+const cut = {panel: 'M64 24H180V64.5966L136 90H20V49.4034Z', corner: 'M20 49.4034H64V24'};
+const cells = [
+    'M40 74.641H160',
+    'M20 40H180',
+    'M40 74.641 60 40 80 74.641 100 40 120 74.641 140 40 160 74.641',
+    'M20 40 40 74.641',
+    'M160 74.641 180 40'
+];
+
+const triangle = `M${n(AXIS)} 0 ${n(RIGHT_BASE)} ${n(BASE)}H${n(LEFT_BASE)}Z`;
+const tail = `M${n(RIGHT_BASE)} ${n(BASE)} ${n(AXIS)} ${n(VIEW)} ${n(LEFT_BASE)} ${n(BASE)}`;
+const frame = `M${n(LEFT_BASE)} 0H${n(RIGHT_BASE)}V${n(VIEW)}H${n(LEFT_BASE)}Z`;
+const baseline = `M${n(LEFT_BASE)} ${n(BASE)}H${n(RIGHT_BASE)}`;
+const diamond = `M${n(AXIS)} 0 ${n(RIGHT_BASE)} ${n(BASE)} ${n(AXIS)} ${n(VIEW)} ${n(LEFT_BASE)} ${n(BASE)}Z`;
+
+const fit = (viewBox: string): string => {
+    const [, , width, height] = parseViewBox(viewBox);
+    return `--fit:${Number((width / height).toFixed(4))}`;
+};
+
+const MODULE_BOX = `${n(LEFT_BASE - 4)} -3.2 ${n(SIDE + 8.5)} ${n(VIEW + 11)}`;
+const CLEAR_BOX = `${n(LEFT_BASE - MOD - 2.5)} ${n(-MOD - 2.5)} ${n(SIDE + 2 * MOD + 5)} ${n(VIEW + 2 * MOD + 5)}`;
+const LOCKUP_BOX = `${n(LEFT_BASE - MOD - 2.5)} ${n(-MOD - 2.5)} ${n(SIDE + WORD + 3 * MOD + 5)} ${n(VIEW + 2 * MOD + 5)}`;
+const GUIDE = RIGHT_BASE + MOD * 0.42;
+const TICK = RIGHT_BASE + MOD * 0.28;
+const moduleGuides = [`M${n(LEFT_BASE)} ${n(BASE)}H${n(GUIDE)}`, `M${n(LEFT_BASE)} ${n(VIEW)}H${n(GUIDE)}`];
+const moduleTicks = [
+    `M${n(TICK)} ${n(BASE)}V${n(VIEW)}`,
+    `M${n(TICK - 1.25)} ${n(BASE)}H${n(TICK + 1.25)}`,
+    `M${n(TICK - 1.25)} ${n(VIEW)}H${n(TICK + 1.25)}`
+];
+const clearBox = `M${n(LEFT_BASE - MOD)} ${n(-MOD)}H${n(RIGHT_BASE + MOD)}V${n(VIEW + MOD)}H${n(LEFT_BASE - MOD)}Z`;
+const clearTick = `M${n(AXIS)} ${n(-MOD)}V0`;
+const lockupBox = `M${n(LEFT_BASE - MOD)} ${n(-MOD)}H${n(RIGHT_BASE + MOD + WORD + MOD)}V${n(VIEW + MOD)}H${n(LEFT_BASE - MOD)}Z`;
+const lockupTick = `M${n(RIGHT_BASE)} ${n(AXIS)}H${n(RIGHT_BASE + MOD)}`;
+
+const erenos = [
+    'M44 24 34 41.3205 14 41.3205 4 24 14 6.6795 34 6.6795Z',
+    'M32 24 28 30.9282 20 30.9282 16 24 20 17.0718 28 17.0718Z',
+    'M32 24H44',
+    'M20 30.9282 14 41.3205',
+    'M20 17.0718 14 6.6795'
+];
+const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H6Z', 'M10 34.3923H42L38 41.3205H6Z'];
+---
+
+<Layout title={title} description={description}>
+    <a href="#main" class="skip-link mono-label">Skip to content</a>
+    <Plate stations={chapters.length} />
+    <LatticeField />
+
+    <main class="main-content" id="main" tabindex="-1">
+        <header class="page-hero" data-station={`00 / ${total}`}>
+            <div class="container">
+                <div class="page-rail">
+                    <p class="mono-label">aerulion / {system.name}</p>
+                    <p class="mono-label">Rev 01 / Monochrome</p>
+                </div>
+                <div class="page-hero-body">
+                    <div class="page-hero-copy">
+                        <p class="page-kicker mono-label">{system.epithet}</p>
+                        <h1 class="page-title">{system.name}</h1>
+                        <p class="page-standfirst">{system.tagline}</p>
+                        <p class="page-lede">
+                            The design language behind aerulion.net. Everything here is derived from one mark, an
+                            equilateral triangle with a 30/60 bolt cut. Nothing in it is here to decorate, so nothing in
+                            it has a reason to sit off the grid.
+                        </p>
+                        <Button href="/" glyph="west">Back to the site</Button>
+                    </div>
+                    <div class="page-hero-mark" data-draw>
+                        <MorphingMark drawDelay={320} fillDelay={1100} shells={2} depth={0.4} ladder={0.13} />
+                    </div>
+                </div>
+
+                <nav class="contents" aria-labelledby="contents-caption" data-reveal>
+                    <p class="mono-label contents-caption" id="contents-caption">Contents / {total} sections</p>
+                    <ol class="contents-list" role="list">
+                        {
+                            contents.map((chapter) => (
+                                <li>
+                                    <a class="contents-link" href={`#${chapter.id}`}>
+                                        <span class="mono-label">{chapter.number}</span>
+                                        <span class="contents-name">{chapter.eyebrow}</span>
+                                    </a>
+                                </li>
+                            ))
+                        }
+                    </ol>
+                </nav>
+            </div>
+        </header>
+
+        <section class="page-section" id="name" data-station={station('name')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">The name</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('name')}</p>
+                    </div>
+                    <h2 class="section-title">Night, and what is drawn on it.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            The system is named for the ground it is built on, not for anything it puts there. Every
+                            part of it carries that name and one plain noun, so a thing can be asked for by the name it
+                            is filed under.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="night-prose prose" data-reveal>
+                    {system.night.map((paragraph) => <p>{paragraph}</p>)}
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        nomenclature.map((asset) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{asset.name}</span>
+                                    <span class="part-kind mono-label">{asset.subject}</span>
+                                </dt>
+                                <dd class="part-note">{asset.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+            </div>
+        </section>
+
+        <section class="page-section" id="rules" data-station={station('rules')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">The rules</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('rules')}</p>
+                    </div>
+                    <h2 class="section-title">Six laws, no exceptions.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            These are the whole identity. If a change breaks one of them it is not a variation, it is a
+                            different system, and it belongs somewhere else.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <ol class="law-list" data-reveal>
+                    {
+                        laws.map((law) => (
+                            <li class="law">
+                                <p class="law-index">{law.index}</p>
+                                <div class="law-body">
+                                    <h3 class="law-name">{law.name}</h3>
+                                    <p class="law-rule prose">{law.rule}</p>
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ol>
+            </div>
+        </section>
+
+        <section class="page-section" id="ink" data-station={station('ink')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Ground and ink</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('ink')}</p>
+                    </div>
+                    <h2 class="section-title">The palette is complete.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Two things exist here: the ground, and what has been drawn on it. There is no accent, no
+                            secondary and no tint ramp. A warning reads as a warning because of what it says and where
+                            it sits, not because it turned a colour.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="ink-grid" data-reveal>
+                    <div class="ink-cell">
+                        <div class="ink-chip ink-chip-ground"></div>
+                        <div class="ink-meta">
+                            <p class="mono-label">Ground</p>
+                            <p class="mono-label">#000000</p>
+                        </div>
+                        <p class="ink-note">
+                            The page, every panel, and the ground behind the mark. Never softened to a near-black. A
+                            near-black reads as a night with something lit behind it.
+                        </p>
+                    </div>
+                    <div class="ink-cell">
+                        <div class="ink-chip ink-chip-ink"></div>
+                        <div class="ink-meta">
+                            <p class="mono-label">Ink</p>
+                            <p class="mono-label">#FFFFFF</p>
+                        </div>
+                        <p class="ink-note">
+                            Every rule, every glyph, every fill. Never dimmed to carry hierarchy. That is what size and
+                            position are for.
+                        </p>
+                    </div>
+                    <div class="ink-cell ink-cell-wide">
+                        <p class="ink-note">
+                            The only permitted inversion is a solid white field carrying black type: a primary button,
+                            any control under hover or focus, and selected text. The only alpha in the system lives
+                            inside the unfold, on the shells it passes through, and it is spent on depth rather than
+                            hierarchy, never on text, a rule or an edge. The lattice, the one thing here that recedes,
+                            holds a flat #fff and thins instead. 21 : 1 is the contrast ratio that falls out of all of
+                            that.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section" id="geometry" data-station={station('geometry')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">The parts</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('geometry')}</p>
+                    </div>
+                    <h2 class="section-title">Thirty and sixty, everywhere.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Both angles come off the mark. Every named part below is one of them applied to a different
+                            job, which is why the system holds together without a style guide policing it.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="figure-row" data-reveal>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={WIDE}
+                            role="img"
+                            aria-label="The four lattice directions at 30, 60, 120 and 150 degrees"
+                            data-collide="lines"
+                            data-segments={collide(WIDE, [axes.base, ...axes.rays])}
+                        >
+                            <g class="fig-line">
+                                <path class="fig-dash" d={axes.base}></path>
+                                {axes.rays.map((d) => <path d={d} />)}
+                            </g>
+                            <rect x="98" y="58" width="4" height="4" fill="#fff"></rect>
+                            <text class="fig-text" x="20" y="110">30 / 60 / 120 / 150</text>
+                        </svg>
+                        <figcaption class="mono-label">The four axes</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={WIDE}
+                            role="img"
+                            aria-label="A panel bevelled at 30 degrees"
+                            data-collide="lines"
+                            data-segments={collide(WIDE, [cut.panel, cut.corner])}
+                        >
+                            <path class="fig-line" d={cut.panel}></path>
+                            <path class="fig-dash" d={cut.corner}></path>
+                            <text class="fig-text" x="72" y="66">30°</text>
+                        </svg>
+                        <figcaption class="mono-label">The cut</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={WIDE}
+                            role="img"
+                            aria-label="A 60 degree triangular lattice cell"
+                            data-collide="lines"
+                            data-segments={collide(WIDE, cells)}
+                        >
+                            <g class="fig-line">{cells.map((d) => <path d={d} />)}</g>
+                            <text class="fig-text" x="90" y="110">60°</text>
+                        </svg>
+                        <figcaption class="mono-label">The lattice</figcaption>
+                    </figure>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        parts.map((part) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{part.name}</span>
+                                    <span class="part-kind mono-label">{part.kind}</span>
+                                </dt>
+                                <dd class="part-note">{part.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Tokens</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Token</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Governs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                tokens.map((row) => (
+                                    <tr>
+                                        <td class="cell-code">{row.token}</td>
+                                        <td class="cell-code">{row.value}</td>
+                                        <td>{row.governs}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section" id="mark" data-station={station('mark')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">The mark</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('mark')}</p>
+                    </div>
+                    <h2 class="section-title">Nothing in it was chosen twice.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            The mark is drawn in four moves, and after the first two there is almost nothing left to
+                            decide. Every angle it ends up with was already implied by the triangle it started as.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="construct-row" data-reveal>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="Step one: an equilateral triangle"
+                            data-collide="lines"
+                            data-segments={collide(STEP, [triangle])}
+                        >
+                            <path class="fig-line" d={triangle}></path>
+                            <text class="fig-text fig-text-mark" x="11" y="31">60°</text>
+                        </svg>
+                        <figcaption class="mono-label">01 / Triangle</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="Step two: a tail dropped one third of the triangle height below the base"
+                            data-collide="lines"
+                            data-segments={collide(STEP, [triangle, tail])}
+                        >
+                            <path class="fig-dash" d={triangle}></path>
+                            <path class="fig-line" d={tail}></path>
+                            <text class="fig-text fig-text-mark" x="11" y="31">30°</text>
+                        </svg>
+                        <figcaption class="mono-label">02 / Tail</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="Step three: the bounding box, the square root of three to two"
+                            data-collide="lines"
+                            data-segments={collide(STEP, [frame, baseline, diamond])}
+                        >
+                            <path class="fig-dash" d={frame}></path>
+                            <path class="fig-dash" d={baseline}></path>
+                            <path class="fig-line" d={diamond}></path>
+                            <text class="fig-text fig-text-mark" x="9.5" y="31">√3 : 2</text>
+                        </svg>
+                        <figcaption class="mono-label">03 / Frame</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={STEP}
+                            role="img"
+                            aria-label="Step four: the finished mark with its bolt cut"
+                            data-collide="lines"
+                            data-segments={collide(STEP, [diamond, SILHOUETTE])}
+                        >
+                            <path class="fig-dash" d={diamond}></path>
+                            <path class="mark-solid" d={SILHOUETTE}></path>
+                            <text class="fig-text fig-text-mark" x="8" y="31">15 EDGES</text>
+                        </svg>
+                        <figcaption class="mono-label">04 / Bolt</figcaption>
+                    </figure>
+                </div>
+
+                <ol class="law-list" data-reveal>
+                    {
+                        construction.map((step) => (
+                            <li class="law">
+                                <p class="law-index">{step.index}</p>
+                                <div class="law-body">
+                                    <h3 class="law-name">{step.name}</h3>
+                                    <p class="law-rule prose">{step.rule}</p>
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ol>
+
+                <div class="census" data-reveal>
+                    <h3 class="prose-head">Every edge, on an axis</h3>
+                    <p class="census-lede prose">
+                        The finished outline has fifteen edges, and every one of them is exactly on an axis: the outline
+                        is not fitted to the grid, it is solved on it, from a single side length. The counts below are
+                        not balanced, and were never meant to be: the bolt cuts the tail’s lower-right edge in two,
+                        which is why 150° carries five.
+                    </p>
+                    <dl class="census-row">
+                        {
+                            census.map((row) => (
+                                <div class="census-cell">
+                                    <dt class="census-axis">{row.axis}</dt>
+                                    <dd class="census-count">{row.count}</dd>
+                                    <dd class="census-role">{row.role}</dd>
+                                </div>
+                            ))
+                        }
+                    </dl>
+                </div>
+
+                <div class="figure-row" data-reveal>
+                    <figure class="figure panel-cut">
+                        <div class="mark-figure" data-draw>
+                            <Mark drawDelay={0} fillDelay={300} />
+                        </div>
+                        <figcaption class="mono-label">Inked / primary</figcaption>
+                        <p class="figure-note">
+                            The resting state, and the answer wherever a single static mark is needed.
+                        </p>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <div class="mark-figure">
+                            <svg
+                                viewBox={MARK_BOX}
+                                role="img"
+                                aria-label="The mark drawn as an outline"
+                                data-collide="lines"
+                                data-segments={collide(MARK_BOX, [SILHOUETTE])}
+                            >
+                                <path class="mark-hollow" d={SILHOUETTE}></path>
+                            </svg>
+                        </div>
+                        <figcaption class="mono-label">Drawn / quiet</figcaption>
+                        <p class="figure-note">For large sizes and calm surfaces, and the first beat of every intro.</p>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <div class="mark-figure">
+                            <svg
+                                viewBox={MARK_BOX}
+                                role="img"
+                                aria-label="The mark held inside 84 percent of a circular crop"
+                                data-collide="lines"
+                                data-segments={cropCollide}
+                            >
+                                <circle class="fig-dash" cx={AXIS} cy={AXIS} r={AXIS - 0.05}></circle>
+                                <g transform={`translate(${AXIS} ${AXIS}) scale(0.84) translate(${-AXIS} ${-AXIS})`}>
+                                    <path class="mark-solid" d={SILHOUETTE}></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <figcaption class="mono-label">Cropped / 84%</figcaption>
+                        <p class="figure-note">
+                            Inside a circular crop the mark is held to 84% of the radius, so the unfold never touches
+                            the edge.
+                        </p>
+                    </figure>
+                </div>
+
+                <div class="mark-prose prose" data-reveal>
+                    <h3 class="prose-head">The unfold</h3>
+                    <p>
+                        The outline is classified into the four lattice directions, lifted into four dimensions, rotated
+                        there, and projected back down. That is why the mark can turn without ever spinning in the
+                        plane, and why every silhouette it passes through on the way is still built from 30° and 60°
+                        edges. Two arcs travelling the same way close a full turn, so a loop built that way has no seam.
+                    </p>
+                </div>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Geometry</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Measure</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                metrics.map((row) => (
+                                    <tr>
+                                        <td>{row.label}</td>
+                                        <td class="cell-code">{row.value}</td>
+                                        <td>{row.note}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Minimum sizes</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Context</th>
+                                <th scope="col">Minimum</th>
+                                <th scope="col">State</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                sizes.map((row) => (
+                                    <tr>
+                                        <td>{row.context}</td>
+                                        <td class="cell-code">{row.minimum}</td>
+                                        <td>{row.state}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section" id="spacing" data-station={station('spacing')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Spacing</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('spacing')}</p>
+                    </div>
+                    <h2 class="section-title">One ramp, one module.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Distance in this system comes from two places and nowhere else: a spacing ramp that doubles
+                            every second step, and a module of clear space read straight off the mark.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="ramp" data-reveal>
+                    <h3 class="prose-head">The ramp</h3>
+                    <p class="ramp-lede prose">
+                        Steps alternate × 1.5 and × 1.333, which means the scale doubles every second stop. It is two
+                        interleaved octaves, 4 / 8 / 16 / 32 / 64 / 128 and 6 / 12 / 24 / 48 / 96, so any two adjacent
+                        steps are far enough apart to read as a decision. The bottom two stops exist because the ramp
+                        used to start at 8px, and everything finer than that had to invent a value: forty-two of them
+                        had, by the time anyone counted. The rules below are drawn at their true length.
+                    </p>
+                    <dl class="ramp-list">
+                        {
+                            spacing.map((stop) => (
+                                <div class="ramp-row">
+                                    <dt class="ramp-token mono-label">{stop.token}</dt>
+                                    <dd class="ramp-bar">
+                                        <span class="ramp-line" style={`width:${stop.px}px`} />
+                                    </dd>
+                                    <dd class="ramp-value mono-label">
+                                        {stop.px} / {stop.rem}
+                                    </dd>
+                                    <dd class="ramp-step mono-label">{stop.step}</dd>
+                                </div>
+                            ))
+                        }
+                    </dl>
+                </div>
+
+                <div class="ramp" data-reveal>
+                    <h3 class="prose-head">The travelling ramp</h3>
+                    <p class="ramp-lede prose">
+                        Almost no gap on this site is fixed. A flow step doubles, which is exactly two stops of the
+                        ramp, so both of its ends land on the ramp too: it holds the lower stop below 640px, grows
+                        across the band, and reaches the upper one at 1280px. Because the ramp is geometric and the band
+                        is the same for every step, the vw coefficients come out as the ramp over again: 1.875, 2.5,
+                        3.75, 5, 7.5. Each rule below is drawn at the width its step is resolving to right now, so
+                        narrowing this window walks them down their span.
+                    </p>
+                    <dl class="ramp-list">
+                        {
+                            flow.map((step) => (
+                                <div class="ramp-row">
+                                    <dt class="ramp-token mono-label">{step.token}</dt>
+                                    <dd class="ramp-bar">
+                                        <span class="ramp-line" style={`width:var(${step.token})`} />
+                                    </dd>
+                                    <dd class="ramp-value mono-label">{step.span}</dd>
+                                    <dd class="ramp-step mono-label">{step.note}</dd>
+                                </div>
+                            ))
+                        }
+                    </dl>
+                </div>
+
+                <div class="figure-row clear-row" data-reveal>
+                    <figure class="figure panel-cut">
+                        <div class="clear-frame" style={fit(MODULE_BOX)}>
+                            <svg
+                                viewBox={MODULE_BOX}
+                                role="img"
+                                aria-label="The module equals one quarter of the mark height, the same as the tail drop"
+                                data-collide="lines"
+                                data-segments={collide(MODULE_BOX, [...moduleGuides, ...moduleTicks, SILHOUETTE])}
+                            >
+                                {moduleGuides.map((d) => <path class="fig-dash" d={d} />)}
+                                {moduleTicks.map((d) => <path class="fig-line" d={d} />)}
+                                <path class="fig-line" d={SILHOUETTE}></path>
+                                <text class="fig-text fig-text-module" x={n(LEFT_BASE - 3.4)} y={n(VIEW + 5.2)}
+                                    >M = H / 4</text
+                                >
+                            </svg>
+                        </div>
+                        <figcaption class="mono-label">The module</figcaption>
+                        <p class="figure-note">
+                            One quarter of the mark’s height, the same drop the tail makes below the triangle’s base.
+                        </p>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <div class="clear-frame" style={fit(CLEAR_BOX)}>
+                            <svg
+                                viewBox={CLEAR_BOX}
+                                role="img"
+                                aria-label="Clear space of one module on every side of the mark"
+                                data-collide="lines"
+                                data-segments={collide(CLEAR_BOX, [clearBox, clearTick, SILHOUETTE])}
+                            >
+                                <path class="fig-dash" d={clearBox}></path>
+                                <path class="fig-line" d={clearTick}></path>
+                                <path class="mark-solid" d={SILHOUETTE}></path>
+                                <text class="fig-text fig-text-clear" x={n(AXIS + 1)} y={n(-MOD / 2.6)}>M</text>
+                            </svg>
+                        </div>
+                        <figcaption class="mono-label">Clear space</figcaption>
+                        <p class="figure-note">
+                            One module on all four sides, measured off the mark’s own box, holding nothing but ground.
+                        </p>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <div class="clear-frame" style={fit(LOCKUP_BOX)}>
+                            <svg
+                                viewBox={LOCKUP_BOX}
+                                role="img"
+                                aria-label="The lockup: one module between mark and wordmark, and one module around the pair"
+                                data-collide="lines"
+                                data-segments={collide(LOCKUP_BOX, [lockupBox, lockupTick, SILHOUETTE])}
+                            >
+                                <path class="fig-dash" d={lockupBox}></path>
+                                <path class="fig-line" d={lockupTick}></path>
+                                <path class="mark-solid" d={SILHOUETTE}></path>
+                                <text
+                                    class="fig-wordmark"
+                                    x={n(RIGHT_BASE + MOD)}
+                                    y={n(AXIS + 6.6)}
+                                    textLength={n(WORD)}
+                                    lengthAdjust="spacingAndGlyphs"
+                                    >aerulion
+                                </text>
+                                <text class="fig-text fig-text-lockup" x={n(RIGHT_BASE + MOD / 8)} y={n(AXIS - 2.1)}
+                                    >M</text
+                                >
+                            </svg>
+                        </div>
+                        <figcaption class="mono-label">The lockup</figcaption>
+                        <p class="figure-note">
+                            One module from the mark to the first letter, and one module of ground around the pair.
+                        </p>
+                    </figure>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        clearSpace.map((rule) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{rule.subject}</span>
+                                    <span class="part-kind mono-label">{rule.module}</span>
+                                </dt>
+                                <dd class="part-note">{rule.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+            </div>
+        </section>
+
+        <section class="page-section" id="plate" data-station={station('plate')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">The plate</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('plate')}</p>
+                    </div>
+                    <h2 class="section-title">Rank runs backwards to measure.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            There is one column, cropped by four rules pinned inside the viewport. Everything in that
+                            column is ranked by how short its line is: the title is the narrowest thing on the page and
+                            the small print is the widest.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="ramp ladder" data-reveal>
+                    <h3 class="prose-head">The measure ladder</h3>
+                    <p class="ramp-lede prose">
+                        Five measures, and a block takes the one its rank calls for rather than the one its container
+                        happens to offer. A longer line is a quieter line, so the ladder does the work a second type
+                        size would do elsewhere. The rules below are drawn in proportion to the longest of them.
+                    </p>
+                    <dl class="ramp-list">
+                        {
+                            measureLadder.map((stop) => (
+                                <div class="ramp-row">
+                                    <dt class="ramp-token mono-label">{stop.subject}</dt>
+                                    <dd class="ramp-bar">
+                                        <span
+                                            class="ramp-line"
+                                            style={`width:${((stop.ch / longest) * 100).toFixed(2)}%`}
+                                        />
+                                    </dd>
+                                    <dd class="ramp-value mono-label">{stop.ch} ch</dd>
+                                    <dd class="ramp-step mono-label">{stop.note}</dd>
+                                </div>
+                            ))
+                        }
+                    </dl>
+                </div>
+
+                <div class="ramp" data-reveal>
+                    <h3 class="prose-head">Where the plate changes its mind</h3>
+                    <p class="ramp-lede prose">
+                        Six widths, and no more. They are written as literals because a media query cannot read a custom
+                        property, which is the one place in this system a number is allowed to be loose in the
+                        stylesheet, so they are listed here instead. Nothing else may invent a seventh.
+                    </p>
+                    <dl class="ramp-list">
+                        {
+                            breakpoints.map((point) => (
+                                <div class="ramp-row breakpoint-row">
+                                    <dt class="ramp-token mono-label">{point.width}</dt>
+                                    <dd class="breakpoint-note">{point.governs}</dd>
+                                </div>
+                            ))
+                        }
+                    </dl>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        plate.map((part) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{part.name}</span>
+                                    <span class="part-kind mono-label">{part.kind}</span>
+                                </dt>
+                                <dd class="part-note">{part.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Layers</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Token</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Governs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                layers.map((row) => (
+                                    <tr>
+                                        <td class="cell-code">{row.token}</td>
+                                        <td class="cell-code">{row.value}</td>
+                                        <td>{row.governs}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Plate</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Token</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Governs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                plateTokens.map((row) => (
+                                    <tr>
+                                        <td class="cell-code">{row.token}</td>
+                                        <td class="cell-code">{row.value}</td>
+                                        <td>{row.governs}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mark-prose prose" data-reveal>
+                    <h3 class="prose-head">Filed under the same name</h3>
+                    <p>
+                        A name is only worth having if the code answers to it. Every part above is filed in the source
+                        under the name it carries here, so a thing can be found by the word used to ask for it. If a
+                        part cannot be named in this table, that is the first sign it does not belong to the system.
+                    </p>
+                </div>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Filing</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Part</th>
+                                <th scope="col">Component or class</th>
+                                <th scope="col">Module</th>
+                                <th scope="col">Attribute or token</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                filing.map((row) => (
+                                    <tr>
+                                        <td>{row.part}</td>
+                                        <td class="cell-code">{row.component}</td>
+                                        <td class="cell-code">{row.module}</td>
+                                        <td class="cell-code">{row.token}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section" id="icons" data-station={station('icons')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Icons</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('icons')}</p>
+                    </div>
+                    <h2 class="section-title">A glyph the field could have drawn.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            An icon is not a second vocabulary bolted on beside the first. It is drawn on the lattice,
+                            at hairline weight, in the five directions this system already has. If a subject will not go
+                            on that grid, it does not get an icon.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="figure-row" data-reveal>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={ICON_BOX}
+                            role="img"
+                            aria-label={`The icon grid: ${ICON_ROWS} rows of a 60 degree lattice inside a 48 unit box`}
+                        >
+                            <path class="fig-grid" d={iconGrid}></path>
+                            <text class="fig-text fig-text-icon" x="0" y="49">{GLYPH_BOX} / CELL {GLYPH_CELL}</text>
+                        </svg>
+                        <figcaption class="mono-label">The grid</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={ICON_BOX}
+                            role="img"
+                            aria-label="The Erenos glyph drawn on the icon grid"
+                            data-collide="lines"
+                            data-segments={collide(ICON_BOX, erenos)}
+                        >
+                            <path class="fig-grid" d={iconGrid}></path>
+                            <g class="fig-line">{erenos.map((d) => <path d={d} />)}</g>
+                            <text class="fig-text fig-text-icon" x="0" y="49">15 EDGES</text>
+                        </svg>
+                        <figcaption class="mono-label">On the grid</figcaption>
+                    </figure>
+                    <figure class="figure panel-cut">
+                        <svg
+                            viewBox={ICON_BOX}
+                            role="img"
+                            aria-label="The CloudStorage glyph drawn on the icon grid"
+                            data-collide="lines"
+                            data-segments={collide(ICON_BOX, cloudstorage)}
+                        >
+                            <path class="fig-grid" d={iconGrid}></path>
+                            <g class="fig-line">{cloudstorage.map((d) => <path d={d} />)}</g>
+                            <text class="fig-text fig-text-icon" x="0" y="49">12 EDGES</text>
+                        </svg>
+                        <figcaption class="mono-label">A second glyph</figcaption>
+                    </figure>
+                </div>
+
+                <div class="glyph-set" data-reveal>
+                    <h3 class="prose-head">The set</h3>
+                    <p class="glyph-lede prose">
+                        Seven so far, and the list grows only when something on the page needs one. Every arrowhead
+                        opens 30° each side of its shaft; the descent runs at 30° because that is the direction a block
+                        already travels when it reveals. There is no down arrow, because a vertical is not one of the
+                        five directions.
+                    </p>
+                    <dl class="glyph-list">
+                        {
+                            glyphSet.map((item) => (
+                                <div class="glyph-cell">
+                                    <dt class="glyph-figure">
+                                        <Glyph name={item.name as never} />
+                                        <span class="mono-label">{item.name}</span>
+                                    </dt>
+                                    <dd class="glyph-use">{item.use}</dd>
+                                </div>
+                            ))
+                        }
+                    </dl>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        glyph.map((rule) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{rule.name}</span>
+                                    <span class="part-kind mono-label">{rule.kind}</span>
+                                </dt>
+                                <dd class="part-note">{rule.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+            </div>
+        </section>
+
+        <section class="page-section" id="type" data-station={station('type')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Type</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('type')}</p>
+                    </div>
+                    <h2 class="section-title">Four faces, one job each.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            A face never takes another’s job. Headings are not set in Tektur, and a label is always
+                            mono, always uppercase, always tracked open.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="face-list" data-reveal>
+                    {
+                        faces.map((face) => (
+                            <div class="face">
+                                <div class="face-rail">
+                                    <p class="mono-label">{face.name}</p>
+                                    <p class="mono-label face-variable">{face.variable}</p>
+                                    <p class="mono-label">{face.role}</p>
+                                </div>
+                                <p class:list={['face-sample', `face-sample-${face.slug}`]}>{face.sample}</p>
+                                <p class="face-note">{face.note}</p>
+                            </div>
+                        ))
+                    }
+                </div>
+
+                <div class="mark-prose prose" data-reveal>
+                    <h3 class="prose-head">The scale</h3>
+                    <p>
+                        Eight fixed steps. Seven of them are the conventional text ladder, 11 and then even pixels from
+                        12 to 24. The eighth is that ladder taken up one turn of the ramp, 24 × 1.5, for a statistic.
+                        Nothing larger is fixed: a heading is clamped against the viewport instead, so a title keeps its
+                        measure rather than its point size.
+                    </p>
+                </div>
+
+                <div class="table-wrap" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Scale</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Token</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Governs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                typeTokens.map((row) => (
+                                    <tr>
+                                        <td class="cell-code">{row.token}</td>
+                                        <td class="cell-code">{row.value}</td>
+                                        <td>{row.governs}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section" id="motion" data-station={station('motion')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Motion</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('motion')}</p>
+                    </div>
+                    <h2 class="section-title">Motion is construction.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Things draw themselves, ink themselves and deflect. Nothing eases in from nowhere, nothing
+                            bounces, and the system has to be complete with all of it switched off.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="table-wrap table-wrap-lead" data-reveal>
+                    <table class="spec-table">
+                        <caption class="mono-label">Durations</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Token</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Governs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                durations.map((row) => (
+                                    <tr>
+                                        <td class="cell-code">{row.token}</td>
+                                        <td class="cell-code">{row.value}</td>
+                                        <td>{row.governs}</td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        motion.map((beat) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{beat.name}</span>
+                                    <span class="part-kind mono-label">{beat.token}</span>
+                                </dt>
+                                <dd class="part-note">{beat.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+            </div>
+        </section>
+
+        <section class="page-section" id="access" data-station={station('access')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Access</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('access')}</p>
+                    </div>
+                    <h2 class="section-title">It has to work switched off.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Nothing here is a concession. Two inks is the highest contrast a screen can render, one
+                            column is a reading order that cannot come apart, and motion that is construction is motion
+                            nothing depends on. The system pays for its access by being what it is.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        access.map((item) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{item.name}</span>
+                                    <span class="part-kind mono-label">{item.kind}</span>
+                                </dt>
+                                <dd class="part-note">{item.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+            </div>
+        </section>
+
+        <section class="page-section" id="misuse" data-station={station('misuse')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Misuse</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('misuse')}</p>
+                    </div>
+                    <h2 class="section-title">{misuse.length} ways out.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Each of these breaks a law, and each is the shortcut that gets reached for first. None of
+                            them are variations: a surface that does any of them is a surface in a different design
+                            language, and it should be given a different name.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <ol class="law-list deny-list" data-reveal>
+                    {
+                        misuse.map((item) => (
+                            <li class="law">
+                                <p class="law-index">{item.index}</p>
+                                <div class="law-body">
+                                    <h3 class="law-name">{item.name}</h3>
+                                    <p class="law-rule prose">{item.rule}</p>
+                                </div>
+                            </li>
+                        ))
+                    }
+                </ol>
+            </div>
+        </section>
+
+        <section class="page-section page-section-last" id="applications" data-station={station('applications')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Applications</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('applications')}</p>
+                    </div>
+                    <h2 class="section-title">Off the site, same rules.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            Three surfaces with a crop the system does not control. One rule carries all of them: let
+                            every hairline bleed off an edge, so no crop can sever a frame.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="application-list">
+                    {
+                        applications.map((application) => (
+                            <article class="application" data-reveal>
+                                <div class="application-rail">
+                                    <h3 class="application-name">{application.name}</h3>
+                                    <p class="mono-label">{application.format}</p>
+                                </div>
+                                <div class="application-body">
+                                    <picture
+                                        class:list={[
+                                            'application-frame',
+                                            `application-frame-${application.orientation}`
+                                        ]}
+                                    >
+                                        {application.still && (
+                                            <source
+                                                srcset={application.still}
+                                                media="(prefers-reduced-motion: reduce)"
+                                            />
+                                        )}
+                                        <img
+                                            class="application-shot"
+                                            src={application.image}
+                                            width={application.width}
+                                            height={application.height}
+                                            alt={application.alt}
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                    </picture>
+                                    <ul class="application-notes" role="list">
+                                        {application.notes.map((note) => (
+                                            <li>{note}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </article>
+                        ))
+                    }
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <Footer />
+    <Curtain />
+</Layout>
+
+<style>
+    .page-hero {
+        padding: var(--flow-4xl) 0 var(--spacing-4xl);
+    }
+
+    .page-rail {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-md);
+        padding-bottom: var(--spacing-md);
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .page-hero-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) clamp(150px, 20vw, 260px);
+        align-items: center;
+        gap: var(--flow-3xl);
+        padding-top: var(--flow-3xl);
+    }
+
+    .page-hero-copy {
+        display: grid;
+        gap: var(--spacing-lg);
+        justify-items: start;
+    }
+
+    .page-kicker {
+        margin-bottom: calc(-1 * var(--spacing-sm));
+    }
+
+    .page-title {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(4rem, 13vw, 9rem);
+        font-weight: 600;
+        line-height: 0.86;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        text-wrap: balance;
+    }
+
+    .page-standfirst {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.15rem, 2.2vw, var(--font-size-2xl));
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-md);
+        margin-top: calc(-1 * var(--spacing-xs));
+    }
+
+    .page-lede {
+        font-size: clamp(1rem, 1.25vw, var(--font-size-lg));
+        max-width: 52ch;
+    }
+
+    .contents {
+        display: grid;
+        gap: var(--spacing-md);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-md);
+        margin-top: var(--flow-3xl);
+    }
+
+    .contents-caption {
+        padding-left: var(--spacing-sm);
+    }
+
+    .contents-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: var(--flow-xl);
+        list-style: none;
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .contents-link {
+        display: grid;
+        grid-template-columns: 2.4rem minmax(0, 1fr);
+        align-items: baseline;
+        gap: var(--spacing-xs);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        text-decoration: none;
+        border-bottom: var(--hairline) solid var(--white);
+        transition:
+            background var(--transition-base),
+            color var(--transition-base);
+    }
+
+    .contents-link:hover,
+    .contents-link:focus-visible {
+        background: var(--white);
+        color: var(--black);
+    }
+
+    .contents-name {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .page-section {
+        padding-bottom: var(--spacing-5xl);
+    }
+
+    .page-section-last {
+        padding-bottom: var(--spacing-2xl);
+    }
+
+    .night-prose {
+        display: grid;
+        gap: var(--spacing-md);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .night-prose p {
+        max-width: 72ch;
+    }
+
+    .night-prose p:first-child {
+        font-size: clamp(1.05rem, 1.6vw, var(--font-size-xl));
+    }
+
+    .law-list {
+        list-style: none;
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .law {
+        display: grid;
+        grid-template-columns: clamp(3rem, 6vw, 5rem) minmax(0, 1fr);
+        gap: var(--spacing-lg);
+        align-items: start;
+        padding: var(--spacing-lg) 0;
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .law-index {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        padding-top: var(--spacing-2xs);
+    }
+
+    .law-body {
+        display: grid;
+        gap: var(--spacing-2xs);
+    }
+
+    .law-name {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.1rem, 1.8vw, var(--font-size-xl));
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .law-rule {
+        max-width: 68ch;
+    }
+
+    .ink-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--flow-2xl);
+    }
+
+    .ink-cell {
+        display: grid;
+        gap: var(--spacing-sm);
+        align-content: start;
+    }
+
+    .ink-cell-wide {
+        grid-column: 1 / -1;
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+    }
+
+    .ink-chip {
+        height: clamp(120px, 18vw, 200px);
+        border: var(--hairline) solid var(--white);
+    }
+
+    .ink-chip-ink {
+        background: var(--white);
+    }
+
+    .ink-chip-ground {
+        background: var(--black);
+    }
+
+    .ink-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--spacing-md);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-xs);
+    }
+
+    .ink-note {
+        max-width: 62ch;
+        font-size: var(--font-size-sm);
+    }
+
+    .figure-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--flow-xl);
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .construct-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--flow-xl);
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .figure {
+        display: grid;
+        gap: var(--spacing-sm);
+        align-content: start;
+        padding: var(--flow-xl);
+    }
+
+    .figure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .clear-frame {
+        --frame-height: clamp(180px, 19vw, 250px);
+
+        display: grid;
+        place-items: center;
+        height: var(--frame-height);
+    }
+
+    .clear-row .figure svg {
+        width: min(100%, calc(var(--frame-height) * var(--fit)));
+        height: auto;
+        aspect-ratio: var(--fit);
+    }
+
+    .fig-line,
+    .fig-line path {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .fig-dash {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 1;
+        stroke-dasharray: 6 5;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .fig-text {
+        fill: var(--white);
+        font-family: var(--font-family-mono), monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+    }
+
+    .glyph-set {
+        display: grid;
+        gap: var(--spacing-sm);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+        margin-bottom: var(--flow-3xl);
+    }
+
+    .glyph-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--flow-xl);
+        margin-top: var(--spacing-md);
+    }
+
+    .glyph-cell {
+        display: grid;
+        gap: var(--spacing-xs);
+        align-content: start;
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-sm);
+    }
+
+    .glyph-figure {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-sm);
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+    }
+
+    .glyph-use {
+        font-size: var(--font-size-sm);
+    }
+
+    .fig-grid {
+        fill: var(--white);
+        stroke: none;
+    }
+
+    .fig-text-icon {
+        font-size: 3px;
+    }
+
+    .fig-text-mark {
+        font-size: 1.5px;
+    }
+
+    .fig-text-module {
+        font-size: 1.5px;
+    }
+
+    .fig-text-clear {
+        font-size: 2px;
+    }
+
+    .fig-text-lockup {
+        font-size: 3.4px;
+    }
+
+    .fig-wordmark {
+        fill: var(--white);
+        font-family: var(--font-family-accent), sans-serif;
+        font-weight: 700;
+        font-size: 19px;
+    }
+
+    .mark-figure {
+        width: min(100%, 132px);
+        margin-inline: auto;
+        padding-block: var(--spacing-sm);
+    }
+
+    .mark-figure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .mark-hollow {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+        stroke-linejoin: miter;
+    }
+
+    .mark-solid {
+        fill: var(--white);
+    }
+
+    .figure-note {
+        font-size: var(--font-size-sm);
+    }
+
+    .census {
+        display: grid;
+        gap: var(--spacing-sm);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .census-lede {
+        max-width: 72ch;
+    }
+
+    .census-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--flow-xl);
+        margin-top: var(--spacing-md);
+    }
+
+    .census-cell {
+        display: grid;
+        gap: var(--spacing-2xs);
+        align-content: start;
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-sm);
+    }
+
+    .census-axis {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+    }
+
+    .census-count {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.8rem, 4vw, var(--font-size-3xl));
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .census-role {
+        font-size: var(--font-size-sm);
+    }
+
+    .ramp {
+        display: grid;
+        gap: var(--spacing-sm);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .ramp-lede {
+        max-width: 72ch;
+    }
+
+    .ramp-list {
+        margin-top: var(--spacing-md);
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .ramp-row {
+        display: grid;
+        grid-template-columns: clamp(7rem, 12vw, 10rem) minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-xs) 0;
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .ramp-bar {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .ramp-line {
+        display: block;
+        height: var(--hairline);
+        max-width: 100%;
+        background: var(--white);
+    }
+
+    .ramp-value,
+    .ramp-step {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .ramp-step {
+        min-width: 4.5rem;
+    }
+
+    /* Eleven rows: tighten the rhythm so the list stays one field. */
+    .deny-list .law {
+        padding: var(--spacing-md) 0;
+    }
+
+    .breakpoint-row {
+        grid-template-columns: clamp(5rem, 10vw, 7rem) minmax(0, 1fr);
+    }
+
+    .breakpoint-note {
+        font-size: var(--font-size-sm);
+    }
+
+    .ladder .ramp-row {
+        grid-template-columns: clamp(8rem, 14vw, 11rem) minmax(0, 1fr) auto auto;
+    }
+
+    .ladder .ramp-step {
+        min-width: 11rem;
+        text-align: left;
+    }
+
+    .mark-prose {
+        display: grid;
+        gap: var(--spacing-sm);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .prose-head,
+    .part-name,
+    .application-name {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.1rem, 1.8vw, var(--font-size-xl));
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .mark-prose p {
+        max-width: 72ch;
+    }
+
+    .part-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .part {
+        display: grid;
+        gap: var(--spacing-2xs);
+        align-content: start;
+        padding: var(--spacing-lg) var(--flow-xl) var(--spacing-lg) 0;
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .part:nth-child(even) {
+        padding-left: var(--flow-xl);
+        border-left: var(--hairline) solid var(--white);
+    }
+
+    /* An odd last item would leave the closing rule half drawn. */
+    .part:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+
+    .part-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--spacing-sm);
+    }
+
+    .part-note {
+        font-size: var(--font-size-sm);
+        max-width: 54ch;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+        margin-top: var(--spacing-3xl);
+    }
+
+    .table-wrap-lead {
+        margin-top: 0;
+        margin-bottom: var(--spacing-3xl);
+    }
+
+    .spec-table {
+        width: 100%;
+        min-width: 520px;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .spec-table caption {
+        text-align: left;
+        padding-bottom: var(--spacing-sm);
+    }
+
+    .spec-table th,
+    .spec-table td {
+        text-align: left;
+        padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-sm) 0;
+        border-bottom: var(--hairline) solid var(--white);
+        vertical-align: baseline;
+    }
+
+    .spec-table thead th {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        font-weight: 400;
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .spec-table tbody td {
+        font-size: var(--font-size-sm);
+    }
+
+    .spec-table tbody td:first-child {
+        white-space: nowrap;
+    }
+
+    .cell-code {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-xs);
+        white-space: nowrap;
+    }
+
+    .face-list {
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .face {
+        display: grid;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-lg) 0;
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .face-rail {
+        display: grid;
+        grid-template-columns: clamp(8rem, 14vw, 11rem) minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: var(--spacing-md);
+    }
+
+    .face-sample {
+        line-height: 1.05;
+        overflow-x: auto;
+    }
+
+    .face-sample-wordmark {
+        font-family: var(--font-family-accent), sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.4rem, 8vw, 5rem);
+    }
+
+    .face-sample-headings {
+        font-family: var(--font-family-display), sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.6rem, 4.5vw, 3rem);
+    }
+
+    .face-sample-copy {
+        font-size: clamp(1.1rem, 2.6vw, 1.9rem);
+        line-height: 1.25;
+        max-width: 34ch;
+    }
+
+    .face-sample-instrumentation {
+        font-family: var(--font-family-mono), monospace;
+        font-size: clamp(0.95rem, 2.2vw, 1.4rem);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .face-rail > :last-child {
+        text-align: right;
+    }
+
+    .face-note {
+        font-size: var(--font-size-sm);
+    }
+
+    .application-list {
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .application {
+        display: grid;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-xl) 0;
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .application-rail {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--spacing-md);
+    }
+
+    .application-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+        align-items: start;
+        gap: var(--flow-2xl);
+    }
+
+    .application-frame {
+        display: block;
+        border: var(--hairline) solid var(--white);
+    }
+
+    .application-frame-square {
+        max-width: 180px;
+    }
+
+    .application-frame-tall {
+        max-width: 210px;
+    }
+
+    .application-shot {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .application-notes {
+        display: grid;
+        gap: var(--spacing-sm);
+        align-content: start;
+        list-style: none;
+        font-size: var(--font-size-sm);
+    }
+
+    .application-notes li {
+        display: grid;
+        grid-template-columns: 1.4rem minmax(0, 1fr);
+        gap: var(--spacing-xs);
+    }
+
+    .application-notes li::before {
+        content: '/';
+        font-family: var(--font-family-mono), monospace;
+    }
+
+    @media (max-width: 900px) {
+        .contents-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .part-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .part:nth-child(even) {
+            padding-left: 0;
+            border-left: 0;
+        }
+
+        .construct-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .census-row,
+        .glyph-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ramp-row {
+            grid-template-columns: clamp(6rem, 22vw, 10rem) minmax(0, 1fr) auto;
+        }
+
+        .ramp-step {
+            display: none;
+        }
+
+        .ladder .ramp-row {
+            grid-template-columns: clamp(7rem, 26vw, 11rem) minmax(0, 1fr) auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .contents-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .face-rail {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .face-variable {
+            display: none;
+        }
+
+        .page-hero-body {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .page-hero-mark {
+            width: min(60%, 200px);
+        }
+
+        .figure-row {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .ink-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .application-body {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+</style>

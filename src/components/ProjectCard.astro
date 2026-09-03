@@ -7,7 +7,7 @@ interface Props {
 }
 
 const {project, position} = Astro.props;
-const {title, tagline, description, iconUrl, iconAlt, meta, capabilities} = project;
+const {title, tagline, description, iconUrl, meta, capabilities} = project;
 const index = String(position).padStart(2, '0');
 ---
 
@@ -20,7 +20,7 @@ const index = String(position).padStart(2, '0');
 
     <div class="project-head">
         <div class="project-icon">
-            <img src={iconUrl} alt={iconAlt} width="64" height="64" loading="lazy" />
+            <img src={iconUrl} alt="" aria-hidden="true" width="48" height="48" loading="lazy" />
         </div>
         <div class="project-heading">
             <h3 class="project-title">{title}</h3>
@@ -57,7 +57,7 @@ const index = String(position).padStart(2, '0');
         grid-row: span 5;
         display: grid;
         grid-template-rows: subgrid;
-        padding: clamp(1.5rem, 3vw, 2.5rem);
+        padding: var(--flow-2xl);
     }
 
     .project-topline {
@@ -105,19 +105,17 @@ const index = String(position).padStart(2, '0');
     .project-icon img {
         width: 42px;
         height: 42px;
-        object-fit: contain;
-        filter: grayscale(1) brightness(0) invert(1);
     }
 
     .project-heading {
         display: grid;
-        gap: 0.4rem;
+        gap: var(--spacing-2xs);
         min-width: 0;
     }
 
     .project-title {
         font-family: var(--font-family-display), sans-serif;
-        font-size: clamp(1.75rem, 2.6vw, var(--font-size-4xl));
+        font-size: clamp(1.75rem, 2.6vw, var(--font-size-3xl));
         font-weight: 600;
         line-height: 0.96;
         letter-spacing: 0.04em;
@@ -138,8 +136,8 @@ const index = String(position).padStart(2, '0');
     .meta-row {
         display: grid;
         align-content: start;
-        gap: 0.35rem;
-        padding: 0.85rem 0.9rem;
+        gap: var(--spacing-2xs);
+        padding: var(--spacing-sm) var(--spacing-md);
     }
 
     .meta-row + .meta-row {
@@ -187,12 +185,12 @@ const index = String(position).padStart(2, '0');
     .capability-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.4rem;
+        gap: var(--spacing-2xs);
         list-style: none;
     }
 
     .capability-list li {
-        padding: 0.35rem 0.65rem;
+        padding: var(--spacing-2xs) var(--spacing-sm);
         border: var(--hairline) solid var(--white);
         font-family: var(--font-family-mono), monospace;
         font-size: var(--label-size);

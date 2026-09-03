@@ -1,7 +1,7 @@
 import {hash} from './geometry';
 import {BAND, DistanceField} from './distance-field';
 import {ObstacleIndex, REMEASURE_STEP} from './lattice-obstacles';
-import {logoReach} from './logo-shape';
+import {markReach} from './mark-hull';
 
 const CELL = 40;
 const ROW = CELL * Math.sin(Math.PI / 3);
@@ -237,7 +237,7 @@ export function mountLatticeField(canvas: HTMLCanvasElement) {
                 }
 
                 const dist = Math.sqrt(dist2);
-                const u = dist / (RADIUS * logoReach(Math.atan2(-dy, -dx)));
+                const u = dist / (RADIUS * markReach(Math.atan2(-dy, -dx)));
 
                 const profile = burstAt ? ringAt(u) : discAt(u);
                 const inf = profile * strength;

@@ -5,7 +5,7 @@ import astro from 'eslint-plugin-astro';
 import globals from 'globals';
 
 export default defineConfig([
-    globalIgnores(['dist/', '.astro/', 'node_modules/']),
+    globalIgnores(['dist/', '.astro/', 'node_modules/', 'brand/', '.scratch/']),
     js.configs.recommended,
     tseslint.configs.recommended,
     astro.configs.recommended,

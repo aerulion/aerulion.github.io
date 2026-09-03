@@ -1,6 +1,6 @@
 import {boundsOf, type Point, type Segment} from './geometry';
 import {emptyObstacles, type Obstacles} from './distance-field';
-import {LOGO_HULL} from './logo-shape';
+import {MARK_HULL} from './mark-hull';
 
 const PAD_SURFACE = 10;
 const PAD_BORDER = 9;
@@ -158,7 +158,7 @@ const specOf = (el: Element, cs: CSSStyleDeclaration, pinned: boolean): Spec | n
     if (data?.collide === 'none') return null;
 
     const segments = data?.collide === 'lines' ? parseSegments(data.segments) : null;
-    const hull = data?.collide === 'logo';
+    const hull = data?.collide === 'mark';
     const panel = el.classList.contains('panel-cut');
 
     const text: Text[] = [];
@@ -183,7 +183,7 @@ const specOf = (el: Element, cs: CSSStyleDeclaration, pinned: boolean): Spec | n
 };
 
 const mapHull = (r: DOMRect, dx: number, dy: number) => {
-    const points: Point[] = LOGO_HULL.map(([nx, ny]) => [r.left + dx + nx * r.width, r.top + dy + ny * r.height]);
+    const points: Point[] = MARK_HULL.map(([nx, ny]) => [r.left + dx + nx * r.width, r.top + dy + ny * r.height]);
     return {points, bbox: boundsOf(points), pad: PAD_HULL};
 };
 

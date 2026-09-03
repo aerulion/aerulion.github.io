@@ -1,6 +1,6 @@
 ---
 import {uid} from '../utils/uid';
-import {barePath, inkPoints, INK_TRAVEL, SILHOUETTE, UNFOLD_DEFAULTS} from '../scripts/morphing-logo';
+import {barePath, inkPoints, INK_TRAVEL, SILHOUETTE, UNFOLD_DEFAULTS, VIEW} from '../scripts/mark-geometry';
 
 interface Props {
     class?: string;
@@ -30,12 +30,12 @@ const INTRO = fillDelay + 1400;
 ---
 
 <svg
-    class:list={['morphing-logo-mark', className]}
-    viewBox="0 0 26.458333 26.458333"
+    class:list={['morphing-mark', className]}
+    viewBox={`0 0 ${VIEW} ${VIEW}`}
     role="img"
     aria-label="aerulion logo"
-    data-collide="logo"
-    data-morphing-logo
+    data-collide="mark"
+    data-morphing-mark
     data-intro-delay={INTRO}
     data-shells={shells}
     data-depth={depth}
@@ -57,7 +57,9 @@ const INTRO = fillDelay + 1400;
     </g>
 
     <g clip-path={`url(#${bareId})`}>
-        <path class="draw-path mark-outline" d={SILHOUETTE} pathLength="1"></path>
+        <g clip-path={`url(#${clipId})`}>
+            <path class="draw-path mark-outline" d={SILHOUETTE} pathLength="1"></path>
+        </g>
     </g>
 
     <g clip-path={`url(#${clipId})`}>
@@ -66,7 +68,7 @@ const INTRO = fillDelay + 1400;
 </svg>
 
 <style>
-    .morphing-logo-mark {
+    .morphing-mark {
         display: block;
         width: 100%;
         height: auto;
@@ -74,7 +76,7 @@ const INTRO = fillDelay + 1400;
     }
 
     .mark-outline {
-        stroke-width: 0.4;
+        stroke-width: 0.8;
     }
 
     .mark-ladder,
@@ -96,7 +98,7 @@ const INTRO = fillDelay + 1400;
     }
 
     :global(.js) .mark-ink {
-        transition: transform 0.9s var(--ease-draw) var(--fill-delay, 900ms);
+        transition: transform var(--dur-lg) var(--ease-draw) var(--fill-delay, 900ms);
     }
 
     :global(.is-drawn) .mark-ink,
@@ -105,27 +107,27 @@ const INTRO = fillDelay + 1400;
     }
 
     /* Once the loop owns the ink offset, the intro transition must let go. */
-    .morphing-logo-mark.is-live .mark-ink {
+    .morphing-mark.is-live .mark-ink {
         transition: none;
     }
 
     /* Half the stroke sits outside the silhouette, so it goes once inked. */
     :global(.js) .mark-outline {
         transition:
-            stroke-dashoffset 1.15s var(--ease-draw) var(--draw-delay, 0ms),
-            stroke-opacity 0.45s linear calc(var(--fill-delay, 900ms) + 700ms);
+            stroke-dashoffset var(--dur-xl) var(--ease-draw) var(--draw-delay, 0ms),
+            stroke-opacity var(--dur-sm) linear calc(var(--fill-delay, 900ms) + 700ms);
     }
 
     :global(.is-drawn) .mark-outline {
         stroke-opacity: 0;
     }
 
-    /* A centred stroke overhangs the filled silhouette, so the outline is clipped to
-       wherever the ink is not: the sweep itself uncovers and re-covers the wireframe,
-       with no gap between the two and no rim past the fill. */
-    .morphing-logo-mark.is-live .mark-outline {
+    /* The stroke is clipped to the silhouette, so it reads as an inner one and shares
+       its outer edge with the ink, and to wherever the ink is not, so the sweep itself
+       uncovers and re-covers the wireframe with no step between the two. */
+    .morphing-mark.is-live .mark-outline {
         stroke-opacity: 1;
-        stroke-width: 0.9;
+        stroke-width: 1.8;
         stroke-dasharray: none;
         stroke-dashoffset: 0;
         transition: none;

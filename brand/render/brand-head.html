@@ -1,0 +1,665 @@
+<title>Aerulion Brand System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Tektur:wght@600;700&family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+<style>
+    :root {
+        color-scheme: dark;
+
+        --ground: #000;
+        --ink: #fff;
+
+        --tan-30: 0.5773502692;
+        --cut-x: clamp(20px, 2.4vw, 44px);
+        --cut-y: calc(var(--cut-x) * var(--tan-30));
+        --hairline: 1px;
+
+        --label-size: 0.6875rem;
+        --label-tracking: 0.2em;
+
+        --sp-xs: 0.5rem;
+        --sp-sm: 0.75rem;
+        --sp-md: 1rem;
+        --sp-lg: 1.5rem;
+        --sp-xl: 2rem;
+        --sp-2xl: 3rem;
+        --sp-3xl: 4rem;
+        --sp-4xl: 5rem;
+
+        --gutter: clamp(1.25rem, 4vw, 3rem);
+        --measure: 62ch;
+        --page: 1180px;
+
+        --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+        --ease-out-poster: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: var(--ground);
+        color: var(--ink);
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 1rem;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+    }
+
+    /* ---- Primitives ----------------------------------------------------- */
+
+    .mono {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        line-height: 1.4;
+    }
+
+    .rule {
+        border: 0;
+        border-top: var(--hairline) solid var(--ink);
+        width: 100%;
+    }
+
+    /* The 30° bevel, cut top-left and bottom-right, drawn as a hairline. */
+    .panel-cut {
+        position: relative;
+        background: transparent;
+    }
+
+    .panel-cut::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: var(--ink);
+        clip-path: polygon(
+            nonzero,
+            var(--cut-x) 0,
+            100% 0,
+            100% calc(100% - var(--cut-y)),
+            calc(100% - var(--cut-x)) 100%,
+            0 100%,
+            0 var(--cut-y),
+            var(--cut-x) 0,
+            calc(var(--cut-x) + var(--hairline) * 1.8) var(--hairline),
+            var(--hairline) calc(var(--cut-y) + var(--hairline) * 0.6),
+            var(--hairline) calc(100% - var(--hairline)),
+            calc(100% - var(--cut-x) - var(--hairline) * 1.8) calc(100% - var(--hairline)),
+            calc(100% - var(--hairline)) calc(100% - var(--cut-y) - var(--hairline) * 0.6),
+            calc(100% - var(--hairline)) var(--hairline),
+            calc(var(--cut-x) + var(--hairline) * 1.8) var(--hairline)
+        );
+    }
+
+    .shell {
+        width: min(100%, var(--page));
+        margin-inline: auto;
+        padding-inline: var(--gutter);
+    }
+
+    /* ---- Crop frame ------------------------------------------------------ */
+
+    .crop {
+        position: fixed;
+        inset: clamp(0.5rem, 1vw, 1.15rem);
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .crop span {
+        position: absolute;
+        background: var(--ink);
+    }
+
+    .crop span:nth-child(1),
+    .crop span:nth-child(2) {
+        left: 0;
+        right: 0;
+        height: var(--hairline);
+    }
+
+    .crop span:nth-child(1) {
+        top: 0;
+    }
+    .crop span:nth-child(2) {
+        bottom: 0;
+    }
+
+    .crop span:nth-child(3),
+    .crop span:nth-child(4) {
+        top: 0;
+        bottom: 0;
+        width: var(--hairline);
+    }
+
+    .crop span:nth-child(3) {
+        left: 0;
+    }
+    .crop span:nth-child(4) {
+        right: 0;
+    }
+
+    /* ---- Masthead -------------------------------------------------------- */
+
+    #masthead {
+        position: relative;
+        padding: clamp(4rem, 11vw, 8rem) 0 var(--sp-3xl);
+        overflow: hidden;
+    }
+
+    #lattice {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .masthead-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) clamp(150px, 22vw, 240px);
+        gap: clamp(1.5rem, 5vw, 4rem);
+        align-items: center;
+    }
+
+    .masthead-rail {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--sp-md);
+        flex-wrap: wrap;
+        padding-bottom: var(--sp-md);
+    }
+
+    #wordmark {
+        font-family: 'Tektur', system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(3.2rem, 12vw, 8.5rem);
+        line-height: 0.86;
+        letter-spacing: -0.01em;
+        margin-block: clamp(0.6rem, 2vw, 1.4rem);
+    }
+
+    .masthead-lede {
+        font-size: clamp(1rem, 1.6vw, 1.2rem);
+        max-width: 48ch;
+        text-wrap: pretty;
+    }
+
+    .mark-slot {
+        width: 100%;
+        aspect-ratio: 1;
+        overflow: visible;
+    }
+
+    .mark-slot svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+    }
+
+    .mark-ink {
+        fill: var(--ink);
+    }
+
+    .mark-outline {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 0.36;
+        stroke-linejoin: miter;
+    }
+
+    .mark-shell,
+    .mark-ladder {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 0.28;
+        stroke-linejoin: miter;
+        opacity: 0;
+    }
+
+    /* ---- Sections -------------------------------------------------------- */
+
+    section {
+        padding-block: clamp(3rem, 7vw, 5.5rem);
+        position: relative;
+    }
+
+    .section-head {
+        display: grid;
+        grid-template-columns: clamp(3.5rem, 7vw, 6.5rem) minmax(0, 1fr);
+        gap: var(--sp-lg);
+        align-items: baseline;
+        padding-bottom: var(--sp-xl);
+    }
+
+    .section-head h2 {
+        font-family: 'Chakra Petch', system-ui, sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.5rem, 3.4vw, 2.4rem);
+        line-height: 1.1;
+        letter-spacing: -0.005em;
+        text-wrap: balance;
+    }
+
+    .section-head > .mono {
+        grid-column: 1;
+    }
+
+    .section-head > div {
+        grid-column: 2;
+    }
+
+    .section-head > div > p {
+        max-width: var(--measure);
+        margin-top: var(--sp-sm);
+        text-wrap: pretty;
+    }
+
+    .body-grid {
+        display: grid;
+        grid-template-columns: clamp(3.5rem, 7vw, 6.5rem) minmax(0, 1fr);
+        gap: var(--sp-lg);
+    }
+
+    .body-grid > *:only-child,
+    .body-grid > .span {
+        grid-column: 2;
+    }
+
+    h3 {
+        font-family: 'Chakra Petch', system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: 0.01em;
+        line-height: 1.3;
+    }
+
+    p + p {
+        margin-top: var(--sp-md);
+    }
+
+    .prose {
+        max-width: var(--measure);
+        text-wrap: pretty;
+    }
+
+    /* ---- Law list -------------------------------------------------------- */
+
+    .laws {
+        list-style: none;
+        display: grid;
+        gap: 0;
+    }
+
+    .laws li {
+        display: grid;
+        grid-template-columns: clamp(2.5rem, 5vw, 4rem) minmax(0, 1fr);
+        gap: var(--sp-lg);
+        padding-block: var(--sp-lg);
+        border-top: var(--hairline) solid var(--ink);
+        align-items: start;
+    }
+
+    .laws li:last-child {
+        border-bottom: var(--hairline) solid var(--ink);
+    }
+
+    .laws p {
+        max-width: var(--measure);
+        margin-top: 0.35rem;
+        text-wrap: pretty;
+    }
+
+    /* ---- Specimen blocks ------------------------------------------------- */
+
+    .specimens {
+        display: grid;
+        gap: var(--sp-lg);
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    }
+
+    .specimen {
+        padding: var(--sp-lg);
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-sm);
+        min-width: 0;
+    }
+
+    .specimen-figure {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 96px;
+        overflow: hidden;
+    }
+
+    .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+        gap: var(--sp-lg);
+    }
+
+    .swatch {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-sm);
+    }
+
+    .swatch-chip {
+        height: 132px;
+        border: var(--hairline) solid var(--ink);
+    }
+
+    .swatch-chip.ink {
+        background: var(--ink);
+    }
+
+    .swatch-chip.ground {
+        background: var(--ground);
+    }
+
+    .swatch-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--sp-md);
+        border-top: var(--hairline) solid var(--ink);
+        padding-top: var(--sp-xs);
+    }
+
+    /* ---- Data tables ----------------------------------------------------- */
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 440px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding: 0.6rem var(--sp-md) 0.6rem 0;
+        border-bottom: var(--hairline) solid var(--ink);
+        vertical-align: baseline;
+    }
+
+    thead th {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        font-weight: 400;
+        padding-bottom: var(--sp-xs);
+    }
+
+    tbody td {
+        font-size: 0.9rem;
+    }
+
+    td.code,
+    td.num {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    /* ---- Type specimen --------------------------------------------------- */
+
+    .face {
+        padding-block: var(--sp-lg);
+        border-top: var(--hairline) solid var(--ink);
+        display: grid;
+        gap: var(--sp-sm);
+    }
+
+    .face:last-of-type {
+        border-bottom: var(--hairline) solid var(--ink);
+    }
+
+    .face-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-md);
+        justify-content: space-between;
+    }
+
+    .face-sample {
+        line-height: 1.05;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 0.15rem;
+    }
+
+    .sample-tektur {
+        font-family: 'Tektur', system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.4rem, 7vw, 4.4rem);
+    }
+
+    .sample-chakra {
+        font-family: 'Chakra Petch', system-ui, sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.8rem, 5vw, 3rem);
+    }
+
+    .sample-grotesk {
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: clamp(1.4rem, 3.6vw, 2.2rem);
+        white-space: normal;
+    }
+
+    .sample-plex {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: clamp(1rem, 2.4vw, 1.5rem);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    /* ---- Applications ---------------------------------------------------- */
+
+    .asset {
+        display: grid;
+        gap: var(--sp-lg);
+        padding-block: var(--sp-xl);
+        border-top: var(--hairline) solid var(--ink);
+    }
+
+    .asset:last-of-type {
+        border-bottom: var(--hairline) solid var(--ink);
+    }
+
+    .asset-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-md);
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .asset-body {
+        display: grid;
+        gap: var(--sp-lg);
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .asset-shot {
+        border: var(--hairline) solid var(--ink);
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .asset-shot.tall {
+        max-width: 210px;
+    }
+
+    .asset-shot.round {
+        max-width: 148px;
+        border: 0;
+    }
+
+    .asset-figs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-lg);
+        align-items: flex-start;
+    }
+
+    dl.spec {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.35rem var(--sp-md);
+        align-content: start;
+    }
+
+    dl.spec dt {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+        padding-top: 0.28rem;
+    }
+
+    dl.spec dd {
+        font-size: 0.9rem;
+    }
+
+    /* ---- Do / Don't ------------------------------------------------------ */
+
+    .verdicts {
+        display: grid;
+        gap: var(--sp-lg);
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    }
+
+    .verdict {
+        padding: var(--sp-lg);
+        display: grid;
+        gap: var(--sp-sm);
+        align-content: start;
+    }
+
+    .verdict ul {
+        list-style: none;
+        display: grid;
+        gap: var(--sp-sm);
+    }
+
+    .verdict li {
+        display: grid;
+        grid-template-columns: 1.6rem minmax(0, 1fr);
+        gap: var(--sp-xs);
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+
+    .verdict li span:first-child {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    }
+
+    /* ---- Footer ---------------------------------------------------------- */
+
+    footer {
+        padding-block: var(--sp-2xl) var(--sp-4xl);
+        border-top: var(--hairline) solid var(--ink);
+    }
+
+    .footer-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-md);
+        justify-content: space-between;
+    }
+
+    /* ---- Diagram --------------------------------------------------------- */
+
+    .diagram {
+        width: 100%;
+        height: auto;
+        border: var(--hairline) solid var(--ink);
+    }
+
+    .d-line {
+        stroke: #fff;
+        stroke-width: 1;
+        fill: none;
+    }
+
+    .d-dash {
+        stroke: #fff;
+        stroke-width: 1;
+        fill: none;
+        stroke-dasharray: 5 4;
+    }
+
+    .d-hatch {
+        fill: url(#hatch);
+        stroke: none;
+    }
+
+    .d-text {
+        fill: #fff;
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .d-text.small {
+        font-size: 9.5px;
+    }
+
+    @media (max-width: 760px) {
+        .masthead-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .mark-slot {
+            max-width: 190px;
+        }
+
+        .section-head,
+        .body-grid,
+        .laws li {
+            grid-template-columns: minmax(0, 1fr);
+            gap: var(--sp-sm);
+        }
+
+        .section-head > .mono,
+        .section-head > div,
+        .body-grid > .span,
+        .body-grid > *:only-child {
+            grid-column: 1;
+        }
+
+        .asset-body {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+</style>

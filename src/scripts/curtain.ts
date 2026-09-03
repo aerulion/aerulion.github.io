@@ -1,9 +1,10 @@
+/* On the duration scale in global.css: md, md, xl. */
 const SEEN_KEY = 'aerulion:seen';
-const NAV_HOLD = 640;
-const LIFT = 560;
-const INTRO_HOLD = 1150;
+const NAV_HOLD = 500;
+const LIFT = 500;
+const INTRO_HOLD = 1000;
 
-export function mountPageTransition(curtain: HTMLElement) {
+export function mountCurtain(curtain: HTMLElement) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const label = curtain.querySelector<HTMLElement>('[data-curtain-label]');

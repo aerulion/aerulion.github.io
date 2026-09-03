@@ -1,4 +1,5 @@
 ---
+import Glyph from './Glyph.astro';
 interface Endpoint {
     label: string;
     value: string;
@@ -33,13 +34,13 @@ const endpoints: Endpoint[] = [
 ];
 ---
 
-<section class="contact-section" id="endpoints" data-station="05 / 05">
+<section class="contact-section" id="endpoints" data-station="06 / 06">
     <div class="container">
         <div class="section-header" data-reveal>
             <div class="section-rail">
                 <p class="section-eyebrow">Endpoints</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count" data-telemetry>05 / 05</p>
+                <p class="section-count" data-roll>06 / 06</p>
             </div>
             <h2 class="section-title">Where to find me.</h2>
             <div class="section-lede">
@@ -71,9 +72,7 @@ const endpoints: Endpoint[] = [
                                         <span class="endpoint-value">{endpoint.value}</span>
                                     </span>
                                     <span class="endpoint-note">{endpoint.note}</span>
-                                    <span class="endpoint-glyph" aria-hidden="true">
-                                        ↗
-                                    </span>
+                                    <Glyph name="external" class="endpoint-glyph" />
                                 </a>
                             ) : (
                                 <button
@@ -90,9 +89,7 @@ const endpoints: Endpoint[] = [
                                     <span class="endpoint-note" data-copy-note aria-live="polite">
                                         {endpoint.note}
                                     </span>
-                                    <span class="endpoint-glyph" aria-hidden="true">
-                                        ⧉
-                                    </span>
+                                    <Glyph name="copy" class="endpoint-glyph" />
                                 </button>
                             )}
                         </li>
@@ -119,8 +116,8 @@ const endpoints: Endpoint[] = [
         display: grid;
         grid-template-columns: auto minmax(0, 0.9fr) minmax(0, 1.1fr) auto;
         align-items: center;
-        gap: clamp(1rem, 3vw, 3rem);
-        padding: clamp(1.4rem, 2.5vw, 2rem) clamp(0.5rem, 1.5vw, 1.25rem);
+        gap: var(--flow-2xl);
+        padding: var(--flow-xl) var(--flow-lg);
         border: 0;
         background: transparent;
         font: inherit;
@@ -138,7 +135,7 @@ const endpoints: Endpoint[] = [
     .endpoint-link:focus-visible {
         background: var(--white);
         color: var(--black);
-        padding-left: clamp(1rem, 2.5vw, 2rem);
+        padding-left: var(--flow-xl);
     }
 
     .endpoint-index {
@@ -149,7 +146,7 @@ const endpoints: Endpoint[] = [
 
     .endpoint-body {
         display: grid;
-        gap: 0.3rem;
+        gap: var(--spacing-3xs);
         min-width: 0;
     }
 

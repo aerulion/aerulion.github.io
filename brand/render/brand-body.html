@@ -1,0 +1,689 @@
+<div class="crop" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+<header id="masthead">
+    <canvas id="lattice" aria-hidden="true"></canvas>
+    <div class="shell">
+        <div class="masthead-rail mono" data-shy>
+            <span>Brand system / Revision 01</span>
+            <span>aerulion.net / true monochrome</span>
+        </div>
+        <hr class="rule" />
+        <div class="masthead-grid">
+            <div>
+                <p class="mono" data-shy>Identity / Geometry / Motion</p>
+                <h1 id="wordmark" data-shy>aerulion</h1>
+                <p class="masthead-lede" data-shy>
+                    One mark, two colours and two angles. Everything below is derived from the logo — an equilateral
+                    triangle with a 30/60 bolt cut — and nothing in the system is decorative enough to survive being
+                    off-grid.
+                </p>
+            </div>
+            <div class="mark-slot" data-shy>
+                <svg viewBox="-8.971 -8.971 44.4 44.4" role="img" aria-label="The aerulion mark, unfolding">
+                    <defs>
+                        <clipPath id="mark-clip"><path class="mark-clip" /></clipPath>
+                        <clipPath id="mark-bare"><path class="mark-bare" clip-rule="evenodd" /></clipPath>
+                    </defs>
+                    <g class="mark-depth" aria-hidden="true">
+                        <path class="mark-ladder" />
+                        <path class="mark-shell" />
+                        <path class="mark-shell" />
+                        <path class="mark-shell" />
+                        <path class="mark-shell" />
+                    </g>
+                    <g clip-path="url(#mark-bare)"><path class="mark-outline" /></g>
+                    <g clip-path="url(#mark-clip)"><polygon class="mark-ink" /></g>
+                </svg>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section id="laws">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">01 / 08</p>
+                <div>
+                    <h2>The system</h2>
+                    <p class="prose">
+                        Six rules. They are the whole identity — if a change breaks one of them, it belongs somewhere
+                        else. Every asset in section 07 was built by following them and nothing more.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Constitution</p>
+                <ol class="laws">
+                    <li>
+                        <p class="mono">i</p>
+                        <div>
+                            <h3>Two colours</h3>
+                            <p>
+                                Exactly <code class="mono" style="text-transform: none">#000</code> and
+                                <code class="mono" style="text-transform: none">#fff</code>. No greys, no tints, no
+                                alpha on text. Hierarchy comes from size, position and density — never from dimming.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="mono">ii</p>
+                        <div>
+                            <h3>30° and 60°, always</h3>
+                            <p>
+                                Both angles are taken from the mark. Panel corners bevel at 30°; the cursor lattice is a
+                                60° triangular grid. There is no third angle in the system.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="mono">iii</p>
+                        <div>
+                            <h3>Nothing spins in the plane</h3>
+                            <p>
+                                An in-plane rotation is off-grid for all but six frames of its cycle, so motion runs
+                                <em>along</em> the geometry instead. The one figure that turns does it in four
+                                dimensions and projects back down, so every silhouette it passes through is still built
+                                from the same four lattice directions.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="mono">iv</p>
+                        <div>
+                            <h3>Hairlines are the layout</h3>
+                            <p>
+                                A 1px rule does the work a box, a card or a background would do elsewhere. Fills are for
+                                the mark and for inverted buttons; nothing else gets a surface.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="mono">v</p>
+                        <div>
+                            <h3>Instrumentation labels</h3>
+                            <p>
+                                Small uppercase mono readouts — <span class="mono">Node / 001</span>,
+                                <span class="mono">Status / Active</span>, <span class="mono">02 / 03</span> — frame
+                                each block, the way a print registration mark or a telemetry panel would.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="mono">vi</p>
+                        <div>
+                            <h3>Falloff is density, not opacity</h3>
+                            <p>
+                                Where something fades, it thins: the lattice dithers vertices and segments in and out so
+                                the field never renders a grey pixel. This is law i restated for anything generative.
+                            </p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section id="colour">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">02 / 08</p>
+                <div>
+                    <h2>Colour</h2>
+                    <p class="prose">
+                        The palette is complete. There is no accent, no secondary, no tint ramp, and no semantic colour
+                        — a warning reads as a warning because of what it says and where it sits.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Palette</p>
+                <div class="span" style="display: grid; gap: var(--sp-xl)">
+                    <div class="swatches">
+                        <div class="swatch">
+                            <div class="swatch-chip ground"></div>
+                            <div class="swatch-meta mono"><span>Ground</span><span>#000000</span></div>
+                            <p style="font-size: 0.9rem">
+                                The page, every panel, and the ground behind the mark. Never softened to a near-black.
+                            </p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-chip ink"></div>
+                            <div class="swatch-meta mono"><span>Ink</span><span>#FFFFFF</span></div>
+                            <p style="font-size: 0.9rem">
+                                Type, hairlines, the mark, and the inverted button fill. Never softened to a near-white.
+                            </p>
+                        </div>
+                    </div>
+                    <p class="prose" style="font-size: 0.92rem">
+                        The one sanctioned exception is structural opacity inside a single generative figure — the
+                        unfold shells behind the mark carry an alpha so the stack reads as depth rather than as four
+                        overlapping outlines. It never applies to text, hairlines, or the mark's own silhouette.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="geometry">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">03 / 08</p>
+                <div>
+                    <h2>Geometry</h2>
+                    <p class="prose">
+                        Two angles, four axes, one bevel. The lattice behind the masthead is the system running live:
+                        move the pointer over it and the grid deflects, thinning around the type instead of dimming.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Construction</p>
+                <div class="span" style="display: grid; gap: var(--sp-xl)">
+                    <div class="specimens">
+                        <div class="specimen panel-cut">
+                            <div class="specimen-figure">
+                                <svg viewBox="0 0 160 96" width="160" height="96" aria-label="The four lattice axes at 30, 60, 120 and 150 degrees">
+                                    <g class="d-line">
+                                        <path d="M18 76 L142 76" class="d-dash" />
+                                        <path d="M80 48 L133.7 17" />
+                                        <path d="M80 48 L111 -5.7" />
+                                        <path d="M80 48 L49 -5.7" />
+                                        <path d="M80 48 L26.3 17" />
+                                    </g>
+                                    <circle cx="80" cy="48" r="2" fill="#fff" />
+                                    <text class="d-text small" x="18" y="90">30 / 60 / 120 / 150</text>
+                                </svg>
+                            </div>
+                            <p class="mono">Four axes</p>
+                            <p style="font-size: 0.9rem">
+                                Every edge of the mark classifies onto one of these four directions. They are the only
+                                directions any line in the system may take.
+                            </p>
+                        </div>
+                        <div class="specimen panel-cut">
+                            <div class="specimen-figure">
+                                <svg viewBox="0 0 160 96" width="160" height="96" aria-label="The 30 degree panel bevel">
+                                    <path class="d-line" d="M46 20 H142 V64 L124 76 H18 V32 Z" />
+                                    <path class="d-dash" d="M18 32 H46 V20" />
+                                    <text class="d-text small" x="52" y="52">30°</text>
+                                </svg>
+                            </div>
+                            <p class="mono">The bevel</p>
+                            <p style="font-size: 0.9rem">
+                                Top-left and bottom-right corners only, cut at 30°. The vertical drop is always the
+                                horizontal run times tan 30°.
+                            </p>
+                        </div>
+                        <div class="specimen panel-cut">
+                            <div class="specimen-figure">
+                                <svg viewBox="0 0 160 96" width="160" height="96" aria-label="A 60 degree triangular lattice cell">
+                                    <g class="d-line">
+                                        <path d="M40 68 L80 68 L120 68" />
+                                        <path d="M20 34 L60 34 L100 34 L140 34" />
+                                        <path d="M40 68 L60 34 L80 68 L100 34 L120 68" />
+                                        <path d="M20 34 L40 68" />
+                                        <path d="M120 68 L140 34" />
+                                    </g>
+                                    <text class="d-text small" x="66" y="90">60°</text>
+                                </svg>
+                            </div>
+                            <p class="mono">The lattice</p>
+                            <p style="font-size: 0.9rem">
+                                A 60° triangular grid on a 40px cell, row pitch <span style="white-space: nowrap">40 · sin 60°</span>.
+                                It bends around real content rather than sitting behind it.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <caption class="mono" style="text-align: left; padding-bottom: var(--sp-sm)">
+                                Geometry tokens
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Token</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Governs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="code">--tan-30</td>
+                                    <td class="num">0.5773502692</td>
+                                    <td>The single constant every bevel is derived from</td>
+                                </tr>
+                                <tr>
+                                    <td class="code">--cut-x</td>
+                                    <td class="num">clamp(26px, 2.6vw, 52px)</td>
+                                    <td>Horizontal run of the 30° panel cut</td>
+                                </tr>
+                                <tr>
+                                    <td class="code">--cut-y</td>
+                                    <td class="num">--cut-x × --tan-30</td>
+                                    <td>Vertical drop; never set by hand</td>
+                                </tr>
+                                <tr>
+                                    <td class="code">--hairline</td>
+                                    <td class="num">1px</td>
+                                    <td>Every rule, border and registration mark</td>
+                                </tr>
+                                <tr>
+                                    <td class="code">CELL / ROW</td>
+                                    <td class="num">40px / 40 · sin 60°</td>
+                                    <td>Lattice pitch</td>
+                                </tr>
+                                <tr>
+                                    <td class="code">RADIUS / PULL</td>
+                                    <td class="num">420px / 26px</td>
+                                    <td>Pointer reach, and how far a vertex may travel</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="mark">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">04 / 08</p>
+                <div>
+                    <h2>The mark</h2>
+                    <p class="prose">
+                        An equilateral triangle with a bolt cut through it. It has two states — drawn as an outline, and
+                        inked solid — and one motion, the unfold.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Usage</p>
+                <div class="span" style="display: grid; gap: var(--sp-xl)">
+                    <div class="specimens">
+                        <div class="specimen panel-cut">
+                            <div class="specimen-figure">
+                                <svg viewBox="-3 -3 32.46 32.46" width="120" height="120" aria-label="The mark, inked">
+                                    <path id="mark-solid" fill="#fff" />
+                                </svg>
+                            </div>
+                            <p class="mono">Inked / primary</p>
+                            <p style="font-size: 0.9rem">The resting state. Use this everywhere a single static mark is needed.</p>
+                        </div>
+                        <div class="specimen panel-cut">
+                            <div class="specimen-figure">
+                                <svg viewBox="-3 -3 32.46 32.46" width="120" height="120" aria-label="The mark, drawn as an outline">
+                                    <path id="mark-hollow" fill="none" stroke="#fff" stroke-width="0.5" stroke-linejoin="miter" />
+                                </svg>
+                            </div>
+                            <p class="mono">Drawn / quiet</p>
+                            <p style="font-size: 0.9rem">
+                                For large sizes and calm surfaces — the lockscreen, a watermark, the first beat of the
+                                draw-then-ink intro.
+                            </p>
+                        </div>
+                        <div class="specimen panel-cut">
+                            <div class="specimen-figure">
+                                <svg viewBox="-3 -3 32.46 32.46" width="120" height="120" aria-label="Clear space around the mark">
+                                    <path id="mark-clearance" fill="#fff" />
+                                    <path class="d-dash" d="M-1.6 -1.6 H28.06 V28.06 H-1.6 Z" />
+                                    <text class="d-text small" x="-1.4" y="30.2" style="font-size: 2.4px">Clear space = 1/6 height</text>
+                                </svg>
+                            </div>
+                            <p class="mono">Clear space</p>
+                            <p style="font-size: 0.9rem">
+                                One sixth of the mark's height on every side, and nothing but ground inside it — not a
+                                hairline, not a label.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="padding-bottom: var(--sp-sm)">The unfold</h3>
+                        <p class="prose">
+                            The outline is classified into the four lattice directions, lifted into 4D, rotated there,
+                            and projected back. That is why the mark can turn without ever spinning in the plane, and
+                            why every silhouette on the way through is still made of 30° and 60° edges. Two arcs of the
+                            same direction close a full turn, so a loop built that way has no seam.
+                        </p>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <caption class="mono" style="text-align: left; padding-bottom: var(--sp-sm)">
+                                Minimum sizes
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Context</th>
+                                    <th scope="col">Minimum</th>
+                                    <th scope="col">State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Favicon, chat avatar</td>
+                                    <td class="num">16 px</td>
+                                    <td>Inked only</td>
+                                </tr>
+                                <tr>
+                                    <td>Profile avatar, app icon</td>
+                                    <td class="num">64 px</td>
+                                    <td>Inked; unfold permitted at 128 px and up</td>
+                                </tr>
+                                <tr>
+                                    <td>Outline / drawn</td>
+                                    <td class="num">96 px</td>
+                                    <td>Below this the hairline breaks up</td>
+                                </tr>
+                                <tr>
+                                    <td>Print</td>
+                                    <td class="num">12 mm</td>
+                                    <td>Inked, solid black or solid white</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="type">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">05 / 08</p>
+                <div>
+                    <h2>Typography</h2>
+                    <p class="prose">
+                        Four faces, one job each. A face never takes another's job — headings do not get set in Tektur,
+                        and labels are always mono, always uppercase, always tracked.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Faces</p>
+                <div class="span">
+                    <div class="face">
+                        <div class="face-meta">
+                            <p class="mono">Tektur 700 / wordmark</p>
+                            <p class="mono">Set tight, never as body</p>
+                        </div>
+                        <p class="face-sample sample-tektur">aerulion</p>
+                    </div>
+                    <div class="face">
+                        <div class="face-meta">
+                            <p class="mono">Chakra Petch 600 / headings</p>
+                            <p class="mono">Section titles and subheads</p>
+                        </div>
+                        <p class="face-sample sample-chakra">Performance-focused plugins</p>
+                    </div>
+                    <div class="face">
+                        <div class="face-meta">
+                            <p class="mono">Space Grotesk 400 / copy</p>
+                            <p class="mono">Measure ≈ 62 characters</p>
+                        </div>
+                        <p class="face-sample sample-grotesk">
+                            Professional Java development for custom Minecraft systems and long-term server
+                            architecture.
+                        </p>
+                    </div>
+                    <div class="face">
+                        <div class="face-meta">
+                            <p class="mono">IBM Plex Mono 400 / labels</p>
+                            <p class="mono">0.6875rem at 0.2em tracking</p>
+                        </div>
+                        <p class="face-sample sample-plex">Node / 001 &nbsp; Status / Active</p>
+                    </div>
+
+                    <div class="table-wrap" style="padding-top: var(--sp-xl)">
+                        <table>
+                            <caption class="mono" style="text-align: left; padding-bottom: var(--sp-sm)">
+                                Scale
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Token</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Used for</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="code">--label-size</td><td class="num">0.6875rem</td><td>Every mono readout, tracked 0.2em</td></tr>
+                                <tr><td class="code">--font-size-xs</td><td class="num">0.75rem</td><td>Dense metadata</td></tr>
+                                <tr><td class="code">--font-size-sm</td><td class="num">0.875rem</td><td>Secondary copy</td></tr>
+                                <tr><td class="code">--font-size-base</td><td class="num">1rem</td><td>Body</td></tr>
+                                <tr><td class="code">--font-size-lg / xl</td><td class="num">1.125 / 1.25rem</td><td>Lede paragraphs</td></tr>
+                                <tr><td class="code">--font-size-2xl</td><td class="num">1.5rem</td><td>Subheads</td></tr>
+                                <tr><td class="code">--font-size-4xl</td><td class="num">2.4rem</td><td>Section titles</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="motion">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">06 / 08</p>
+                <div>
+                    <h2>Motion</h2>
+                    <p class="prose">
+                        Motion is construction, not decoration: things draw themselves, ink themselves, and deflect.
+                        Nothing eases in from nowhere and nothing bounces.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Behaviour</p>
+                <div class="span" style="display: grid; gap: var(--sp-xl)">
+                    <div class="specimens">
+                        <div class="specimen panel-cut">
+                            <p class="mono">Draw, then ink</p>
+                            <p style="font-size: 0.9rem">
+                                A figure arrives as a stroke tracing its own outline, then a solid sweep fills it from
+                                below. The stroke is clipped to wherever the ink is not, so there is no rim and no gap.
+                            </p>
+                        </div>
+                        <div class="specimen panel-cut">
+                            <p class="mono">Deflect, don't dim</p>
+                            <p style="font-size: 0.9rem">
+                                The lattice reads the live DOM and bends around it. Near an obstacle it drops vertices
+                                and segments; it never fades them.
+                            </p>
+                        </div>
+                        <div class="specimen panel-cut">
+                            <p class="mono">Turn in 4D</p>
+                            <p style="font-size: 0.9rem">
+                                The only rotation permitted. In-plane spin is banned outright — for a shape made of four
+                                fixed axes it is off-grid almost the entire time.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <caption class="mono" style="text-align: left; padding-bottom: var(--sp-sm)">
+                                Easings
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Token</th>
+                                    <th scope="col">Curve</th>
+                                    <th scope="col">Used for</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="code">--transition-base</td><td class="num">0.25s linear</td><td>State flips — hover, invert, focus</td></tr>
+                                <tr><td class="code">--ease-draw</td><td class="num">cubic-bezier(0.65, 0, 0.35, 1)</td><td>Self-drawing strokes and the ink sweep</td></tr>
+                                <tr><td class="code">--ease-out-poster</td><td class="num">cubic-bezier(0.22, 1, 0.36, 1)</td><td>Scroll reveals, 18px of travel</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="prose" style="font-size: 0.92rem">
+                        Under <span class="mono" style="text-transform: none">prefers-reduced-motion</span> the lattice
+                        does not mount at all, the mark rests inked, and reveals resolve instantly. The system has to be
+                        complete without any of it.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="applications">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">07 / 08</p>
+                <div>
+                    <h2>Applications</h2>
+                    <p class="prose">
+                        Three surfaces the system has to survive outside the site, each with a crop it does not control.
+                        The rule that carries all three: let every hairline bleed off an edge, so no crop can sever a
+                        frame.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Assets</p>
+                <div class="span">
+                    <div class="asset">
+                        <div class="asset-head">
+                            <h3>Discord profile banner</h3>
+                            <p class="mono">600 × 240 · 5:2</p>
+                        </div>
+                        <div class="asset-body">
+                            <div style="display: grid; gap: var(--sp-md)">
+                                <img class="asset-shot" src="BANNER_SRC" alt="The aerulion Discord banner: a lattice field on the left, the wordmark and mono labels on the right" width="1200" height="480" />
+                                <svg class="diagram" viewBox="0 0 600 240" role="img" aria-label="Banner safe-zone diagram: the middle 77 percent of the height survives Discord's crop, and the avatar covers the bottom-left">
+                                    <defs>
+                                        <pattern id="hatch" width="7" height="7" patternTransform="rotate(30)" patternUnits="userSpaceOnUse">
+                                            <line x1="0" y1="0" x2="0" y2="7" stroke="#fff" stroke-width="0.7" />
+                                        </pattern>
+                                    </defs>
+                                    <rect x="0" y="0" width="600" height="27.7" class="d-hatch" />
+                                    <rect x="0" y="212.3" width="600" height="27.7" class="d-hatch" />
+                                    <path class="d-dash" d="M0 27.7 H600 M0 212.3 H600" />
+                                    <path class="d-dash" d="M0 140 A116 116 0 0 0 232 140 L232 240 L0 240 Z" />
+                                    <path class="d-line" d="M0 46 H600 M0 194 H600 M268 0 V240" />
+                                    <text class="d-text small" x="10" y="20">Cropped on desktop</text>
+                                    <text class="d-text small" x="10" y="232">Cropped on desktop</text>
+                                    <text class="d-text small" x="10" y="186">Avatar reserve</text>
+                                    <text class="d-text small" x="292" y="20">Type block</text>
+                                </svg>
+                            </div>
+                            <dl class="spec">
+                                <dt>Sizes</dt>
+                                <dd>600 × 240, 1200 × 480, 2400 × 960</dd>
+                                <dt>Formats</dt>
+                                <dd>PNG, and a seamless GIF — 5.6 s, 20 fps, 112 frames</dd>
+                                <dt>Vertical safe</dt>
+                                <dd>
+                                    y 46–194. Discord's popout renders the banner at roughly 3.25:1, so only the middle
+                                    77 % of the height survives.
+                                </dd>
+                                <dt>Avatar reserve</dt>
+                                <dd>Left 39 % of the width below 58 % of the height. The lattice opens a soft void there rather than hiding a hard circle.</dd>
+                                <dt>No frame</dt>
+                                <dd>Two horizontal rules and one vertical spine, all full-bleed. A bordered banner loses its corners at every crop.</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="asset">
+                        <div class="asset-head">
+                            <h3>Discord avatar</h3>
+                            <p class="mono">128 · 256 · 512 px</p>
+                        </div>
+                        <div class="asset-body">
+                            <div class="asset-figs">
+                                <img class="asset-shot round" src="AVATAR_STATIC_SRC" alt="The aerulion mark inked, inside a hairline ring" width="256" height="256" />
+                                <img class="asset-shot round" src="AVATAR_GIF_SRC" alt="The aerulion mark unfolding through its four lattice axes" width="256" height="256" />
+                            </div>
+                            <dl class="spec">
+                                <dt>Crop</dt>
+                                <dd>Circular. The mark stays inside 80 % of the crop radius through the whole unfold; the hairline ring sits at 90 %.</dd>
+                                <dt>Loop</dt>
+                                <dd>7.0 s, 20 fps, 140 frames. Two same-direction arcs close the rotation on a full turn, so the last frame is the first.</dd>
+                                <dt>Rest</dt>
+                                <dd>Inked solid. The wireframe is a passage, not a state — the static PNG is always the inked frame.</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="asset">
+                        <div class="asset-head">
+                            <h3>iPhone lockscreen</h3>
+                            <p class="mono">1290 × 2796 · 430 × 932 pt</p>
+                        </div>
+                        <div class="asset-body">
+                            <div class="asset-figs">
+                                <img class="asset-shot tall" src="LOCKSCREEN_SRC" alt="The lockscreen: a thin-outline mark centred between two full-bleed hairlines, over a sparse dot lattice" width="430" height="932" />
+                            </div>
+                            <dl class="spec">
+                                <dt>Clear above</dt>
+                                <dd>0–260 pt — Dynamic Island, date, clock and the widget row.</dd>
+                                <dt>Clear below</dt>
+                                <dd>820–932 pt — torch and camera buttons, home indicator.</dd>
+                                <dt>Mark</dt>
+                                <dd>Drawn, not inked. 214 pt wide, centred at 522 pt, inside a circular clearance in the dot field.</dd>
+                                <dt>Decoration</dt>
+                                <dd>Two full-bleed rules at 300 and 740 pt, edge ticks every 40 pt, and the lattice reduced to vertices only.</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="verdicts">
+        <div class="shell">
+            <div class="section-head">
+                <p class="mono">08 / 08</p>
+                <div>
+                    <h2>Do and don't</h2>
+                    <p class="prose">
+                        Most of the ways this system breaks are additions, not mistakes — a grey, a radius, a shadow, a
+                        rotation. Each one is individually harmless and collectively fatal.
+                    </p>
+                </div>
+            </div>
+            <div class="body-grid">
+                <p class="mono">Verdicts</p>
+                <div class="span verdicts">
+                    <div class="verdict panel-cut">
+                        <p class="mono">Do</p>
+                        <ul>
+                            <li><span>+</span><span>Let hairlines run off the edge of the canvas.</span></li>
+                            <li><span>+</span><span>Thin a field out when it should recede.</span></li>
+                            <li><span>+</span><span>Label a block with a mono readout that says something true.</span></li>
+                            <li><span>+</span><span>Bevel a panel at 30°, top-left and bottom-right.</span></li>
+                            <li><span>+</span><span>Invert — black on white — to make something loud.</span></li>
+                            <li><span>+</span><span>Leave the mark inked and still when in doubt.</span></li>
+                        </ul>
+                    </div>
+                    <div class="verdict panel-cut">
+                        <p class="mono">Don't</p>
+                        <ul>
+                            <li><span>−</span><span>Introduce a grey, a tint, or text at reduced opacity.</span></li>
+                            <li><span>−</span><span>Round a corner, add a shadow, or fill a card.</span></li>
+                            <li><span>−</span><span>Rotate the mark in the plane, at any angle.</span></li>
+                            <li><span>−</span><span>Draw a line at an angle that is not 30° or 60°.</span></li>
+                            <li><span>−</span><span>Set a heading in Tektur or a label in anything but mono.</span></li>
+                            <li><span>−</span><span>Put a frame on an asset whose crop you don't control.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="shell footer-row mono">
+        <span>aerulion / brand system / revision 01</span>
+        <span>Derived from aerulion.net</span>
+    </div>
+</footer>

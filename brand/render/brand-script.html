@@ -1,0 +1,200 @@
+<script>
+    (function () {
+        'use strict';
+
+        /* === lattice.js ================================================== */
+        LATTICE_MODULE
+
+        /* === morphing-logo.ts (transpiled) =============================== */
+        MORPH_MODULE
+
+        /* === static mark specimens ======================================= */
+        ['mark-solid', 'mark-hollow', 'mark-clearance'].forEach(function (id) {
+            var node = document.getElementById(id);
+            if (node) node.setAttribute('d', SILHOUETTE);
+        });
+
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* === masthead lattice ============================================ */
+        var canvas = document.getElementById('lattice');
+        var host = document.getElementById('masthead');
+        var ctx = canvas && canvas.getContext('2d');
+
+        var pointer = null;
+        var eased = null;
+        var boxes = [];
+        var W = 0;
+        var H = 0;
+
+        function measure() {
+            var rect = host.getBoundingClientRect();
+            W = Math.round(rect.width);
+            H = Math.round(rect.height);
+            var dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.round(W * dpr);
+            canvas.height = Math.round(H * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            boxes = [];
+            host.querySelectorAll('[data-shy]').forEach(function (el) {
+                var b = el.getBoundingClientRect();
+                boxes.push({
+                    x: b.left - rect.left,
+                    y: b.top - rect.top,
+                    w: b.width,
+                    h: b.height,
+                    band: 18,
+                    clear: 16
+                });
+            });
+        }
+
+        function paint(now) {
+            if (!W || !H) return;
+            ctx.clearRect(0, 0, W, H);
+
+            var target = pointer;
+            if (!target) {
+                var a = (now / 9000) * Math.PI * 2;
+                target = [W * 0.5 + Math.cos(a) * W * 0.3, H * 0.55 + Math.sin(a * 2) * H * 0.26];
+            }
+            if (!eased) eased = target.slice();
+            eased[0] += (target[0] - eased[0]) * 0.09;
+            eased[1] += (target[1] - eased[1]) * 0.09;
+
+            drawLattice(ctx, {
+                width: W,
+                height: H,
+                cell: 40,
+                radius: 300,
+                pull: 24,
+                density: 0.1,
+                lift: 0.72,
+                weave: 0.9,
+                dot: 1.3,
+                obstacles: boxes,
+                attractor: eased,
+                falloff: function () {
+                    return 1;
+                }
+            });
+        }
+
+        /* === the unfolding mark ========================================== */
+        var svg = document.querySelector('.mark-slot svg');
+        var LOOP = 7;
+        var LEAD = 0.7;
+        var OPTIONS = {depth: 0.4, shells: 2, precess: -1, anomaly: 0.14, phase: 0, fan: 0};
+        var episode = {
+            rest: 0.5,
+            span: 5.1,
+            arcs: [
+                {
+                    fan: 0.42,
+                    phase: 1.9,
+                    reach: 1.05,
+                    dir: 1,
+                    peak: Math.PI / 2 + 0.1,
+                    out: {strike: 0.5, hold: 1.0, ease: 'snap'},
+                    back: {strike: 0.45, hold: 0.4, ease: 'recoil'}
+                },
+                {
+                    fan: 2.65,
+                    phase: 4.35,
+                    reach: 0.95,
+                    dir: 1,
+                    peak: Math.PI / 2 - 0.12,
+                    out: {strike: 0.55, hold: 1.1, ease: 'recoil'},
+                    back: {strike: 0.45, hold: 0.65, ease: 'glide'}
+                }
+            ]
+        };
+
+        var rig = null;
+        if (svg) {
+            rig = {
+                outline: svg.querySelector('.mark-outline'),
+                clip: svg.querySelector('.mark-clip'),
+                bare: svg.querySelector('.mark-bare'),
+                ladder: svg.querySelector('.mark-ladder'),
+                ink: svg.querySelector('.mark-ink'),
+                shells: Array.prototype.slice.call(svg.querySelectorAll('.mark-shell'))
+            };
+            rig.ink.setAttribute('points', inkPoints());
+        }
+
+        function paintMark(clock) {
+            if (!rig) return;
+            var beat = episodeBeat(episode, clock, LEAD);
+            var frame = unfold(beat.angle, {
+                depth: OPTIONS.depth * beat.reach,
+                shells: OPTIONS.shells,
+                precess: OPTIONS.precess,
+                anomaly: OPTIONS.anomaly,
+                phase: beat.phase,
+                fan: beat.fan
+            });
+
+            var d = toPath(frame.base);
+            rig.outline.setAttribute('d', d);
+            rig.clip.setAttribute('d', d);
+
+            var dy = beat.ink * INK_TRAVEL;
+            rig.bare.setAttribute('d', barePath(dy));
+            rig.ink.style.transform = 'translateY(' + dy.toFixed(4) + 'px)';
+
+            rig.ladder.setAttribute('d', ladderPath(frame));
+            rig.ladder.style.opacity = String(frame.spread * 0.11);
+
+            frame.shells.forEach(function (shell, i) {
+                var node = rig.shells[i];
+                if (!node) return;
+                node.setAttribute('d', d);
+                node.setAttribute(
+                    'transform',
+                    'translate(' + shell.offset[0].toFixed(3) + ' ' + shell.offset[1].toFixed(3) + ')'
+                );
+                node.style.opacity = String(frame.spread * 0.34 * (1 - shell.level * 0.5));
+            });
+        }
+
+        /* === run ========================================================= */
+        function boot() {
+            if (ctx) measure();
+            if (reduced) {
+                if (ctx) paint(0);
+                paintMark(0);
+                return;
+            }
+
+            var start = performance.now();
+            (function tick(now) {
+                if (ctx) paint(now);
+                paintMark(((now - start) / 1000) % LOOP);
+                requestAnimationFrame(tick);
+            })(start);
+        }
+
+        if (ctx) {
+            host.addEventListener('pointermove', function (e) {
+                var rect = host.getBoundingClientRect();
+                pointer = [e.clientX - rect.left, e.clientY - rect.top];
+            });
+            host.addEventListener('pointerleave', function () {
+                pointer = null;
+            });
+            var resizeTimer = 0;
+            window.addEventListener('resize', function () {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(measure, 160);
+            });
+        }
+
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(boot);
+        } else {
+            boot();
+        }
+    })();
+</script>

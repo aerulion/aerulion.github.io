@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'bun:test';
 import {boundsOf, distToSegment2, hash, type Point, pointInPolygon} from './geometry';
-import {LOGO_HULL} from './logo-shape';
+import {MARK_HULL} from './mark-hull';
 
 const SQUARE: Point[] = [
     [0, 0],
@@ -76,8 +76,8 @@ describe('pointInPolygon', () => {
     });
 
     test('follows the logo hull rather than its bounding box', () => {
-        expect(pointInPolygon(0.5, 0.5, LOGO_HULL)).toBe(true);
-        expect(pointInPolygon(0.05, 0.05, LOGO_HULL)).toBe(false);
-        expect(pointInPolygon(0.95, 0.95, LOGO_HULL)).toBe(false);
+        expect(pointInPolygon(0.5, 0.5, MARK_HULL)).toBe(true);
+        expect(pointInPolygon(0.05, 0.05, MARK_HULL)).toBe(false);
+        expect(pointInPolygon(0.95, 0.95, MARK_HULL)).toBe(false);
     });
 });

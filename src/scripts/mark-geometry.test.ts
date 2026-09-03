@@ -8,6 +8,7 @@ import {
     episodeBeat,
     episodeLength,
     INK_TRAVEL,
+    VIEW,
     inkPoints,
     ladderPath,
     planEpisode,
@@ -15,7 +16,7 @@ import {
     toPath,
     unfold,
     UNFOLD_DEFAULTS
-} from './morphing-logo';
+} from './mark-geometry';
 
 const OUTLINE_POINTS = 15;
 const {lead} = EPISODE_DEFAULTS;
@@ -30,7 +31,7 @@ const seeded = (seed: number) => {
 
 describe('SILHOUETTE', () => {
     test('is a closed path', () => {
-        expect(SILHOUETTE.startsWith('m')).toBe(true);
+        expect(SILHOUETTE.startsWith('M')).toBe(true);
         expect(SILHOUETTE.endsWith('Z')).toBe(true);
     });
 });
@@ -46,7 +47,7 @@ describe('ink geometry', () => {
     });
 
     test('INK_TRAVEL clears the whole view box', () => {
-        expect(INK_TRAVEL).toBeGreaterThan(26.458333);
+        expect(INK_TRAVEL).toBeGreaterThan(VIEW);
     });
 });
 

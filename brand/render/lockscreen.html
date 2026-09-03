@@ -1,0 +1,84 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>lockscreen</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        background: #000;
+    }
+    body {
+        width: 430px;
+        height: 932px;
+        overflow: hidden;
+    }
+    #stage {
+        position: relative;
+        width: 430px;
+        height: 932px;
+        background: #000;
+    }
+    svg {
+        position: absolute;
+        inset: 0;
+        width: 430px;
+        height: 932px;
+        overflow: visible;
+    }
+    path {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 1;
+        stroke-linejoin: miter;
+    }
+    .dash {
+        stroke-dasharray: 3 5;
+    }
+</style>
+<div id="stage">
+    <svg viewBox="0 0 430 932"><g id="art"></g></svg>
+</div>
+<script type="module">
+    import {SILHOUETTE} from './morphing-logo.js';
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const art = document.getElementById('art');
+    const CX = 215;
+    const CY = 549;
+    const X0 = 34;
+    const Y0 = 326;
+    const X1 = 396;
+    const Y1 = 772;
+    const CUT_X = 44;
+    const CUT_Y = CUT_X * 0.5773502692;
+
+    const add = (d, cls) => {
+        const path = document.createElementNS(NS, 'path');
+        path.setAttribute('d', d);
+        if (cls) path.setAttribute('class', cls);
+        art.append(path);
+        return path;
+    };
+
+    add(`M${X0 + CUT_X} ${Y0}H${X1}V${Y1 - CUT_Y}L${X1 - CUT_X} ${Y1}H${X0}V${Y0 + CUT_Y}Z`);
+
+    const mark = document.createElementNS(NS, 'svg');
+    mark.setAttribute('viewBox', '0 0 27.712813 27.712813');
+    const MW = 205;
+    mark.setAttribute('x', String(CX - MW / 2));
+    mark.setAttribute('y', String(CY - MW / 2));
+    mark.setAttribute('width', String(MW));
+    mark.setAttribute('height', String(MW));
+    const inner = document.createElementNS(NS, 'path');
+    inner.setAttribute('d', SILHOUETTE);
+    inner.setAttribute('vector-effect', 'non-scaling-stroke');
+    mark.append(inner);
+    art.append(mark);
+
+    window.render = () => {};
+    document.documentElement.dataset.ready = '1';
+</script>

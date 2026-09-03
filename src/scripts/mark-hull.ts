@@ -1,10 +1,12 @@
 import type {Point} from './geometry';
 
-export const LOGO_HULL: Point[] = [
+const PAD = (1 - Math.sqrt(3) / 2) / 2;
+
+export const MARK_HULL: Point[] = [
     [0.5, 0],
-    [0.933, 0.75],
+    [1 - PAD, 0.75],
     [0.5, 1],
-    [0.067, 0.75]
+    [PAD, 0.75]
 ];
 
 const CENTRE_X = 0.5;
@@ -17,9 +19,9 @@ const castRay = (angle: number): number => {
         dy = Math.sin(angle);
     let best = 0;
 
-    for (let i = 0; i < LOGO_HULL.length; i++) {
-        const a = LOGO_HULL[i],
-            b = LOGO_HULL[(i + 1) % LOGO_HULL.length];
+    for (let i = 0; i < MARK_HULL.length; i++) {
+        const a = MARK_HULL[i],
+            b = MARK_HULL[(i + 1) % MARK_HULL.length];
         const ex = b[0] - a[0],
             ey = b[1] - a[1];
         const den = dx * ey - dy * ex;
@@ -45,7 +47,7 @@ const table = (() => {
     return t;
 })();
 
-export const logoReach = (angle: number): number => {
+export const markReach = (angle: number): number => {
     const pos = (angle / TAU) * STEPS;
     const lo = Math.floor(pos);
     const a = table[((lo % STEPS) + STEPS) % STEPS];

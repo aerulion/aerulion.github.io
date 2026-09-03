@@ -1,0 +1,178 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>og</title>
+<link rel="stylesheet" href="./fonts-inline.css" />
+<style>
+    :root {
+        --hair: 1px;
+        --cut: 30px;
+        --cut-y: calc(var(--cut) * 0.5773502692);
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    html,
+    body {
+        width: 1200px;
+        height: 630px;
+        background: #000;
+        color: #fff;
+        overflow: hidden;
+    }
+    #plate {
+        position: absolute;
+        inset: 32px;
+        background: #fff;
+        clip-path: polygon(
+            nonzero,
+            var(--cut) 0,
+            100% 0,
+            100% calc(100% - var(--cut-y)),
+            calc(100% - var(--cut)) 100%,
+            0 100%,
+            0 var(--cut-y),
+            var(--cut) 0,
+            calc(var(--cut) + 0.4px) var(--hair),
+            var(--hair) calc(var(--cut-y) + 0.7px),
+            var(--hair) calc(100% - var(--hair)),
+            calc(100% - var(--cut) - 0.4px) calc(100% - var(--hair)),
+            calc(100% - var(--hair)) calc(100% - var(--cut-y) - 0.7px),
+            calc(100% - var(--hair)) var(--hair),
+            calc(var(--cut) + 0.4px) var(--hair)
+        );
+    }
+    .label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 400;
+        font-size: 15px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    #rail-top {
+        position: absolute;
+        top: 70px;
+        left: 88px;
+        right: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #ticks {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 34px;
+    }
+    #ticks span {
+        display: block;
+        width: 1px;
+        height: 100%;
+        background: #fff;
+    }
+    #ticks span:nth-child(3n) {
+        height: 66%;
+    }
+    #ticks span:nth-child(4n) {
+        height: 40%;
+    }
+    #body {
+        position: absolute;
+        left: 388px;
+        right: 88px;
+        top: 156px;
+    }
+    #mark {
+        position: absolute;
+        left: 101px;
+        top: 205px;
+        width: 209px;
+        display: block;
+    }
+    #eyebrow {
+        margin-bottom: 28px;
+    }
+    #wordmark {
+        font-family: 'Tektur', sans-serif;
+        font-weight: 700;
+        font-size: 104px;
+        line-height: 0.82;
+        letter-spacing: -0.01em;
+        margin-bottom: 31px;
+    }
+    #standfirst {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 400;
+        font-size: 27px;
+        line-height: 1.43;
+        max-width: 660px;
+    }
+    #rule {
+        width: 220px;
+        height: var(--hair);
+        background: #fff;
+        margin-top: 30px;
+    }
+    #rail-bottom {
+        position: absolute;
+        bottom: 66px;
+        left: 88px;
+        right: 88px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    #rail-bottom div {
+        display: grid;
+        gap: 9px;
+    }
+    #rail-bottom .end {
+        text-align: right;
+    }
+</style>
+<div id="plate"></div>
+<div id="rail-top">
+    <span class="label">Java / Systems / Plugin architecture</span>
+    <span id="ticks"></span>
+    <span class="label">Germany / EU Central / Online</span>
+</div>
+<svg id="mark" xmlns="http://www.w3.org/2000/svg"></svg>
+<div id="body">
+    <div>
+        <p class="label" id="eyebrow">Professional Java developer / Minecraft system design</p>
+        <p id="wordmark">aerulion</p>
+        <p id="standfirst">
+            Professional Java development for custom Minecraft systems, performance-focused plugins and long-term server
+            architecture.
+        </p>
+        <div id="rule"></div>
+    </div>
+</div>
+<div id="rail-bottom">
+    <div>
+        <span class="label">Node / 001</span>
+        <span class="label">Status / Active</span>
+    </div>
+    <div class="end">
+        <span class="label">Developing since / 2012</span>
+        <span class="label">aerulion.net</span>
+    </div>
+</div>
+<script type="module">
+    import {SILHOUETTE} from './morphing-logo.js';
+
+    const VIEW = (2 * 24) / Math.sqrt(3);
+    const svg = document.getElementById('mark');
+    svg.setAttribute('viewBox', `0 0 ${VIEW} ${VIEW}`);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('fill', '#fff');
+    path.setAttribute('d', SILHOUETTE);
+    svg.append(path);
+
+    const ticks = document.getElementById('ticks');
+    for (let i = 0; i < 12; i++) ticks.append(document.createElement('span'));
+
+    document.documentElement.dataset.ready = 'true';
+</script>

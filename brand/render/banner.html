@@ -1,0 +1,99 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>banner</title>
+<link rel="stylesheet" href="./fonts-inline.css" />
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        background: #000;
+    }
+    body {
+        width: 600px;
+        height: 240px;
+        overflow: hidden;
+    }
+    #stage {
+        position: relative;
+        width: 600px;
+        height: 240px;
+        background: #000;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+    }
+    canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+    #wordmark {
+        position: absolute;
+        left: 268px;
+        right: 20px;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Tektur', sans-serif;
+        font-weight: 700;
+        font-size: 66px;
+        line-height: 1;
+        letter-spacing: -0.005em;
+    }
+</style>
+<div id="stage">
+    <canvas id="lattice"></canvas>
+    <h1 id="wordmark"><span>aerulion</span></h1>
+</div>
+<script type="module">
+    import {drawLattice, fade} from './lattice.js';
+
+    const W = 600;
+    const H = 240;
+
+    const canvas = document.getElementById('lattice');
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const glyphs = document.querySelector('#wordmark span').getBoundingClientRect();
+    const obstacles = [
+        {x: glyphs.left, y: glyphs.top + 6, w: glyphs.width, h: glyphs.height - 12, band: 26, clear: 22},
+        {cx: 116, cy: 266, r: 104, band: 40}
+    ];
+
+    const q = new URLSearchParams(location.search);
+    const DENSITY = Number(q.get('d') ?? 0.52);
+    const EDGE = Number(q.get('edge') ?? 330);
+
+    window.render = (t) => {
+        const angle = Math.PI * 2 * t;
+        ctx.clearRect(0, 0, W, H);
+        drawLattice(ctx, {
+            width: W,
+            height: H,
+            cell: 34,
+            radius: 190,
+            pull: 16,
+            density: DENSITY,
+            lift: 0.22,
+            weave: 1,
+            obstacles,
+            attractor: [128 + 86 * Math.cos(angle), 110 + 52 * Math.sin(angle * 2)],
+            falloff: fade(96, EDGE)
+        });
+    };
+
+    window.render(Number(q.get('t') ?? 0));
+
+    await document.fonts.ready;
+    document.documentElement.dataset.ready = '1';
+</script>

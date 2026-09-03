@@ -1,30 +1,65 @@
 import type {Point} from './geometry';
 
-export const SILHOUETTE =
-    'm24.686 19.8438-3.1349 1.81-3.3773-5.8496-4.9444 2.8546-1.8102-1.0449 1.81-3.1348 3.1347-1.8098-3.1347-5.4297-6.512 11.2793 6.512 3.7597 3.3773-1.95 1.81 3.135-5.1873 2.9947-11.4568-6.6145L13.2292 0Z';
+const ROOT3 = Math.sqrt(3);
 
-const LOGO_OUTLINE: Point[] = [
-    [24.686, 19.8438],
-    [21.5511, 21.6538],
-    [18.1738, 15.8042],
-    [13.2294, 18.6588],
-    [11.4192, 17.6139],
-    [13.2292, 14.4791],
-    [16.3639, 12.6693],
-    [13.2292, 7.2396],
-    [6.7172, 18.5189],
-    [13.2292, 22.2786],
-    [16.6065, 20.3286],
-    [18.4165, 23.4636],
-    [13.2292, 26.4583],
-    [1.7724, 19.8438],
-    [13.2292, 0]
+export const SIDE = 24;
+export const VIEW = (2 * SIDE) / ROOT3;
+export const BAND = (SIDE * (2 * ROOT3 - 3)) / 3;
+
+const APEX: Point = [VIEW / 2, 0];
+const TAIL: Point = [VIEW / 2, VIEW];
+
+const NORMALS: Record<number, Point> = {
+    30: [-0.5, ROOT3 / 2],
+    60: [-ROOT3 / 2, 0.5],
+    120: [-ROOT3 / 2, -0.5],
+    150: [-0.5, -ROOT3 / 2]
+};
+
+const EDGES: [axis: number, band: number][] = [
+    [150, 0],
+    [60, 1],
+    [150, 2],
+    [30, -2],
+    [120, -2],
+    [150, 3],
+    [60, 1],
+    [120, -1],
+    [30, -1],
+    [150, 1],
+    [60, 2],
+    [150, 0],
+    [30, 0],
+    [120, 0],
+    [60, 0]
 ];
+
+type Line = [nx: number, ny: number, c: number];
+
+const edgeLine = ([axis, band]: [number, number]): Line => {
+    const [nx, ny] = NORMALS[axis];
+    const anchor = axis === 30 || axis === 150 ? TAIL : APEX;
+    return [nx, ny, nx * anchor[0] + ny * anchor[1] + band * BAND];
+};
+
+const meet = ([a, b, c]: Line, [d, e, f]: Line): Point => {
+    const det = a * e - b * d;
+    return [(c * e - b * f) / det, (a * f - c * d) / det];
+};
+
+const LOGO_OUTLINE: Point[] = (() => {
+    const lines = EDGES.map(edgeLine);
+    const corners = lines.map((line, i) => meet(line, lines[(i + 1) % lines.length]));
+    return [corners[corners.length - 1], ...corners.slice(0, -1)];
+})();
+
+const trim = (n: number): string => String(Number(n.toFixed(6)));
+
+export const SILHOUETTE = `M${LOGO_OUTLINE.map(([x, y]) => `${trim(x)} ${trim(y)}`).join(' ')}Z`;
 
 const TAU = Math.PI * 2;
 const DEG = Math.PI / 180;
 const ROOT2 = Math.SQRT2;
-const ROOT3 = Math.sqrt(3);
 
 const AXIS_ANGLES = [30, 60, 120, 150];
 
@@ -178,12 +213,13 @@ export const unfold = (angle: number, options: UnfoldOptions = UNFOLD_DEFAULTS):
     return {base, shells: out, span: shift(shells * step), spread: Math.abs(sa)};
 };
 
-const TAN30 = 0.5773502692;
+const TAN30 = 1 / ROOT3;
 const FAR = 60;
+const INK_CLEAR = 0.262;
 
-export const INK_REST = 7.388;
+export const INK_REST = VIEW / (2 * ROOT3) - INK_CLEAR;
 
-export const INK_TRAVEL = 31;
+export const INK_TRAVEL = 34;
 
 const INK_POLY: Point[] = [
     [-FAR, INK_REST + FAR * TAN30],

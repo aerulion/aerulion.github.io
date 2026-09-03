@@ -1,13 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ScreenFrame from '../components/ScreenFrame.astro';
+import Plate from '../components/Plate.astro';
 import LatticeField from '../components/LatticeField.astro';
-import PageTransition from '../components/PageTransition.astro';
+import Curtain from '../components/Curtain.astro';
 import Hero from '../components/Hero.astro';
 import AboutSection from '../components/AboutSection.astro';
 import TimelineSection from '../components/TimelineSection.astro';
 import ProjectsSection from '../components/ProjectsSection.astro';
 import StackSection from '../components/StackSection.astro';
+import DesignSection from '../components/DesignSection.astro';
 import ContactSection from '../components/ContactSection.astro';
 import Footer from '../components/Footer.astro';
 
@@ -18,7 +19,7 @@ const description =
 
 <Layout title={title} description={description}>
     <a href="#main" class="skip-link mono-label">Skip to content</a>
-    <ScreenFrame />
+    <Plate />
     <LatticeField />
     <main class="main-content" id="main" tabindex="-1">
         <Hero />
@@ -26,8 +27,9 @@ const description =
         <TimelineSection />
         <ProjectsSection />
         <StackSection />
+        <DesignSection />
         <ContactSection />
     </main>
     <Footer />
-    <PageTransition />
+    <Curtain />
 </Layout>

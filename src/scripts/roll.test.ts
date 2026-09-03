@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'bun:test';
-import {planRoll, ROLL_DEFAULTS, rollAt} from './telemetry';
+import {planRoll, ROLL_DEFAULTS, rollAt} from './roll';
 
 const COUNT = '01 / 05';
 

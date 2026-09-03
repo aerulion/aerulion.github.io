@@ -23,7 +23,7 @@ export const stationAt = (stations: Station[], scrollY: number, viewport: number
     return found ?? stations[0] ?? null;
 };
 
-export function mountScrollGauge() {
+export function mountGauge() {
     const gauge = document.querySelector<HTMLElement>('[data-gauge]');
     const readout = document.querySelector<HTMLElement>('[data-gauge-readout]');
     if (!gauge) return;

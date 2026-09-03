@@ -2,13 +2,13 @@
 import {stack} from '../data/stack';
 ---
 
-<section class="stack-section" id="stack" data-station="04 / 05">
+<section class="stack-section" id="stack" data-station="04 / 06">
     <div class="container">
         <div class="section-header" data-reveal>
             <div class="section-rail">
                 <p class="section-eyebrow">Stack</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count" data-telemetry>04 / 05</p>
+                <p class="section-count" data-roll>04 / 06</p>
             </div>
             <h2 class="section-title">A short, deliberate list.</h2>
             <div class="section-lede">
@@ -54,7 +54,7 @@ import {stack} from '../data/stack';
         display: grid;
         align-content: start;
         gap: var(--spacing-lg);
-        padding: clamp(1.25rem, 2.5vw, 2rem);
+        padding: var(--flow-xl);
     }
 
     .stack-cell + .stack-cell {
@@ -70,7 +70,7 @@ import {stack} from '../data/stack';
 
     .stack-items ul {
         display: grid;
-        gap: 0.45rem;
+        gap: var(--spacing-xs);
         list-style: none;
     }
 
@@ -98,7 +98,7 @@ import {stack} from '../data/stack';
         }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 560px) {
         .stack-grid {
             grid-template-columns: 1fr;
         }

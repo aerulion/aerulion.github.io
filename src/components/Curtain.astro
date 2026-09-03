@@ -13,7 +13,7 @@ import LineConstruct from './LineConstruct.astro';
     .curtain {
         position: fixed;
         inset: 0;
-        z-index: 90;
+        z-index: var(--layer-curtain);
         display: grid;
         place-items: center;
         background: var(--black);
@@ -31,15 +31,15 @@ import LineConstruct from './LineConstruct.astro';
     .curtain[data-state='lifting'] {
         opacity: 1;
         visibility: visible;
-        animation: curtainLift 0.55s var(--ease-out-poster) forwards;
+        animation: curtainLift var(--dur-md) var(--ease-settle) forwards;
     }
 
     @keyframes curtainLift {
         from {
-            clip-path: polygon(0 -20%, 100% -75%, 100% 100%, 0 100%);
+            clip-path: polygon(0 0, 100% calc(0% - 57.735vw), 100% 100%, 0 100%);
         }
         to {
-            clip-path: polygon(0 100%, 100% 45%, 100% 100%, 0 100%);
+            clip-path: polygon(0 calc(100% + 57.735vw), 100% 100%, 100% 100%, 0 100%);
         }
     }
 
@@ -49,15 +49,15 @@ import LineConstruct from './LineConstruct.astro';
 
     .curtain-label {
         position: absolute;
-        bottom: clamp(1.5rem, 4vw, 3rem);
+        bottom: clamp(var(--spacing-lg), 4vw, var(--spacing-2xl));
         left: 50%;
         transform: translateX(-50%);
     }
 </style>
 
 <script>
-    import {mountPageTransition} from '../scripts/page-transition';
+    import {mountCurtain} from '../scripts/curtain';
 
     const curtain = document.querySelector<HTMLElement>('[data-curtain]');
-    if (curtain) mountPageTransition(curtain);
+    if (curtain) mountCurtain(curtain);
 </script>

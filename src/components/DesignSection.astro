@@ -1,0 +1,93 @@
+---
+import Button from './Button.astro';
+import {system} from '../data/design';
+
+const facts = [
+    {value: '#000', name: 'Ground'},
+    {value: '#fff', name: 'Ink'},
+    {value: '30°', name: 'The cut'},
+    {value: '60°', name: 'The lattice'}
+];
+---
+
+<section class="design-section" id="design" data-station="05 / 06">
+    <div class="container">
+        <div class="section-header" data-reveal>
+            <div class="section-rail">
+                <p class="section-eyebrow">Design language</p>
+                <span class="section-rule" aria-hidden="true"></span>
+                <p class="section-count" data-roll>05 / 06</p>
+            </div>
+            <h2 class="section-title">{system.tagline}</h2>
+            <div class="section-lede">
+                <p class="section-subtitle">
+                    {system.name} is the design language this site is built from, named for the ground it is drawn on. Both
+                    angles are taken from the mark, hairlines do the work boxes would do elsewhere, and where a field recedes
+                    it thins rather than fades. Six rules, and nothing on the page that breaks one.
+                </p>
+                <div class="section-line" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <div class="design-body" data-reveal>
+            <dl class="design-facts">
+                {
+                    facts.map((fact) => (
+                        <div class="design-fact">
+                            <dt class="design-fact-value">{fact.value}</dt>
+                            <dd class="design-fact-name">{fact.name}</dd>
+                        </div>
+                    ))
+                }
+            </dl>
+            <Button href="/design" glyph="east">Read the {system.name} guidelines</Button>
+        </div>
+    </div>
+</section>
+
+<style>
+    .design-section {
+        padding-bottom: var(--spacing-5xl);
+    }
+
+    .design-body {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-xl);
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-xl);
+    }
+
+    .design-facts {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: var(--flow-3xl);
+    }
+
+    .design-fact {
+        display: grid;
+        gap: var(--spacing-2xs);
+    }
+
+    .design-fact-value {
+        font-family: var(--font-family-accent), sans-serif;
+        font-size: clamp(1.5rem, 3vw, var(--font-size-3xl));
+        line-height: 1;
+    }
+
+    .design-fact-name {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 640px) {
+        .design-facts {
+            grid-template-columns: repeat(2, auto);
+            gap: var(--spacing-lg) var(--spacing-2xl);
+        }
+    }
+</style>

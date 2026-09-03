@@ -1,27 +1,27 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ScreenFrame from '../components/ScreenFrame.astro';
+import Plate from '../components/Plate.astro';
 import LatticeField from '../components/LatticeField.astro';
-import PageTransition from '../components/PageTransition.astro';
-import LogoMark from '../components/LogoMark.astro';
+import Curtain from '../components/Curtain.astro';
+import Mark from '../components/Mark.astro';
 import Footer from '../components/Footer.astro';
 import Button from '../components/Button.astro';
 ---
 
 <Layout title="404 - Page Not Found" description="This page does not exist." noindex>
-    <ScreenFrame />
+    <Plate />
     <LatticeField />
     <div class="not-found-shell">
         <main class="not-found-section">
             <div class="not-found-card panel-cut">
                 <div class="not-found-rail">
                     <p class="mono-label">aerulion / Route error</p>
-                    <p class="mono-label" data-telemetry>Status / 404</p>
+                    <p class="mono-label" data-roll>Status / 404</p>
                 </div>
 
                 <div class="not-found-body">
                     <div class="not-found-logo" data-draw>
-                        <LogoMark drawDelay={200} fillDelay={1100} />
+                        <Mark drawDelay={200} fillDelay={1100} />
                     </div>
                     <div class="not-found-copy">
                         <h1>404</h1>
@@ -32,14 +32,14 @@ import Button from '../components/Button.astro';
                 </div>
 
                 <div class="not-found-rail not-found-rail-bottom">
-                    <p class="mono-label" data-telemetry>Node / 001</p>
+                    <p class="mono-label" data-roll>Node / 001</p>
                     <p class="mono-label">Route / Unresolved</p>
                 </div>
             </div>
         </main>
         <Footer />
     </div>
-    <PageTransition />
+    <Curtain />
 </Layout>
 
 <style>
@@ -53,18 +53,18 @@ import Button from '../components/Button.astro';
 
     .not-found-section {
         position: relative;
-        z-index: 1;
+        z-index: var(--layer-page);
         flex: 1;
         display: grid;
         place-items: center;
-        padding: clamp(1rem, 3vw, 2rem);
+        padding: var(--flow-xl);
     }
 
     .not-found-card {
         width: min(100%, 780px);
-        padding: clamp(1.5rem, 4vw, 3rem);
+        padding: var(--flow-2xl);
         display: grid;
-        gap: clamp(2rem, 5vw, 3.5rem);
+        gap: var(--flow-3xl);
     }
 
     .not-found-rail {
@@ -86,7 +86,7 @@ import Button from '../components/Button.astro';
         display: grid;
         grid-template-columns: auto minmax(0, 1fr);
         align-items: center;
-        gap: clamp(1.5rem, 4vw, 3rem);
+        gap: var(--flow-2xl);
     }
 
     .not-found-logo {

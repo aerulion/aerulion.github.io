@@ -6,13 +6,13 @@ const years = getCurrentYear() - FIRST_YEAR;
 const MARK_STAGGER = 90;
 ---
 
-<section class="timeline-section" id="timeline" data-station="02 / 05">
+<section class="timeline-section" id="timeline" data-station="02 / 06">
     <div class="container">
         <div class="section-header" data-reveal>
             <div class="section-rail">
                 <p class="section-eyebrow">Timeline</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count" data-telemetry>02 / 05</p>
+                <p class="section-count" data-roll>02 / 06</p>
             </div>
             <h2 class="section-title">Since before it had a name.</h2>
             <div class="section-lede">
@@ -29,11 +29,11 @@ const MARK_STAGGER = 90;
                 timeline.map((milestone, index) => {
                     const isNow = index === timeline.length - 1;
                     return (
-                        <li class="milestone" style={`--mark-delay:${index * MARK_STAGGER}ms`}>
+                        <li class="milestone" style={`--node-delay:${index * MARK_STAGGER}ms`}>
                             <p class="milestone-year">{milestone.year}</p>
                             <span class="milestone-mark" aria-hidden="true">
-                                <span class="mark-line" />
-                                <span class:list={['mark-node', isNow && 'mark-node-now']}>
+                                <span class="node-line" />
+                                <span class:list={['node', isNow && 'node-now']}>
                                     {isNow && <span class="node-face" />}
                                 </span>
                             </span>
@@ -62,7 +62,7 @@ const MARK_STAGGER = 90;
     .milestone {
         display: grid;
         grid-template-columns: 4.5rem 1rem minmax(0, 34rem) minmax(0, 1fr);
-        column-gap: clamp(1rem, 2vw, 2rem);
+        column-gap: var(--flow-xl);
     }
 
     .milestone-year {
@@ -71,7 +71,7 @@ const MARK_STAGGER = 90;
         letter-spacing: var(--label-tracking);
         text-transform: uppercase;
         text-align: right;
-        padding-top: 0.25rem;
+        padding-top: var(--spacing-3xs);
     }
 
     .milestone-mark {
@@ -79,7 +79,7 @@ const MARK_STAGGER = 90;
         display: block;
     }
 
-    .mark-line {
+    .node-line {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -88,17 +88,17 @@ const MARK_STAGGER = 90;
         background: var(--white);
     }
 
-    .mark-node {
+    .node {
         position: absolute;
         left: 0;
         right: 0;
-        top: 0.7rem;
+        top: var(--spacing-sm);
         height: var(--hairline);
         background: var(--white);
     }
 
-    .mark-node-now {
-        top: 0.45rem;
+    .node-now {
+        top: var(--spacing-xs);
         left: 50%;
         right: auto;
         width: 0.5rem;
@@ -111,11 +111,11 @@ const MARK_STAGGER = 90;
         position: absolute;
         inset: 0;
         background: var(--white);
-        animation: nodeTurn 7s var(--ease-out-poster) infinite;
+        animation: nodeSnap 7s steps(1, end) infinite;
     }
 
     .milestone-body {
-        padding-bottom: clamp(2rem, 4vw, 3.25rem);
+        padding-bottom: var(--flow-2xl);
     }
 
     .milestone:last-child .milestone-body {
@@ -132,7 +132,7 @@ const MARK_STAGGER = 90;
     }
 
     .milestone-note {
-        padding-top: 0.6rem;
+        padding-top: var(--spacing-xs);
     }
 
     .milestone-track {
@@ -141,7 +141,7 @@ const MARK_STAGGER = 90;
         letter-spacing: var(--label-tracking);
         text-transform: uppercase;
         text-align: right;
-        padding-top: 0.25rem;
+        padding-top: var(--spacing-3xs);
     }
 
     @media (max-width: 1100px) {
@@ -150,7 +150,7 @@ const MARK_STAGGER = 90;
         }
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 768px) {
         .milestone-track {
             display: none;
         }
