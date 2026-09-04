@@ -54,7 +54,14 @@ import {GLYPH_BOX, GLYPH_CELL} from '../data/glyphs';
 
 const title = 'Nyx - the aerulion design language';
 const description =
-    'Nyx: the design language behind aerulion.net. Two inks, two angles taken from the mark, hairlines instead of boxes, and density instead of dimming.';
+    'Nyx is the design system behind aerulion.net: how the mark is built, how the page is set, how it moves, and the rules that hold it together.';
+const socialImage = '/assets/images/og-design.png';
+const socialImageAlt =
+    'Nyx, the aerulion design system: the mark in white on black beside the word NYX, with #000, #fff and a 21:1 contrast ratio listed below.';
+const breadcrumb = [
+    {name: 'Home', path: '/'},
+    {name: 'Nyx', path: '/design/'}
+];
 
 const NUMERALS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
 const spell = (value: number): string => NUMERALS[value] ?? String(value);
@@ -190,7 +197,7 @@ const erenos = [
 const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H6Z', 'M10 34.3923H42L38 41.3205H6Z'];
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} image={socialImage} imageAlt={socialImageAlt} breadcrumb={breadcrumb}>
     <a href="#main" class="skip-link mono-label">Skip to content</a>
     <Plate stations={chapters.length} />
     <LatticeField />

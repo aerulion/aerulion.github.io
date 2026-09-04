@@ -102,6 +102,14 @@
         letter-spacing: -0.01em;
         margin-bottom: 31px;
     }
+    #wordmark.display {
+        font-family: 'Chakra Petch', sans-serif;
+        font-weight: 600;
+        font-size: 122px;
+        line-height: 0.86;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
     #standfirst {
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 400;
@@ -134,34 +142,71 @@
 </style>
 <div id="plate"></div>
 <div id="rail-top">
-    <span class="label">Java / Systems / Plugin architecture</span>
+    <span class="label" id="rail-start"></span>
     <span id="ticks"></span>
-    <span class="label">Germany / EU Central / Online</span>
+    <span class="label" id="rail-end"></span>
 </div>
 <svg id="mark" xmlns="http://www.w3.org/2000/svg"></svg>
 <div id="body">
     <div>
-        <p class="label" id="eyebrow">Professional Java developer / Minecraft system design</p>
-        <p id="wordmark">aerulion</p>
-        <p id="standfirst">
-            Professional Java development for custom Minecraft systems, performance-focused plugins and long-term server
-            architecture.
-        </p>
+        <p class="label" id="eyebrow"></p>
+        <p id="wordmark"></p>
+        <p id="standfirst"></p>
         <div id="rule"></div>
     </div>
 </div>
 <div id="rail-bottom">
     <div>
-        <span class="label">Node / 001</span>
-        <span class="label">Status / Active</span>
+        <span class="label" id="foot-start-a"></span>
+        <span class="label" id="foot-start-b"></span>
     </div>
     <div class="end">
-        <span class="label">Developing since / 2012</span>
-        <span class="label">aerulion.net</span>
+        <span class="label" id="foot-end-a"></span>
+        <span class="label" id="foot-end-b"></span>
     </div>
 </div>
 <script type="module">
     import {SILHOUETTE} from './morphing-logo.js';
+
+    const VARIANTS = {
+        default: {
+            railStart: 'Java / Systems / Plugin architecture',
+            railEnd: 'Germany / EU Central / Online',
+            eyebrow: 'Professional Java developer / Minecraft system design',
+            wordmark: 'aerulion',
+            face: 'accent',
+            standfirst:
+                'Professional Java development for custom Minecraft systems, performance-focused plugins and long-term server architecture.',
+            footStart: ['Node / 001', 'Status / Active'],
+            footEnd: ['Developing since / 2012', 'aerulion.net']
+        },
+        design: {
+            railStart: 'aerulion / Nyx',
+            railEnd: 'Rev 01 / Monochrome',
+            eyebrow: 'Night, the primordial ground',
+            wordmark: 'Nyx',
+            face: 'display',
+            standfirst:
+                'The design system behind aerulion.net: the mark, the type, the spacing, the motion, and the rules none of it is allowed to break.',
+            footStart: ['Ground / #000', 'Ink / #fff'],
+            footEnd: ['Contrast / 21 : 1', 'aerulion.net/design']
+        }
+    };
+
+    const name = new URLSearchParams(location.search).get('variant') ?? 'default';
+    const card = VARIANTS[name] ?? VARIANTS.default;
+    const put = (id, text) => (document.getElementById(id).textContent = text);
+
+    put('rail-start', card.railStart);
+    put('rail-end', card.railEnd);
+    put('eyebrow', card.eyebrow);
+    put('wordmark', card.wordmark);
+    put('standfirst', card.standfirst);
+    put('foot-start-a', card.footStart[0]);
+    put('foot-start-b', card.footStart[1]);
+    put('foot-end-a', card.footEnd[0]);
+    put('foot-end-b', card.footEnd[1]);
+    if (card.face === 'display') document.getElementById('wordmark').classList.add('display');
 
     const VIEW = (2 * 24) / Math.sqrt(3);
     const svg = document.getElementById('mark');

@@ -51,12 +51,11 @@ export function mountCurtain(curtain: HTMLElement) {
         }, NAV_HOLD);
     });
 
-    if (sessionStorage.getItem(SEEN_KEY) === '1') {
-        window.addEventListener('pageshow', (event) => {
-            if (event.persisted) lift();
-        });
-        return;
-    }
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted && curtain.dataset.state) lift();
+    });
+
+    if (sessionStorage.getItem(SEEN_KEY) === '1') return;
 
     sessionStorage.setItem(SEEN_KEY, '1');
     cover();
