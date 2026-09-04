@@ -7,6 +7,7 @@ export interface Chapter {
 
 export const chapters: Chapter[] = [
     {id: 'name', eyebrow: 'The name'},
+    {id: 'lineage', eyebrow: 'Lineage'},
     {id: 'rules', eyebrow: 'The rules'},
     {id: 'ink', eyebrow: 'Ground and ink'},
     {id: 'geometry', eyebrow: 'The parts'},
@@ -93,6 +94,11 @@ export const nomenclature: Asset[] = [
     }
 ];
 
+export const lineageProse: string[] = [
+    'A design system that calls itself new is usually one nobody has read against its ancestors. A triangle, a hairline, a grid and a readout were not invented here; every one of them was settled long before this page. What is particular here is only which of them were kept, and how far the keeping was pushed.',
+    'So the names below are not badges, and not one of them is claimed whole. Each entry says what was taken and what was refused, because a system is described as much by the neighbour it declined to become as by the one it resembles.'
+];
+
 export interface Law {
     index: string;
     name: string;
@@ -158,6 +164,34 @@ export const parts: Part[] = [
         name: 'The hairline',
         kind: '1px',
         note: 'Rules, borders, crop marks, the gauge tick. One weight, never thickened for emphasis. A heavier line is a different idea, not a louder one.'
+    }
+];
+
+export const lineage: Part[] = [
+    {
+        name: 'The technical plate',
+        kind: 'Direct',
+        note: 'Crop marks, construction lines, dimension ticks and instrumentation readouts come straight from engineering drawing and the printed sheet, and they do the job here they already did there: report how a thing was made instead of dressing it. The departure is how lines are told apart. A drawing grades them by thickness, object heavy and hidden dashed and centre thin. This one grades them by dash pattern and leaves the weight alone.'
+    },
+    {
+        name: 'Bauhaus',
+        kind: 'The method, not the palette',
+        note: 'Deriving an entire vocabulary from one geometric primitive is the Bauhaus habit, and the mark is exactly that: an equilateral triangle, with every other measure solved off it rather than chosen beside it. The colour is not taken. The primaries that school is remembered for have nowhere to go in a monochrome system, so the debt is to how it built and never to how it looked.'
+    },
+    {
+        name: 'The Swiss school',
+        kind: 'The attitude, not the grid',
+        note: 'Objectivity, asymmetry, and typography doing the organising that ornament does elsewhere: all Swiss, all kept. The grid is not. That school’s signature is a modular multi-column field, and this page runs one column and ranks its blocks by measure instead. Nor are the faces. Swiss neutrality wanted a grotesque that disappears, and none of these four is trying to.'
+    },
+    {
+        name: 'Industrial design',
+        kind: 'The family, not the object',
+        note: 'A catalogue of products can be recognised as one family without any two of them being alike, because the radii, the grids and the controls are shared and only the job changes. That is the ambition here: the mark, the cut, the lattice and the glyphs are not four decisions, they are one vocabulary applied four times. What does not carry over is the restraint the discipline is admired for. A product recedes so that its use can come forward, and a plate like this one is not trying to recede.'
+    },
+    {
+        name: 'Brutalism',
+        kind: 'One principle',
+        note: 'Béton brut left the structure visible and called that the finish. That single idea transfers: a hairline here is not a border drawn around a panel, it is the panel, and there is no surface behind it to hide. Nothing else comes with it. Brutalism is heavy, raw and unfinished; this is thin, exact and finished. Web brutalism, which borrowed the name for a deliberate crudeness, is further away still.'
     }
 ];
 
@@ -322,7 +356,7 @@ export const clearSpace: ClearRule[] = [
     {
         subject: 'Inside a circular crop',
         module: '84% of the radius',
-        note: 'An avatar is cropped by the client, not by us. The mark is held inside 84% of the crop radius so the unfold never touches the edge.'
+        note: 'An avatar is cropped by the client, not by this system. The mark is held inside 84% of the crop radius so the unfold never touches the edge.'
     }
 ];
 

@@ -25,6 +25,8 @@ import {
     construction,
     faces,
     laws,
+    lineage,
+    lineageProse,
     measureLadder,
     metrics,
     misuse,
@@ -52,9 +54,9 @@ import {
 } from '../scripts/figure-collide';
 import {GLYPH_BOX, GLYPH_CELL} from '../data/glyphs';
 
-const title = 'Nyx - the aerulion design language';
+const title = 'Nyx - the monochrome design system behind aerulion.net';
 const description =
-    'Nyx is the design system behind aerulion.net: how the mark is built, how the page is set, how it moves, and the rules that hold it together.';
+    'Nyx: the monochrome design system behind aerulion.net. How the mark is built, how the typography is set, how it moves, and the rules none of it may break.';
 const socialImage = '/assets/images/og-design.png';
 const socialImageAlt =
     'Nyx, the aerulion design system: the mark in white on black beside the word NYX, with #000, #fff and a 21:1 contrast ratio listed below.';
@@ -276,6 +278,44 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                                     <span class="part-kind mono-label">{asset.subject}</span>
                                 </dt>
                                 <dd class="part-note">{asset.note}</dd>
+                            </div>
+                        ))
+                    }
+                </dl>
+            </div>
+        </section>
+
+        <section class="page-section" id="lineage" data-station={station('lineage')}>
+            <div class="container">
+                <div class="section-header" data-reveal>
+                    <div class="section-rail">
+                        <p class="section-eyebrow">Lineage</p>
+                        <span class="section-rule" aria-hidden="true"></span>
+                        <p class="section-count" data-roll>{station('lineage')}</p>
+                    </div>
+                    <h2 class="section-title">Descended, not invented.</h2>
+                    <div class="section-lede">
+                        <p class="section-subtitle">
+                            {spell(lineage.length)} older traditions are doing most of the work here. Each is taken in part,
+                            and the part that was left out is the more useful half of the description.
+                        </p>
+                        <div class="section-line" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <div class="mark-prose prose" data-reveal>
+                    {lineageProse.map((paragraph) => <p>{paragraph}</p>)}
+                </div>
+
+                <dl class="part-list" data-reveal>
+                    {
+                        lineage.map((part) => (
+                            <div class="part">
+                                <dt class="part-head">
+                                    <span class="part-name">{part.name}</span>
+                                    <span class="part-kind mono-label">{part.kind}</span>
+                                </dt>
+                                <dd class="part-note">{part.note}</dd>
                             </div>
                         ))
                     }
