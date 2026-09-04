@@ -56,6 +56,8 @@ const title = 'Nyx - the aerulion design language';
 const description =
     'Nyx: the design language behind aerulion.net. Two inks, two angles taken from the mark, hairlines instead of boxes, and density instead of dimming.';
 
+const NUMERALS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+const spell = (value: number): string => NUMERALS[value] ?? String(value);
 const pad = (n: number): string => String(n).padStart(2, '0');
 const total = pad(chapters.length);
 const contents = chapters.map((chapter, i) => ({...chapter, number: pad(i + 1)}));
@@ -123,7 +125,7 @@ const walkClip = uid('walk-clip');
 const lineRows = EDGES.map(([axis, band], i) => ({
     edge: `e${i}`,
     axis,
-    band,
+    band: Math.abs(band),
     from: axis === 30 ? 'Tail, left' : axis === 150 ? 'Tail, right' : axis === 60 ? 'Apex, right' : 'Apex, left'
 }));
 
@@ -160,9 +162,11 @@ const fit = (viewBox: string): string => {
     return `--fit:${Number((width / height).toFixed(4))}`;
 };
 
-const MODULE_BOX = `${n(LEFT_BASE - 4)} -3.2 ${n(SIDE + 8.5)} ${n(VIEW + 11)}`;
-const CLEAR_BOX = `${n(LEFT_BASE - MOD - 2.5)} ${n(-MOD - 2.5)} ${n(SIDE + 2 * MOD + 5)} ${n(VIEW + 2 * MOD + 5)}`;
-const LOCKUP_BOX = `${n(LEFT_BASE - MOD - 2.5)} ${n(-MOD - 2.5)} ${n(SIDE + WORD + 3 * MOD + 5)} ${n(VIEW + 2 * MOD + 5)}`;
+const CLEAR_TOP = -MOD - 2.5;
+const CLEAR_HEIGHT = VIEW + 2 * MOD + 5;
+const MODULE_BOX = `${n(LEFT_BASE - 4)} ${n(CLEAR_TOP)} ${n(SIDE + 8.5)} ${n(CLEAR_HEIGHT)}`;
+const CLEAR_BOX = `${n(LEFT_BASE - MOD - 2.5)} ${n(CLEAR_TOP)} ${n(SIDE + 2 * MOD + 5)} ${n(CLEAR_HEIGHT)}`;
+const LOCKUP_BOX = `${n(LEFT_BASE - MOD - 2.5)} ${n(CLEAR_TOP)} ${n(SIDE + WORD + 3 * MOD + 5)} ${n(CLEAR_HEIGHT)}`;
 const GUIDE = RIGHT_BASE + MOD * 0.42;
 const TICK = RIGHT_BASE + MOD * 0.28;
 const moduleGuides = [`M${n(LEFT_BASE)} ${n(BASE)}H${n(GUIDE)}`, `M${n(LEFT_BASE)} ${n(VIEW)}H${n(GUIDE)}`];
@@ -1218,10 +1222,10 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 <div class="glyph-set" data-reveal>
                     <h3 class="prose-head">The set</h3>
                     <p class="glyph-lede prose">
-                        Seven so far, and the list grows only when something on the page needs one. Every arrowhead
-                        opens 30° each side of its shaft; the descent runs at 30° because that is the direction a block
-                        already travels when it reveals. There is no down arrow, because a vertical is not one of the
-                        five directions.
+                        {spell(glyphSet.length)} so far, and the list grows only when something on the page needs one. Every
+                        arrowhead opens 30° each side of its shaft; the descent runs at 30° because that is the direction
+                        a block already travels when it reveals. There is no down arrow, because a vertical is not one of
+                        the five directions.
                     </p>
                     <dl class="glyph-list">
                         {
@@ -1486,7 +1490,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                                     <h3 class="application-name">{application.name}</h3>
                                     <p class="mono-label">{application.format}</p>
                                 </div>
-                                <div class="application-body">
+                                <div class:list={['application-body', `application-body-${application.orientation}`]}>
                                     <picture
                                         class:list={[
                                             'application-frame',
@@ -1606,6 +1610,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         border-top: var(--hairline) solid var(--white);
     }
 
+    .contents-list li:last-child:nth-child(3n + 1) {
+        grid-column: 1 / -1;
+    }
+
+    .contents-list li:last-child:nth-child(3n + 2) {
+        grid-column: 2 / -1;
+    }
+
     .contents-link {
         display: grid;
         grid-template-columns: 2.4rem minmax(0, 1fr);
@@ -1654,7 +1666,8 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
     }
 
     .night-prose p:first-child {
-        font-size: clamp(1.05rem, 1.6vw, var(--font-size-xl));
+        font-size: clamp(1rem, 1.25vw, var(--font-size-lg));
+        max-width: 52ch;
     }
 
     .law-list {
@@ -1736,8 +1749,12 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
     }
 
     .ink-note {
-        max-width: 62ch;
+        max-width: 54ch;
         font-size: var(--font-size-sm);
+    }
+
+    .ink-cell-wide .ink-note {
+        max-width: 72ch;
     }
 
     .figure-row {
@@ -1765,6 +1782,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         display: block;
         width: 100%;
         height: auto;
+    }
+
+    .clear-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .clear-row .figure:last-child {
+        grid-column: 1 / -1;
     }
 
     .clear-frame {
@@ -1834,6 +1859,18 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: var(--flow-xl);
         margin-top: var(--spacing-md);
+    }
+
+    .glyph-cell:last-child:nth-child(4n + 1) {
+        grid-column: 1 / -1;
+    }
+
+    .glyph-cell:last-child:nth-child(4n + 2) {
+        grid-column: 2 / -1;
+    }
+
+    .glyph-cell:last-child:nth-child(4n + 3) {
+        grid-column: 3 / -1;
     }
 
     .glyph-cell {
@@ -1985,7 +2022,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
 
     .ramp-row {
         display: grid;
-        grid-template-columns: clamp(7.5rem, 12vw, 10rem) minmax(0, 1fr) auto auto;
+        grid-template-columns: clamp(7.5rem, 12vw, 10rem) var(--spacing-5xl) var(--spacing-5xl) minmax(0, 1fr);
         align-items: center;
         gap: var(--spacing-md);
         padding: var(--spacing-xs) 0;
@@ -2021,7 +2058,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         padding: var(--spacing-md) 0;
     }
 
-    .breakpoint-row {
+    .ramp-row.breakpoint-row {
         grid-template-columns: clamp(5rem, 10vw, 7rem) minmax(0, 1fr);
     }
 
@@ -2233,6 +2270,11 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         gap: var(--flow-2xl);
     }
 
+    .application-body-square,
+    .application-body-tall {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
     .application-frame {
         display: block;
         border: var(--hairline) solid var(--white);
@@ -2257,6 +2299,7 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
         gap: var(--spacing-sm);
         align-content: start;
         list-style: none;
+        max-width: 68ch;
         font-size: var(--font-size-sm);
     }
 
@@ -2300,8 +2343,21 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
+        .contents-list li:last-child:nth-child(3n + 1),
+        .contents-list li:last-child:nth-child(3n + 2),
+        .glyph-cell:last-child:nth-child(4n + 1),
+        .glyph-cell:last-child:nth-child(4n + 2),
+        .glyph-cell:last-child:nth-child(4n + 3) {
+            grid-column: auto;
+        }
+
+        .contents-list li:last-child:nth-child(odd),
+        .glyph-cell:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+        }
+
         .ramp-row {
-            grid-template-columns: clamp(6rem, 22vw, 10rem) minmax(0, 1fr) auto;
+            grid-template-columns: clamp(6rem, 22vw, 10rem) var(--spacing-5xl) minmax(0, 1fr);
         }
 
         .ramp-step {

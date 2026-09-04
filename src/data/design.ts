@@ -1,3 +1,5 @@
+import {EDGES} from '../scripts/mark-geometry';
+
 export interface Chapter {
     id: string;
     eyebrow: string;
@@ -217,11 +219,17 @@ export interface Census {
     role: string;
 }
 
+const onAxis = (axis: number): number => EDGES.filter(([edgeAxis]) => edgeAxis === axis).length;
+
 export const census: Census[] = [
-    {axis: '30°', count: 3, role: 'The tail’s lower-left edge, and the bolt’s two shallowest runs'},
-    {axis: '60°', count: 4, role: 'The triangle’s right edge, and three edges of the bolt'},
-    {axis: '120°', count: 3, role: 'The triangle’s left edge, the bolt’s longest inner run, and one return'},
-    {axis: '150°', count: 5, role: 'The tail’s lower-right edge, cut in two by the bolt, and three counter-runs'}
+    {axis: '30°', count: onAxis(30), role: 'The tail’s lower-left edge, and the bolt’s two shallowest runs'},
+    {axis: '60°', count: onAxis(60), role: 'The triangle’s right edge, and three edges of the bolt'},
+    {axis: '120°', count: onAxis(120), role: 'The triangle’s left edge, the bolt’s longest inner run, and one return'},
+    {
+        axis: '150°',
+        count: onAxis(150),
+        role: 'The tail’s lower-right edge, cut in two by the bolt, and three counter-runs'
+    }
 ];
 
 export interface Metric {
@@ -231,7 +239,11 @@ export interface Metric {
 }
 
 export const metrics: Metric[] = [
-    {label: 'Outline edges', value: '15', note: 'Every one exactly on an axis, by construction rather than by fitting'},
+    {
+        label: 'Outline edges',
+        value: String(EDGES.length),
+        note: 'Every one exactly on an axis, by construction rather than by fitting'
+    },
     {label: 'Triangle side', value: 'X = 24', note: 'The one number chosen; every other measure falls out of it'},
     {
         label: 'Band',
@@ -454,12 +466,12 @@ export interface Beat {
 export const motion: Beat[] = [
     {
         name: 'The draw',
-        token: 'cubic-bezier(0.65, 0, 0.35, 1)',
+        token: '--ease-draw',
         note: 'A figure arrives as a stroke tracing its own outline. Nothing fades in from nowhere.'
     },
     {
         name: 'The ink sweep',
-        token: 'cubic-bezier(0.65, 0, 0.35, 1)',
+        token: '--ease-draw',
         note: 'A solid edge rises through the outline and fills it. The stroke is clipped to wherever the ink is not, so there is no rim and no gap.'
     },
     {
@@ -484,13 +496,13 @@ export const motion: Beat[] = [
     },
     {
         name: 'The invert',
-        token: '250ms linear',
+        token: '--transition-base',
         note: 'A control under hover, focus or selection swaps its two inks. It is a state change and not a movement, so it takes the only linear timing in the system.'
     },
     {
         name: 'The reveal',
-        token: 'cubic-bezier(0.22, 1, 0.36, 1)',
-        note: '18px of travel as a block enters. Under reduced motion it resolves instantly and the lattice never mounts at all.'
+        token: '--ease-settle',
+        note: 'One --reveal-shift of travel as a block enters. Under reduced motion it resolves instantly and the lattice never mounts at all.'
     }
 ];
 
@@ -560,7 +572,7 @@ export const glyph: Part[] = [
     {
         name: 'The grid',
         kind: '4 / 4 · sin 60°',
-        note: 'The lattice again, at a tenth of the box. The band is ten cells across and ten rows down, and every corner of every glyph is one of its vertices, so a glyph is a thing the field could have drawn itself.'
+        note: 'The lattice again, at a tenth of the band. The band is ten cells across and ten rows down, and every corner of every glyph is one of its vertices, so a glyph is a thing the field could have drawn itself.'
     },
     {
         name: 'The directions',
@@ -634,63 +646,63 @@ export const access: Part[] = [
 
 export const misuse: Law[] = [
     {
-        index: 'Not',
-        name: 'A grey',
+        index: '01',
+        name: 'Not a grey',
         rule: 'A dimmed white is a half-drawn figure, and the system has no vocabulary for one. Where something must recede, thin it, space it further out, or take it away.'
     },
     {
-        index: 'Not',
-        name: 'A third angle',
+        index: '02',
+        name: 'Not a third angle',
         rule: '45° is not a rounding of 30°. The only right angle in the system is where two rules of the plate meet; every other edge is 30, 60, 120 or 150.'
     },
     {
-        index: 'Not',
-        name: 'A spin',
+        index: '03',
+        name: 'Not a spin',
         rule: 'Nothing sweeps through an in-plane rotation. If a figure has to change orientation it snaps between two on-axis ones, or it rotates its four-axis lift and projects back down, which is the whole reason the unfold exists.'
     },
     {
-        index: 'Not',
-        name: 'A thicker rule',
+        index: '04',
+        name: 'Not a thicker rule',
         rule: '1px, at every size and every distance. A heavier line is a different idea, not a louder one. The focus ring is the single exception, and only because it has to be told apart from a border.'
     },
     {
-        index: 'Not',
-        name: 'A fill',
+        index: '05',
+        name: 'Not a fill',
         rule: 'Surfaces belong to the mark, to a primary button, and to a control inverted under hover or focus. A card, a chip, a callout or a tinted panel is a different design language.'
     },
     {
-        index: 'Not',
-        name: 'A recolour',
+        index: '06',
+        name: 'Not a recolour',
         rule: 'Not for a season, not for a partner, not to mark a state. There is no palette to extend, and a coloured mark is not this mark.'
     },
     {
-        index: 'Not',
-        name: 'A stretch',
+        index: '07',
+        name: 'Not a stretch',
         rule: 'The box is √3 : 2 and it does not negotiate. Scale it, crop it, invert it. Never set its width and its height independently.'
     },
     {
-        index: 'Not',
-        name: 'A ring or a radius',
+        index: '08',
+        name: 'Not a ring or a radius',
         rule: 'A circular crop belongs to the client, not to the mark. The mark is never given a ring, a backing panel, a shadow, a glow or a corner radius of its own.'
     },
     {
-        index: 'Not',
-        name: 'A wireframe at rest',
+        index: '09',
+        name: 'Not a wireframe at rest',
         rule: 'The shells the unfold passes through are frames of an animation, not a variant of the mark. A static mark is inked, or it is drawn as one closed outline.'
     },
     {
-        index: 'Not',
-        name: 'A stock icon',
+        index: '10',
+        name: 'Not a stock icon',
         rule: 'A glyph pulled from an icon set arrives filled, curved and off-axis, and breaks three laws before it is even placed. Two of them sat on this site for a year. Draw it on the lattice or do without it.'
     },
     {
-        index: 'Not',
-        name: 'A capital A',
+        index: '11',
+        name: 'Not a capital A',
         rule: 'The wordmark is aerulion: lowercase, Tektur 700, set tight. Never title-cased, never letterspaced apart, never outlined, and never set in one of the other three faces.'
     },
     {
-        index: 'Not',
-        name: 'A photograph behind it',
+        index: '12',
+        name: 'Not a photograph behind it',
         rule: 'The ground is #000, not “dark”. If the surface underneath is an image, a texture or a gradient, the mark does not go on it.'
     }
 ];
