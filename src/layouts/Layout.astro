@@ -7,6 +7,15 @@ export interface Crumb {
     path: string;
 }
 
+/** A named thing the page is primarily about, emitted as its own node in the graph. */
+export interface Entity {
+    type: string;
+    name: string;
+    description: string;
+    alternateName?: string;
+    keywords?: string[];
+}
+
 interface Props {
     title: string;
     description: string;
@@ -14,6 +23,7 @@ interface Props {
     image?: string;
     imageAlt?: string;
     breadcrumb?: Crumb[];
+    entity?: Entity;
 }
 
 const {
@@ -22,7 +32,8 @@ const {
     noindex = false,
     image = '/assets/images/og.png',
     imageAlt = 'aerulion — Java developer and Minecraft plugin creator',
-    breadcrumb = []
+    breadcrumb = [],
+    entity
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://aerulion.net');
@@ -33,6 +44,7 @@ const siteId = new URL('/#website', site).href;
 const personId = new URL('/#person', site).href;
 const pageId = `${canonical.href}#webpage`;
 const imageId = `${canonical.href}#primaryimage`;
+const entityId = `${canonical.href}#entity`;
 const isHome = canonical.pathname === '/';
 
 const graph: Record<string, unknown>[] = [
@@ -59,7 +71,10 @@ const graph: Record<string, unknown>[] = [
             'Paper API',
             'Bukkit API',
             'Database Design',
-            'Game Development'
+            'Game Development',
+            'Design Systems',
+            'Typography',
+            'Web Development'
         ],
         worksFor: {'@type': 'Organization', name: 'Corpium', url: 'https://corpium.net'},
         nationality: {'@type': 'Country', name: 'Germany'},
@@ -84,9 +99,27 @@ const graph: Record<string, unknown>[] = [
         isPartOf: {'@id': siteId},
         primaryImageOfPage: {'@id': imageId},
         ...(isHome ? {mainEntity: {'@id': personId}} : noindex ? {} : {about: {'@id': personId}}),
+        ...(entity ? {mainEntity: {'@id': entityId}} : {}),
         ...(breadcrumb.length ? {breadcrumb: {'@id': `${canonical.href}#breadcrumb`}} : {})
     }
 ];
+
+if (entity) {
+    graph.push({
+        '@type': entity.type,
+        '@id': entityId,
+        name: entity.name,
+        description: entity.description,
+        url: canonical.href,
+        inLanguage: 'en',
+        image: {'@id': imageId},
+        author: {'@id': personId},
+        creator: {'@id': personId},
+        mainEntityOfPage: {'@id': pageId},
+        ...(entity.alternateName ? {alternateName: entity.alternateName} : {}),
+        ...(entity.keywords ? {keywords: entity.keywords} : {})
+    });
+}
 
 if (breadcrumb.length) {
     graph.push({

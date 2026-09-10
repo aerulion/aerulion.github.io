@@ -1,5 +1,6 @@
 import {defineConfig, fontProviders} from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import {lastmodResolver} from './src/utils/lastmod.ts';
 
 const fonts = [
     {name: 'Space Grotesk', cssVariable: '--font-family', weights: [400, 500, 700]},
@@ -12,11 +13,21 @@ const FALLBACKS = {
     '--font-family-mono': ['ui-monospace', 'monospace']
 };
 
+const lastmodFor = lastmodResolver();
+
 export default defineConfig({
     site: 'https://aerulion.net',
     base: '/',
     prefetch: {prefetchAll: true, defaultStrategy: 'hover'},
-    integrations: [sitemap({filter: (page) => !page.includes('/404')})],
+    integrations: [
+        sitemap({
+            filter: (page) => !page.includes('/404'),
+            serialize(item) {
+                const lastmod = lastmodFor?.(item.url);
+                return lastmod ? {...item, lastmod} : item;
+            }
+        })
+    ],
     fonts: fonts.map((font) => ({
         ...font,
         provider: fontProviders.fontsource(),
