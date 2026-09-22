@@ -53,7 +53,9 @@ const INTRO = fillDelay + 1400;
 
     <g class="mark-depth" aria-hidden="true">
         <path class="mark-ladder" d="" style={ladder > 0 ? undefined : 'display:none'}></path>
-        {Array.from({length: shells * 2}, () => <path class="mark-shell" d="" />)}
+        {Array.from({length: shells * 2}, () => (
+            <path class="mark-shell" d="" />
+        ))}
     </g>
 
     <g clip-path={`url(#${bareId})`}>

@@ -29,24 +29,26 @@ const index = String(position).padStart(2, '0');
     </div>
 
     <dl class="project-meta">
-        {
-            meta.map((item) => (
-                <div class="meta-row">
-                    <dt>{item.label}</dt>
-                    <dd>{item.value}</dd>
-                </div>
-            ))
-        }
+        {meta.map((item) => (
+            <div class="meta-row">
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+            </div>
+        ))}
     </dl>
 
     <div class="project-content prose">
-        {description.map((paragraph) => <p class="project-description">{paragraph}</p>)}
+        {description.map((paragraph) => (
+            <p class="project-description">{paragraph}</p>
+        ))}
     </div>
 
     <div class="project-capabilities">
         <p class="capabilities-label">Surface</p>
         <ul class="capability-list" role="list">
-            {capabilities.map((capability) => <li>{capability}</li>)}
+            {capabilities.map((capability) => (
+                <li>{capability}</li>
+            ))}
         </ul>
     </div>
 </article>

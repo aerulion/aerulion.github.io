@@ -18,7 +18,9 @@ const facts = [
                 <div class="section-rail">
                     <p class="section-eyebrow">Context</p>
                     <span class="section-rule" aria-hidden="true"></span>
-                    <p class="section-count" data-roll>01 / 06</p>
+                    <p class="section-count" data-roll>
+                        01 / 06
+                    </p>
                 </div>
                 <h2 class="section-title">Precision under load.</h2>
                 <div class="section-lede">
@@ -32,37 +34,34 @@ const facts = [
 
             <div class="about-content">
                 <dl class="about-facts">
-                    {
-                        facts.map((fact) => (
-                            <div class="fact-row">
-                                <dt>{fact.term}</dt>
-                                <dd>{fact.value}</dd>
-                            </div>
-                        ))
-                    }
+                    {facts.map((fact) => (
+                        <div class="fact-row">
+                            <dt>{fact.term}</dt>
+                            <dd>{fact.value}</dd>
+                        </div>
+                    ))}
                 </dl>
 
                 <div class="about-text prose">
                     <p>
-                        My name is aerulion, I'm a {age}-year-old <strong>Java developer from Germany</strong> with a focus
-                        on building <strong>custom gameplay systems</strong> that push beyond default Minecraft constraints
-                        while staying coherent and maintainable.
+                        My name is aerulion, I'm a {age}-year-old <strong>Java developer from Germany</strong> with a
+                        focus on building <strong>custom gameplay systems</strong> that push beyond default Minecraft
+                        constraints while staying coherent and maintainable.
                     </p>
                     <p>
-                        As <strong>admin and lead developer</strong> at <a
-                            href="https://corpium.net/"
-                            class="modern-link"
-                            rel="noopener noreferrer"
-                            target="_blank">Corpium</a
-                        >, one of the oldest German Minecraft servers, I design and maintain sophisticated <strong
-                            >plugin ecosystems</strong
-                        > with performance-focused features, complex mechanics and a controlled vanilla-adjacent feel.
+                        As <strong>admin and lead developer</strong> at{' '}
+                        <a href="https://corpium.net/" class="modern-link" rel="noopener noreferrer" target="_blank">
+                            Corpium
+                        </a>
+                        , one of the oldest German Minecraft servers, I design and maintain sophisticated{' '}
+                        <strong>plugin ecosystems</strong> with performance-focused features, complex mechanics and a
+                        controlled vanilla-adjacent feel.
                     </p>
                     <p>
                         My expertise ranges from low-level Java optimization to high-level system design, with
-                        particular strengths in <strong>database architecture</strong> and <strong
-                            >scalable plugin development</strong
-                        >. Clean abstractions, longevity and operational clarity are core to the way I build.
+                        particular strengths in <strong>database architecture</strong> and{' '}
+                        <strong>scalable plugin development</strong>. Clean abstractions, longevity and operational
+                        clarity are core to the way I build.
                     </p>
                 </div>
             </div>

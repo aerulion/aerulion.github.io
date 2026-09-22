@@ -9,7 +9,9 @@ import {projects} from '../data/projects';
             <div class="section-rail">
                 <p class="section-eyebrow">Selected systems</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count" data-roll>03 / 06</p>
+                <p class="section-count" data-roll>
+                    03 / 06
+                </p>
             </div>
             <h2 class="section-title">Two systems, end to end.</h2>
             <div class="section-lede">
@@ -22,7 +24,9 @@ import {projects} from '../data/projects';
         </div>
 
         <div class="projects-grid">
-            {projects.map((project, index) => <ProjectCard project={project} position={index + 1} />)}
+            {projects.map((project, index) => (
+                <ProjectCard project={project} position={index + 1} />
+            ))}
         </div>
     </div>
 </section>

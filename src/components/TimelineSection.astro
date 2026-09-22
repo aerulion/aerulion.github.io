@@ -12,40 +12,40 @@ const MARK_STAGGER = 90;
             <div class="section-rail">
                 <p class="section-eyebrow">Timeline</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count" data-roll>02 / 06</p>
+                <p class="section-count" data-roll>
+                    02 / 06
+                </p>
             </div>
             <h2 class="section-title">Since before it had a name.</h2>
             <div class="section-lede">
                 <p class="section-subtitle">
-                    Java came first, the name two years later, Corpium two after that. {years} years on it is still the same
-                    work, just steadily larger.
+                    Java came first, the name two years later, Corpium two after that. {years} years on it is still the
+                    same work, just steadily larger.
                 </p>
                 <div class="section-line" aria-hidden="true"></div>
             </div>
         </div>
 
         <ol class="timeline" role="list" data-reveal>
-            {
-                timeline.map((milestone, index) => {
-                    const isNow = index === timeline.length - 1;
-                    return (
-                        <li class="milestone" style={`--node-delay:${index * MARK_STAGGER}ms`}>
-                            <p class="milestone-year">{milestone.year}</p>
-                            <span class="milestone-mark" aria-hidden="true">
-                                <span class="node-line" />
-                                <span class:list={['node', isNow && 'node-now']}>
-                                    {isNow && <span class="node-face" />}
-                                </span>
+            {timeline.map((milestone, index) => {
+                const isNow = index === timeline.length - 1;
+                return (
+                    <li class="milestone" style={`--node-delay:${index * MARK_STAGGER}ms`}>
+                        <p class="milestone-year">{milestone.year}</p>
+                        <span class="milestone-mark" aria-hidden="true">
+                            <span class="node-line" />
+                            <span class:list={['node', isNow && 'node-now']}>
+                                {isNow && <span class="node-face" />}
                             </span>
-                            <div class="milestone-body">
-                                <h3 class="milestone-title">{milestone.title}</h3>
-                                <p class="milestone-note">{milestone.note}</p>
-                            </div>
-                            <p class="milestone-track">{milestone.track}</p>
-                        </li>
-                    );
-                })
-            }
+                        </span>
+                        <div class="milestone-body">
+                            <h3 class="milestone-title">{milestone.title}</h3>
+                            <p class="milestone-note">{milestone.note}</p>
+                        </div>
+                        <p class="milestone-track">{milestone.track}</p>
+                    </li>
+                );
+            })}
         </ol>
     </div>
 </section>

@@ -222,7 +222,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
     breadcrumb={breadcrumb}
     entity={entity}
 >
-    <a href="#main" class="skip-link mono-label">Skip to content</a>
+    <a href="#main" class="skip-link mono-label">
+        Skip to content
+    </a>
     <Plate stations={chapters.length} />
     <LatticeField />
 
@@ -243,7 +245,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             equilateral triangle with a 30/60 bolt cut. Nothing in it is here to decorate, so nothing in
                             it has a reason to sit off the grid.
                         </p>
-                        <Button href="/" glyph="west">Back to the site</Button>
+                        <Button href="/" glyph="west">
+                            Back to the site
+                        </Button>
                     </div>
                     <div class="page-hero-mark" data-draw>
                         <MorphingMark drawDelay={320} fillDelay={1100} shells={2} depth={0.4} ladder={0.13} />
@@ -251,18 +255,18 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <nav class="contents" aria-labelledby="contents-caption" data-reveal>
-                    <p class="mono-label contents-caption" id="contents-caption">Contents / {total} sections</p>
+                    <p class="mono-label contents-caption" id="contents-caption">
+                        Contents / {total} sections
+                    </p>
                     <ol class="contents-list" role="list">
-                        {
-                            contents.map((chapter) => (
-                                <li>
-                                    <a class="contents-link" href={`#${chapter.id}`}>
-                                        <span class="mono-label">{chapter.number}</span>
-                                        <span class="contents-name">{chapter.eyebrow}</span>
-                                    </a>
-                                </li>
-                            ))
-                        }
+                        {contents.map((chapter) => (
+                            <li>
+                                <a class="contents-link" href={`#${chapter.id}`}>
+                                    <span class="mono-label">{chapter.number}</span>
+                                    <span class="contents-name">{chapter.eyebrow}</span>
+                                </a>
+                            </li>
+                        ))}
                     </ol>
                 </nav>
             </div>
@@ -274,7 +278,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">The name</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('name')}</p>
+                        <p class="section-count" data-roll>
+                            {station('name')}
+                        </p>
                     </div>
                     <h2 class="section-title">Night, and what is drawn on it.</h2>
                     <div class="section-lede">
@@ -288,21 +294,21 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <div class="night-prose prose" data-reveal>
-                    {system.night.map((paragraph) => <p>{paragraph}</p>)}
+                    {system.night.map((paragraph) => (
+                        <p>{paragraph}</p>
+                    ))}
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        nomenclature.map((asset) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{asset.name}</span>
-                                    <span class="part-kind mono-label">{asset.subject}</span>
-                                </dt>
-                                <dd class="part-note">{asset.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {nomenclature.map((asset) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{asset.name}</span>
+                                <span class="part-kind mono-label">{asset.subject}</span>
+                            </dt>
+                            <dd class="part-note">{asset.note}</dd>
+                        </div>
+                    ))}
                 </dl>
             </div>
         </section>
@@ -313,34 +319,36 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Lineage</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('lineage')}</p>
+                        <p class="section-count" data-roll>
+                            {station('lineage')}
+                        </p>
                     </div>
                     <h2 class="section-title">Descended, not invented.</h2>
                     <div class="section-lede">
                         <p class="section-subtitle">
-                            {spell(lineage.length)} older traditions are doing most of the work here. Each is taken in part,
-                            and the part that was left out is the more useful half of the description.
+                            {spell(lineage.length)} older traditions are doing most of the work here. Each is taken in
+                            part, and the part that was left out is the more useful half of the description.
                         </p>
                         <div class="section-line" aria-hidden="true"></div>
                     </div>
                 </div>
 
                 <div class="mark-prose prose" data-reveal>
-                    {lineageProse.map((paragraph) => <p>{paragraph}</p>)}
+                    {lineageProse.map((paragraph) => (
+                        <p>{paragraph}</p>
+                    ))}
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        lineage.map((part) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{part.name}</span>
-                                    <span class="part-kind mono-label">{part.kind}</span>
-                                </dt>
-                                <dd class="part-note">{part.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {lineage.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
                 </dl>
             </div>
         </section>
@@ -351,7 +359,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">The rules</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('rules')}</p>
+                        <p class="section-count" data-roll>
+                            {station('rules')}
+                        </p>
                     </div>
                     <h2 class="section-title">Six laws, no exceptions.</h2>
                     <div class="section-lede">
@@ -364,17 +374,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <ol class="law-list" data-reveal>
-                    {
-                        laws.map((law) => (
-                            <li class="law">
-                                <p class="law-index">{law.index}</p>
-                                <div class="law-body">
-                                    <h3 class="law-name">{law.name}</h3>
-                                    <p class="law-rule prose">{law.rule}</p>
-                                </div>
-                            </li>
-                        ))
-                    }
+                    {laws.map((law) => (
+                        <li class="law">
+                            <p class="law-index">{law.index}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{law.name}</h3>
+                                <p class="law-rule prose">{law.rule}</p>
+                            </div>
+                        </li>
+                    ))}
                 </ol>
             </div>
         </section>
@@ -385,7 +393,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Ground and ink</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('ink')}</p>
+                        <p class="section-count" data-roll>
+                            {station('ink')}
+                        </p>
                     </div>
                     <h2 class="section-title">The palette is complete.</h2>
                     <div class="section-lede">
@@ -441,7 +451,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">The parts</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('geometry')}</p>
+                        <p class="section-count" data-roll>
+                            {station('geometry')}
+                        </p>
                     </div>
                     <h2 class="section-title">Thirty and sixty, everywhere.</h2>
                     <div class="section-lede">
@@ -464,10 +476,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         >
                             <g class="fig-line">
                                 <path class="fig-dash" d={axes.base}></path>
-                                {axes.rays.map((d) => <path d={d} />)}
+                                {axes.rays.map((d) => (
+                                    <path d={d} />
+                                ))}
                             </g>
                             <rect x="98" y="58" width="4" height="4" fill="#fff"></rect>
-                            <text class="fig-text" x="20" y="110">30 / 60 / 120 / 150</text>
+                            <text class="fig-text" x="20" y="110">
+                                30 / 60 / 120 / 150
+                            </text>
                         </svg>
                         <figcaption class="mono-label">The four axes</figcaption>
                     </figure>
@@ -481,7 +497,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         >
                             <path class="fig-line" d={cut.panel}></path>
                             <path class="fig-dash" d={cut.corner}></path>
-                            <text class="fig-text" x="72" y="66">30°</text>
+                            <text class="fig-text" x="72" y="66">
+                                30°
+                            </text>
                         </svg>
                         <figcaption class="mono-label">The cut</figcaption>
                     </figure>
@@ -493,25 +511,29 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-collide="lines"
                             data-segments={collide(WIDE, cells)}
                         >
-                            <g class="fig-line">{cells.map((d) => <path d={d} />)}</g>
-                            <text class="fig-text" x="90" y="110">60°</text>
+                            <g class="fig-line">
+                                {cells.map((d) => (
+                                    <path d={d} />
+                                ))}
+                            </g>
+                            <text class="fig-text" x="90" y="110">
+                                60°
+                            </text>
                         </svg>
                         <figcaption class="mono-label">The lattice</figcaption>
                     </figure>
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        parts.map((part) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{part.name}</span>
-                                    <span class="part-kind mono-label">{part.kind}</span>
-                                </dt>
-                                <dd class="part-note">{part.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {parts.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
                 </dl>
 
                 <div class="table-wrap" data-reveal>
@@ -525,19 +547,17 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                tokens.map((row) => (
-                                    <tr>
-                                        <td class="cell-code" data-col="Token">
-                                            {row.token}
-                                        </td>
-                                        <td class="cell-code" data-col="Value">
-                                            {row.value}
-                                        </td>
-                                        <td data-col="Governs">{row.governs}</td>
-                                    </tr>
-                                ))
-                            }
+                            {tokens.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Token">
+                                        {row.token}
+                                    </td>
+                                    <td class="cell-code" data-col="Value">
+                                        {row.value}
+                                    </td>
+                                    <td data-col="Governs">{row.governs}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -550,7 +570,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">The mark</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('mark')}</p>
+                        <p class="section-count" data-roll>
+                            {station('mark')}
+                        </p>
                     </div>
                     <h2 class="section-title">Nothing in it was chosen twice.</h2>
                     <div class="section-lede">
@@ -572,7 +594,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={collide(STEP, [triangle])}
                         >
                             <path class="fig-line" d={triangle}></path>
-                            <text class="fig-text fig-text-mark" x="11" y="31">60°</text>
+                            <text class="fig-text fig-text-mark" x="11" y="31">
+                                60°
+                            </text>
                         </svg>
                         <figcaption class="mono-label">01 / Triangle</figcaption>
                     </figure>
@@ -586,7 +610,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         >
                             <path class="fig-dash" d={triangle}></path>
                             <path class="fig-line" d={tail}></path>
-                            <text class="fig-text fig-text-mark" x="11" y="31">30°</text>
+                            <text class="fig-text fig-text-mark" x="11" y="31">
+                                30°
+                            </text>
                         </svg>
                         <figcaption class="mono-label">02 / Tail</figcaption>
                     </figure>
@@ -601,7 +627,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             <path class="fig-dash" d={frame}></path>
                             <path class="fig-dash" d={baseline}></path>
                             <path class="fig-line" d={diamond}></path>
-                            <text class="fig-text fig-text-mark" x="9.5" y="31">√3 : 2</text>
+                            <text class="fig-text fig-text-mark" x="9.5" y="31">
+                                √3 : 2
+                            </text>
                         </svg>
                         <figcaption class="mono-label">03 / Frame</figcaption>
                     </figure>
@@ -615,24 +643,24 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         >
                             <path class="fig-dash" d={diamond}></path>
                             <path class="mark-solid" d={SILHOUETTE}></path>
-                            <text class="fig-text fig-text-mark" x="8" y="31">15 EDGES</text>
+                            <text class="fig-text fig-text-mark" x="8" y="31">
+                                15 EDGES
+                            </text>
                         </svg>
                         <figcaption class="mono-label">04 / Bolt</figcaption>
                     </figure>
                 </div>
 
                 <ol class="law-list" data-reveal>
-                    {
-                        construction.map((step) => (
-                            <li class="law">
-                                <p class="law-index">{step.index}</p>
-                                <div class="law-body">
-                                    <h3 class="law-name">{step.name}</h3>
-                                    <p class="law-rule prose">{step.rule}</p>
-                                </div>
-                            </li>
-                        ))
-                    }
+                    {construction.map((step) => (
+                        <li class="law">
+                            <p class="law-index">{step.index}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{step.name}</h3>
+                                <p class="law-rule prose">{step.rule}</p>
+                            </div>
+                        </li>
+                    ))}
                 </ol>
 
                 <div class="mark-prose prose" data-reveal>
@@ -655,14 +683,18 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={traced([line(60, 1)], [bodyPath, gapMark.d])}
                         >
                             <defs>
-                                <clipPath id={bandClip}><path d={bodyPath}></path></clipPath>
+                                <clipPath id={bandClip}>
+                                    <path d={bodyPath}></path>
+                                </clipPath>
                             </defs>
                             <g clip-path={`url(#${bandClip})`}>
                                 <path class="fig-trace" d={line(60, 1)}></path>
                             </g>
                             <path class="fig-line" d={bodyPath}></path>
                             <path class="fig-gauge" d={gapMark.d}></path>
-                            <text class="fig-text fig-text-band" x={n(gapMark.x + 2.2)} y={n(gapMark.y - 0.6)}>w</text>
+                            <text class="fig-text fig-text-band" x={n(gapMark.x + 2.2)} y={n(gapMark.y - 0.6)}>
+                                w
+                            </text>
                         </svg>
                         <figcaption class="mono-label">One band</figcaption>
                         <p class="figure-note">The width every stroke and every cut in the mark is held to.</p>
@@ -676,10 +708,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={traced(families, [bodyPath])}
                         >
                             <defs>
-                                <clipPath id={familyClip}><path d={bodyPath}></path></clipPath>
+                                <clipPath id={familyClip}>
+                                    <path d={bodyPath}></path>
+                                </clipPath>
                             </defs>
                             <g class="fig-trace" clip-path={`url(#${familyClip})`}>
-                                {families.map((d) => <path d={d} />)}
+                                {families.map((d) => (
+                                    <path d={d} />
+                                ))}
                             </g>
                             <path class="fig-line" d={bodyPath}></path>
                         </svg>
@@ -695,10 +731,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={traced(walked, [SILHOUETTE])}
                         >
                             <defs>
-                                <clipPath id={walkClip}><path d={bodyPath}></path></clipPath>
+                                <clipPath id={walkClip}>
+                                    <path d={bodyPath}></path>
+                                </clipPath>
                             </defs>
                             <g class="fig-trace" clip-path={`url(#${walkClip})`}>
-                                {walked.map((d) => <path d={d} />)}
+                                {walked.map((d) => (
+                                    <path d={d} />
+                                ))}
                             </g>
                             <path class="mark-hollow" d={SILHOUETTE}></path>
                         </svg>
@@ -708,17 +748,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        bandRules.map((rule) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{rule.name}</span>
-                                    <span class="part-kind mono-label">{rule.kind}</span>
-                                </dt>
-                                <dd class="part-note">{rule.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {bandRules.map((rule) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{rule.name}</span>
+                                <span class="part-kind mono-label">{rule.kind}</span>
+                            </dt>
+                            <dd class="part-note">{rule.note}</dd>
+                        </div>
+                    ))}
                 </dl>
 
                 <div class="table-wrap" data-reveal>
@@ -733,22 +771,20 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                lineRows.map((row) => (
-                                    <tr>
-                                        <td class="cell-code" data-col="Edge">
-                                            {row.edge}
-                                        </td>
-                                        <td class="cell-code" data-col="Axis">
-                                            {row.axis}°
-                                        </td>
-                                        <td class="cell-code" data-col="Bands in">
-                                            {row.band}
-                                        </td>
-                                        <td data-col="Measured from">{row.from}</td>
-                                    </tr>
-                                ))
-                            }
+                            {lineRows.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Edge">
+                                        {row.edge}
+                                    </td>
+                                    <td class="cell-code" data-col="Axis">
+                                        {row.axis}°
+                                    </td>
+                                    <td class="cell-code" data-col="Bands in">
+                                        {row.band}
+                                    </td>
+                                    <td data-col="Measured from">{row.from}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -762,15 +798,13 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         which is why 150° carries five.
                     </p>
                     <dl class="census-row">
-                        {
-                            census.map((row) => (
-                                <div class="census-cell">
-                                    <dt class="census-axis">{row.axis}</dt>
-                                    <dd class="census-count">{row.count}</dd>
-                                    <dd class="census-role">{row.role}</dd>
-                                </div>
-                            ))
-                        }
+                        {census.map((row) => (
+                            <div class="census-cell">
+                                <dt class="census-axis">{row.axis}</dt>
+                                <dd class="census-count">{row.count}</dd>
+                                <dd class="census-role">{row.role}</dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
 
@@ -843,17 +877,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                metrics.map((row) => (
-                                    <tr>
-                                        <td data-col="Measure">{row.label}</td>
-                                        <td class="cell-code" data-col="Value">
-                                            {row.value}
-                                        </td>
-                                        <td data-col="Note">{row.note}</td>
-                                    </tr>
-                                ))
-                            }
+                            {metrics.map((row) => (
+                                <tr>
+                                    <td data-col="Measure">{row.label}</td>
+                                    <td class="cell-code" data-col="Value">
+                                        {row.value}
+                                    </td>
+                                    <td data-col="Note">{row.note}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -869,17 +901,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                sizes.map((row) => (
-                                    <tr>
-                                        <td data-col="Context">{row.context}</td>
-                                        <td class="cell-code" data-col="Minimum">
-                                            {row.minimum}
-                                        </td>
-                                        <td data-col="State">{row.state}</td>
-                                    </tr>
-                                ))
-                            }
+                            {sizes.map((row) => (
+                                <tr>
+                                    <td data-col="Context">{row.context}</td>
+                                    <td class="cell-code" data-col="Minimum">
+                                        {row.minimum}
+                                    </td>
+                                    <td data-col="State">{row.state}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -892,7 +922,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Spacing</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('spacing')}</p>
+                        <p class="section-count" data-roll>
+                            {station('spacing')}
+                        </p>
                     </div>
                     <h2 class="section-title">One ramp, one module.</h2>
                     <div class="section-lede">
@@ -914,20 +946,18 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         had, by the time anyone counted. The rules below are drawn at their true length.
                     </p>
                     <dl class="ramp-list">
-                        {
-                            spacing.map((stop) => (
-                                <div class="ramp-row">
-                                    <dt class="ramp-token mono-label">{stop.token}</dt>
-                                    <dd class="ramp-bar">
-                                        <span class="ramp-line" style={`width:${stop.px}px`} />
-                                    </dd>
-                                    <dd class="ramp-value mono-label">
-                                        {stop.px} / {stop.rem}
-                                    </dd>
-                                    <dd class="ramp-step mono-label">{stop.step}</dd>
-                                </div>
-                            ))
-                        }
+                        {spacing.map((stop) => (
+                            <div class="ramp-row">
+                                <dt class="ramp-token mono-label">{stop.token}</dt>
+                                <dd class="ramp-bar">
+                                    <span class="ramp-line" style={`width:${stop.px}px`} />
+                                </dd>
+                                <dd class="ramp-value mono-label">
+                                    {stop.px} / {stop.rem}
+                                </dd>
+                                <dd class="ramp-step mono-label">{stop.step}</dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
 
@@ -942,18 +972,16 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         narrowing this window walks them down their span.
                     </p>
                     <dl class="ramp-list">
-                        {
-                            flow.map((step) => (
-                                <div class="ramp-row">
-                                    <dt class="ramp-token mono-label">{step.token}</dt>
-                                    <dd class="ramp-bar">
-                                        <span class="ramp-line" style={`width:var(${step.token})`} />
-                                    </dd>
-                                    <dd class="ramp-value mono-label">{step.span}</dd>
-                                    <dd class="ramp-step mono-label">{step.note}</dd>
-                                </div>
-                            ))
-                        }
+                        {flow.map((step) => (
+                            <div class="ramp-row">
+                                <dt class="ramp-token mono-label">{step.token}</dt>
+                                <dd class="ramp-bar">
+                                    <span class="ramp-line" style={`width:var(${step.token})`} />
+                                </dd>
+                                <dd class="ramp-value mono-label">{step.span}</dd>
+                                <dd class="ramp-step mono-label">{step.note}</dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
 
@@ -967,12 +995,16 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                                 data-collide="lines"
                                 data-segments={collide(MODULE_BOX, [...moduleGuides, ...moduleTicks, SILHOUETTE])}
                             >
-                                {moduleGuides.map((d) => <path class="fig-dash" d={d} />)}
-                                {moduleTicks.map((d) => <path class="fig-line" d={d} />)}
+                                {moduleGuides.map((d) => (
+                                    <path class="fig-dash" d={d} />
+                                ))}
+                                {moduleTicks.map((d) => (
+                                    <path class="fig-line" d={d} />
+                                ))}
                                 <path class="fig-line" d={SILHOUETTE}></path>
-                                <text class="fig-text fig-text-module" x={n(LEFT_BASE - 3.4)} y={n(VIEW + 5.2)}
-                                    >M = H / 4</text
-                                >
+                                <text class="fig-text fig-text-module" x={n(LEFT_BASE - 3.4)} y={n(VIEW + 5.2)}>
+                                    M = H / 4
+                                </text>
                             </svg>
                         </div>
                         <figcaption class="mono-label">The module</figcaption>
@@ -992,7 +1024,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                                 <path class="fig-dash" d={clearBox}></path>
                                 <path class="fig-line" d={clearTick}></path>
                                 <path class="mark-solid" d={SILHOUETTE}></path>
-                                <text class="fig-text fig-text-clear" x={n(AXIS + 1)} y={n(-MOD / 2.6)}>M</text>
+                                <text class="fig-text fig-text-clear" x={n(AXIS + 1)} y={n(-MOD / 2.6)}>
+                                    M
+                                </text>
                             </svg>
                         </div>
                         <figcaption class="mono-label">Clear space</figcaption>
@@ -1018,11 +1052,12 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                                     y={n(AXIS + 6.6)}
                                     textLength={n(WORD)}
                                     lengthAdjust="spacingAndGlyphs"
-                                    >aerulion
-                                </text>
-                                <text class="fig-text fig-text-lockup" x={n(RIGHT_BASE + MOD / 8)} y={n(AXIS - 2.1)}
-                                    >M</text
                                 >
+                                    aerulion
+                                </text>
+                                <text class="fig-text fig-text-lockup" x={n(RIGHT_BASE + MOD / 8)} y={n(AXIS - 2.1)}>
+                                    M
+                                </text>
                             </svg>
                         </div>
                         <figcaption class="mono-label">The lockup</figcaption>
@@ -1033,17 +1068,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        clearSpace.map((rule) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{rule.subject}</span>
-                                    <span class="part-kind mono-label">{rule.module}</span>
-                                </dt>
-                                <dd class="part-note">{rule.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {clearSpace.map((rule) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{rule.subject}</span>
+                                <span class="part-kind mono-label">{rule.module}</span>
+                            </dt>
+                            <dd class="part-note">{rule.note}</dd>
+                        </div>
+                    ))}
                 </dl>
             </div>
         </section>
@@ -1054,7 +1087,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">The plate</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('plate')}</p>
+                        <p class="section-count" data-roll>
+                            {station('plate')}
+                        </p>
                     </div>
                     <h2 class="section-title">Rank runs backwards to measure.</h2>
                     <div class="section-lede">
@@ -1075,21 +1110,19 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         size would do elsewhere. The rules below are drawn in proportion to the longest of them.
                     </p>
                     <dl class="ramp-list">
-                        {
-                            measureLadder.map((stop) => (
-                                <div class="ramp-row">
-                                    <dt class="ramp-token mono-label">{stop.subject}</dt>
-                                    <dd class="ramp-bar">
-                                        <span
-                                            class="ramp-line"
-                                            style={`width:${((stop.ch / longest) * 100).toFixed(2)}%`}
-                                        />
-                                    </dd>
-                                    <dd class="ramp-value mono-label">{stop.ch} ch</dd>
-                                    <dd class="ramp-step mono-label">{stop.note}</dd>
-                                </div>
-                            ))
-                        }
+                        {measureLadder.map((stop) => (
+                            <div class="ramp-row">
+                                <dt class="ramp-token mono-label">{stop.subject}</dt>
+                                <dd class="ramp-bar">
+                                    <span
+                                        class="ramp-line"
+                                        style={`width:${((stop.ch / longest) * 100).toFixed(2)}%`}
+                                    />
+                                </dd>
+                                <dd class="ramp-value mono-label">{stop.ch} ch</dd>
+                                <dd class="ramp-step mono-label">{stop.note}</dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
 
@@ -1101,29 +1134,25 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         stylesheet, so they are listed here instead. Nothing else may invent a seventh.
                     </p>
                     <dl class="ramp-list">
-                        {
-                            breakpoints.map((point) => (
-                                <div class="ramp-row breakpoint-row">
-                                    <dt class="ramp-token mono-label">{point.width}</dt>
-                                    <dd class="breakpoint-note">{point.governs}</dd>
-                                </div>
-                            ))
-                        }
+                        {breakpoints.map((point) => (
+                            <div class="ramp-row breakpoint-row">
+                                <dt class="ramp-token mono-label">{point.width}</dt>
+                                <dd class="breakpoint-note">{point.governs}</dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        plate.map((part) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{part.name}</span>
-                                    <span class="part-kind mono-label">{part.kind}</span>
-                                </dt>
-                                <dd class="part-note">{part.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {plate.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
                 </dl>
 
                 <div class="table-wrap" data-reveal>
@@ -1137,19 +1166,17 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                layers.map((row) => (
-                                    <tr>
-                                        <td class="cell-code" data-col="Token">
-                                            {row.token}
-                                        </td>
-                                        <td class="cell-code" data-col="Value">
-                                            {row.value}
-                                        </td>
-                                        <td data-col="Governs">{row.governs}</td>
-                                    </tr>
-                                ))
-                            }
+                            {layers.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Token">
+                                        {row.token}
+                                    </td>
+                                    <td class="cell-code" data-col="Value">
+                                        {row.value}
+                                    </td>
+                                    <td data-col="Governs">{row.governs}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -1165,19 +1192,17 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                plateTokens.map((row) => (
-                                    <tr>
-                                        <td class="cell-code" data-col="Token">
-                                            {row.token}
-                                        </td>
-                                        <td class="cell-code" data-col="Value">
-                                            {row.value}
-                                        </td>
-                                        <td data-col="Governs">{row.governs}</td>
-                                    </tr>
-                                ))
-                            }
+                            {plateTokens.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Token">
+                                        {row.token}
+                                    </td>
+                                    <td class="cell-code" data-col="Value">
+                                        {row.value}
+                                    </td>
+                                    <td data-col="Governs">{row.governs}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -1203,22 +1228,20 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                filing.map((row) => (
-                                    <tr>
-                                        <td data-col="Part">{row.part}</td>
-                                        <td class="cell-code" data-col="Component or class">
-                                            {row.component}
-                                        </td>
-                                        <td class="cell-code" data-col="Module">
-                                            {row.module}
-                                        </td>
-                                        <td class="cell-code" data-col="Attribute or token">
-                                            {row.token}
-                                        </td>
-                                    </tr>
-                                ))
-                            }
+                            {filing.map((row) => (
+                                <tr>
+                                    <td data-col="Part">{row.part}</td>
+                                    <td class="cell-code" data-col="Component or class">
+                                        {row.component}
+                                    </td>
+                                    <td class="cell-code" data-col="Module">
+                                        {row.module}
+                                    </td>
+                                    <td class="cell-code" data-col="Attribute or token">
+                                        {row.token}
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -1231,7 +1254,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Icons</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('icons')}</p>
+                        <p class="section-count" data-roll>
+                            {station('icons')}
+                        </p>
                     </div>
                     <h2 class="section-title">A glyph the field could have drawn.</h2>
                     <div class="section-lede">
@@ -1254,7 +1279,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={collide(ICON_BOX, gridRows)}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
-                            <text class="fig-text fig-text-icon" x="0" y="49">{GLYPH_BOX} / CELL {GLYPH_CELL}</text>
+                            <text class="fig-text fig-text-icon" x="0" y="49">
+                                {GLYPH_BOX} / CELL {GLYPH_CELL}
+                            </text>
                         </svg>
                         <figcaption class="mono-label">The grid</figcaption>
                     </figure>
@@ -1267,8 +1294,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={collide(ICON_BOX, [...corplexium, ...gridRows])}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
-                            <g class="fig-line">{corplexium.map((d) => <path d={d} />)}</g>
-                            <text class="fig-text fig-text-icon" x="0" y="49">15 EDGES</text>
+                            <g class="fig-line">
+                                {corplexium.map((d) => (
+                                    <path d={d} />
+                                ))}
+                            </g>
+                            <text class="fig-text fig-text-icon" x="0" y="49">
+                                15 EDGES
+                            </text>
                         </svg>
                         <figcaption class="mono-label">On the grid</figcaption>
                     </figure>
@@ -1281,8 +1314,14 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             data-segments={collide(ICON_BOX, [...cloudstorage, ...gridRows])}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
-                            <g class="fig-line">{cloudstorage.map((d) => <path d={d} />)}</g>
-                            <text class="fig-text fig-text-icon" x="0" y="49">12 EDGES</text>
+                            <g class="fig-line">
+                                {cloudstorage.map((d) => (
+                                    <path d={d} />
+                                ))}
+                            </g>
+                            <text class="fig-text fig-text-icon" x="0" y="49">
+                                12 EDGES
+                            </text>
                         </svg>
                         <figcaption class="mono-label">A second glyph</figcaption>
                     </figure>
@@ -1291,38 +1330,34 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 <div class="glyph-set" data-reveal>
                     <h3 class="prose-head">The set</h3>
                     <p class="glyph-lede prose">
-                        {spell(glyphSet.length)} so far, and the list grows only when something on the page needs one. Every
-                        arrowhead opens 30° each side of its shaft; the descent runs at 30° because that is the direction
-                        a block already travels when it reveals. There is no down arrow, because a vertical is not one of
-                        the five directions.
+                        {spell(glyphSet.length)} so far, and the list grows only when something on the page needs one.
+                        Every arrowhead opens 30° each side of its shaft; the descent runs at 30° because that is the
+                        direction a block already travels when it reveals. There is no down arrow, because a vertical is
+                        not one of the five directions.
                     </p>
                     <dl class="glyph-list">
-                        {
-                            glyphSet.map((item) => (
-                                <div class="glyph-cell">
-                                    <dt class="glyph-figure">
-                                        <Glyph name={item.name as never} />
-                                        <span class="mono-label">{item.name}</span>
-                                    </dt>
-                                    <dd class="glyph-use">{item.use}</dd>
-                                </div>
-                            ))
-                        }
+                        {glyphSet.map((item) => (
+                            <div class="glyph-cell">
+                                <dt class="glyph-figure">
+                                    <Glyph name={item.name as never} />
+                                    <span class="mono-label">{item.name}</span>
+                                </dt>
+                                <dd class="glyph-use">{item.use}</dd>
+                            </div>
+                        ))}
                     </dl>
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        glyph.map((rule) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{rule.name}</span>
-                                    <span class="part-kind mono-label">{rule.kind}</span>
-                                </dt>
-                                <dd class="part-note">{rule.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {glyph.map((rule) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{rule.name}</span>
+                                <span class="part-kind mono-label">{rule.kind}</span>
+                            </dt>
+                            <dd class="part-note">{rule.note}</dd>
+                        </div>
+                    ))}
                 </dl>
             </div>
         </section>
@@ -1333,7 +1368,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Type</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('type')}</p>
+                        <p class="section-count" data-roll>
+                            {station('type')}
+                        </p>
                     </div>
                     <h2 class="section-title">Four faces, one job each.</h2>
                     <div class="section-lede">
@@ -1346,19 +1383,17 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <div class="face-list" data-reveal>
-                    {
-                        faces.map((face) => (
-                            <div class="face">
-                                <div class="face-rail">
-                                    <p class="mono-label">{face.name}</p>
-                                    <p class="mono-label face-variable">{face.variable}</p>
-                                    <p class="mono-label">{face.role}</p>
-                                </div>
-                                <p class:list={['face-sample', `face-sample-${face.slug}`]}>{face.sample}</p>
-                                <p class="face-note">{face.note}</p>
+                    {faces.map((face) => (
+                        <div class="face">
+                            <div class="face-rail">
+                                <p class="mono-label">{face.name}</p>
+                                <p class="mono-label face-variable">{face.variable}</p>
+                                <p class="mono-label">{face.role}</p>
                             </div>
-                        ))
-                    }
+                            <p class:list={['face-sample', `face-sample-${face.slug}`]}>{face.sample}</p>
+                            <p class="face-note">{face.note}</p>
+                        </div>
+                    ))}
                 </div>
 
                 <div class="mark-prose prose" data-reveal>
@@ -1382,19 +1417,17 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                typeTokens.map((row) => (
-                                    <tr>
-                                        <td class="cell-code" data-col="Token">
-                                            {row.token}
-                                        </td>
-                                        <td class="cell-code" data-col="Value">
-                                            {row.value}
-                                        </td>
-                                        <td data-col="Governs">{row.governs}</td>
-                                    </tr>
-                                ))
-                            }
+                            {typeTokens.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Token">
+                                        {row.token}
+                                    </td>
+                                    <td class="cell-code" data-col="Value">
+                                        {row.value}
+                                    </td>
+                                    <td data-col="Governs">{row.governs}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -1407,7 +1440,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Motion</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('motion')}</p>
+                        <p class="section-count" data-roll>
+                            {station('motion')}
+                        </p>
                     </div>
                     <h2 class="section-title">Motion is construction.</h2>
                     <div class="section-lede">
@@ -1430,35 +1465,31 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                durations.map((row) => (
-                                    <tr>
-                                        <td class="cell-code" data-col="Token">
-                                            {row.token}
-                                        </td>
-                                        <td class="cell-code" data-col="Value">
-                                            {row.value}
-                                        </td>
-                                        <td data-col="Governs">{row.governs}</td>
-                                    </tr>
-                                ))
-                            }
+                            {durations.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Token">
+                                        {row.token}
+                                    </td>
+                                    <td class="cell-code" data-col="Value">
+                                        {row.value}
+                                    </td>
+                                    <td data-col="Governs">{row.governs}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        motion.map((beat) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{beat.name}</span>
-                                    <span class="part-kind mono-label">{beat.token}</span>
-                                </dt>
-                                <dd class="part-note">{beat.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {motion.map((beat) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{beat.name}</span>
+                                <span class="part-kind mono-label">{beat.token}</span>
+                            </dt>
+                            <dd class="part-note">{beat.note}</dd>
+                        </div>
+                    ))}
                 </dl>
             </div>
         </section>
@@ -1469,7 +1500,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Access</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('access')}</p>
+                        <p class="section-count" data-roll>
+                            {station('access')}
+                        </p>
                     </div>
                     <h2 class="section-title">It has to work switched off.</h2>
                     <div class="section-lede">
@@ -1483,17 +1516,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <dl class="part-list" data-reveal>
-                    {
-                        access.map((item) => (
-                            <div class="part">
-                                <dt class="part-head">
-                                    <span class="part-name">{item.name}</span>
-                                    <span class="part-kind mono-label">{item.kind}</span>
-                                </dt>
-                                <dd class="part-note">{item.note}</dd>
-                            </div>
-                        ))
-                    }
+                    {access.map((item) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{item.name}</span>
+                                <span class="part-kind mono-label">{item.kind}</span>
+                            </dt>
+                            <dd class="part-note">{item.note}</dd>
+                        </div>
+                    ))}
                 </dl>
             </div>
         </section>
@@ -1504,7 +1535,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Misuse</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('misuse')}</p>
+                        <p class="section-count" data-roll>
+                            {station('misuse')}
+                        </p>
                     </div>
                     <h2 class="section-title">{misuse.length} ways out.</h2>
                     <div class="section-lede">
@@ -1518,17 +1551,15 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <ol class="law-list deny-list" data-reveal>
-                    {
-                        misuse.map((item) => (
-                            <li class="law">
-                                <p class="law-index">{item.index}</p>
-                                <div class="law-body">
-                                    <h3 class="law-name">{item.name}</h3>
-                                    <p class="law-rule prose">{item.rule}</p>
-                                </div>
-                            </li>
-                        ))
-                    }
+                    {misuse.map((item) => (
+                        <li class="law">
+                            <p class="law-index">{item.index}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{item.name}</h3>
+                                <p class="law-rule prose">{item.rule}</p>
+                            </div>
+                        </li>
+                    ))}
                 </ol>
             </div>
         </section>
@@ -1539,7 +1570,9 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                     <div class="section-rail">
                         <p class="section-eyebrow">Applications</p>
                         <span class="section-rule" aria-hidden="true"></span>
-                        <p class="section-count" data-roll>{station('applications')}</p>
+                        <p class="section-count" data-roll>
+                            {station('applications')}
+                        </p>
                     </div>
                     <h2 class="section-title">Off the site, same rules.</h2>
                     <div class="section-lede">
@@ -1552,45 +1585,37 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                 </div>
 
                 <div class="application-list">
-                    {
-                        applications.map((application) => (
-                            <article class="application" data-reveal>
-                                <div class="application-rail">
-                                    <h3 class="application-name">{application.name}</h3>
-                                    <p class="mono-label">{application.format}</p>
-                                </div>
-                                <div class:list={['application-body', `application-body-${application.orientation}`]}>
-                                    <picture
-                                        class:list={[
-                                            'application-frame',
-                                            `application-frame-${application.orientation}`
-                                        ]}
-                                    >
-                                        {application.still && (
-                                            <source
-                                                srcset={application.still}
-                                                media="(prefers-reduced-motion: reduce)"
-                                            />
-                                        )}
-                                        <img
-                                            class="application-shot"
-                                            src={application.image}
-                                            width={application.width}
-                                            height={application.height}
-                                            alt={application.alt}
-                                            loading="lazy"
-                                            decoding="async"
-                                        />
-                                    </picture>
-                                    <ul class="application-notes" role="list">
-                                        {application.notes.map((note) => (
-                                            <li>{note}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </article>
-                        ))
-                    }
+                    {applications.map((application) => (
+                        <article class="application" data-reveal>
+                            <div class="application-rail">
+                                <h3 class="application-name">{application.name}</h3>
+                                <p class="mono-label">{application.format}</p>
+                            </div>
+                            <div class:list={['application-body', `application-body-${application.orientation}`]}>
+                                <picture
+                                    class:list={['application-frame', `application-frame-${application.orientation}`]}
+                                >
+                                    {application.still && (
+                                        <source srcset={application.still} media="(prefers-reduced-motion: reduce)" />
+                                    )}
+                                    <img
+                                        class="application-shot"
+                                        src={application.image}
+                                        width={application.width}
+                                        height={application.height}
+                                        alt={application.alt}
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </picture>
+                                <ul class="application-notes" role="list">
+                                    {application.notes.map((note) => (
+                                        <li>{note}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </article>
+                    ))}
                 </div>
             </div>
         </section>

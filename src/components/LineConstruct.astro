@@ -70,17 +70,10 @@ const segments = [
     data-collide="lines"
     data-segments={JSON.stringify(segments)}
 >
-    {
-        axes &&
-            AXES.map((axis, i) => (
-                <path
-                    class="draw-path construct-axis"
-                    d={open(axis)}
-                    pathLength="1"
-                    style={`--draw-delay:${i * 80}ms`}
-                />
-            ))
-    }
+    {axes &&
+        AXES.map((axis, i) => (
+            <path class="draw-path construct-axis" d={open(axis)} pathLength="1" style={`--draw-delay:${i * 80}ms`} />
+        ))}
 
     <path class="draw-path construct-hex" d={closed(HEX)} pathLength="1" style="--draw-delay:240ms"></path>
     <path class="draw-path construct-tri" d={closed(TRI_UP)} pathLength="1" style="--draw-delay:380ms"></path>

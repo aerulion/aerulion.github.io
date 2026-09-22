@@ -14,11 +14,9 @@ const TICK_PERIOD = 2.8;
             <div class="hero-rail hero-rail-top">
                 <p class="mono-label">Java / Systems / Plugin architecture</p>
                 <div class="hero-ticks" aria-hidden="true" style={`--tick-period:${TICK_PERIOD}s`}>
-                    {
-                        Array.from({length: TICKS}, (_, i) => (
-                            <span style={`--tick-delay:${((-i * TICK_PERIOD) / TICKS).toFixed(3)}s`} />
-                        ))
-                    }
+                    {Array.from({length: TICKS}, (_, i) => (
+                        <span style={`--tick-delay:${((-i * TICK_PERIOD) / TICKS).toFixed(3)}s`} />
+                    ))}
                 </div>
                 <p class="mono-label rail-end">Germany / EU Central / Online</p>
             </div>
@@ -51,8 +49,12 @@ const TICK_PERIOD = 2.8;
                         <span>Data layer</span>
                     </div>
                     <div class="hero-actions">
-                        <Button href="#work" glyph="descend">Selected work</Button>
-                        <Button href="#context" glyph="descend">Context</Button>
+                        <Button href="#work" glyph="descend">
+                            Selected work
+                        </Button>
+                        <Button href="#context" glyph="descend">
+                            Context
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -69,14 +71,12 @@ const TICK_PERIOD = 2.8;
             </div>
 
             <ul class="skill-strip" role="list" aria-label="Core specialties">
-                {
-                    skills.map((skill, index) => (
-                        <li class="skill-chip">
-                            <span class="skill-index">{String(index + 1).padStart(2, '0')}</span>
-                            <span class="skill-name">{skill}</span>
-                        </li>
-                    ))
-                }
+                {skills.map((skill, index) => (
+                    <li class="skill-chip">
+                        <span class="skill-index">{String(index + 1).padStart(2, '0')}</span>
+                        <span class="skill-name">{skill}</span>
+                    </li>
+                ))}
             </ul>
         </div>
     </div>

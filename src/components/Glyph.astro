@@ -21,7 +21,9 @@ const strokes = [...glyphs[name]];
     data-collide="lines"
     data-segments={collide(box, strokes)}
 >
-    {strokes.map((d) => <path d={d} />)}
+    {strokes.map((d) => (
+        <path d={d} />
+    ))}
 </svg>
 
 <style>

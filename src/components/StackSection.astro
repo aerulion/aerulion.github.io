@@ -8,7 +8,9 @@ import {stack} from '../data/stack';
             <div class="section-rail">
                 <p class="section-eyebrow">Stack</p>
                 <span class="section-rule" aria-hidden="true"></span>
-                <p class="section-count" data-roll>04 / 06</p>
+                <p class="section-count" data-roll>
+                    04 / 06
+                </p>
             </div>
             <h2 class="section-title">A short, deliberate list.</h2>
             <div class="section-lede">
@@ -21,20 +23,18 @@ import {stack} from '../data/stack';
         </div>
 
         <dl class="stack-grid" data-reveal>
-            {
-                stack.map((group) => (
-                    <div class="stack-cell">
-                        <dt class="stack-label">{group.label}</dt>
-                        <dd class="stack-items">
-                            <ul role="list">
-                                {group.items.map((item) => (
-                                    <li>{item}</li>
-                                ))}
-                            </ul>
-                        </dd>
-                    </div>
-                ))
-            }
+            {stack.map((group) => (
+                <div class="stack-cell">
+                    <dt class="stack-label">{group.label}</dt>
+                    <dd class="stack-items">
+                        <ul role="list">
+                            {group.items.map((item) => (
+                                <li>{item}</li>
+                            ))}
+                        </ul>
+                    </dd>
+                </div>
+            ))}
         </dl>
     </div>
 </section>
