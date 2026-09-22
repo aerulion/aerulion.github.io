@@ -40,26 +40,32 @@ export const timeline: Milestone[] = [
     },
     {
         year: '2021',
-        title: 'Erenos',
-        note: 'Years of separate plugins merged into one engine, and Erenos took the form it has now.',
-        track: 'Erenos'
+        title: 'Corplexium',
+        note: 'Years of separate plugins merged into one engine. Erenos then, Corplexium now.',
+        track: 'Corplexium'
     },
     {
         year: '2024',
         title: 'The item service',
-        note: 'The system most of Erenos leans on, taken apart and rebuilt in one pass.',
-        track: 'Erenos'
+        note: 'The system most of Corplexium leans on, taken apart and rebuilt in one pass.',
+        track: 'Corplexium'
     },
     {
         year: '2026',
         title: 'The database layer',
         note: 'Hibernate out, a purpose-built CRUD layer in. Two years in the branch and close to 30.000 lines.',
-        track: 'Erenos'
+        track: 'Corplexium'
+    },
+    {
+        year: '2026',
+        title: 'Admin',
+        note: 'Promoted from developer on 9 September, after ten years on the staff.',
+        track: 'Corpium'
     },
     {
         year: 'Today',
-        title: '100.000+ lines',
-        note: 'Erenos alone, still under active development.',
-        track: 'Erenos'
+        title: '140.000+ lines',
+        note: 'Corplexium alone, still under active development.',
+        track: 'Corplexium'
     }
 ];

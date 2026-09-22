@@ -204,7 +204,7 @@ const clearTick = `M${n(AXIS)} ${n(-MOD)}V0`;
 const lockupBox = `M${n(LEFT_BASE - MOD)} ${n(-MOD)}H${n(RIGHT_BASE + MOD + WORD + MOD)}V${n(VIEW + MOD)}H${n(LEFT_BASE - MOD)}Z`;
 const lockupTick = `M${n(RIGHT_BASE)} ${n(AXIS)}H${n(RIGHT_BASE + MOD)}`;
 
-const erenos = [
+const corplexium = [
     'M44 24 34 41.3205 14 41.3205 4 24 14 6.6795 34 6.6795Z',
     'M32 24 28 30.9282 20 30.9282 16 24 20 17.0718 28 17.0718Z',
     'M32 24H44',
@@ -1262,12 +1262,12 @@ const cloudstorage = ['M10 6.6795H42L38 13.6077H6Z', 'M10 20.5359H42L38 27.4641H
                         <svg
                             viewBox={ICON_BOX}
                             role="img"
-                            aria-label="The Erenos glyph drawn on the icon grid"
+                            aria-label="The Corplexium glyph drawn on the icon grid"
                             data-collide="lines"
-                            data-segments={collide(ICON_BOX, [...erenos, ...gridRows])}
+                            data-segments={collide(ICON_BOX, [...corplexium, ...gridRows])}
                         >
                             <path class="fig-grid" d={iconGrid}></path>
-                            <g class="fig-line">{erenos.map((d) => <path d={d} />)}</g>
+                            <g class="fig-line">{corplexium.map((d) => <path d={d} />)}</g>
                             <text class="fig-text fig-text-icon" x="0" y="49">15 EDGES</text>
                         </svg>
                         <figcaption class="mono-label">On the grid</figcaption>
