@@ -190,6 +190,20 @@
                 'The design system behind aerulion.net: the mark, the type, the spacing, the motion, and the rules none of it is allowed to break.',
             footStart: ['Ground / #000', 'Ink / #fff'],
             footEnd: ['Contrast / 21 : 1', 'aerulion.net/design']
+        },
+        taerra: {
+            railStart: 'aerulion / Taerra',
+            railEnd: 'Status / In testing',
+            eyebrow: 'Web map for Paper',
+            wordmark: 'Taerra',
+            face: 'display',
+            standfirst:
+                // U+2060 after the hyphen keeps "top-down" on one line.
+                'The whole world, in under three minutes: top-⁠down and isometric from all four corners, kept current while people play.',
+            footStart: ['Full render / 2:46', 'Radius / 6,000 blocks'],
+            footEnd: ['Chunks / ~560k', 'aerulion.net/taerra'],
+            // The project icon from src/data/taerra.ts, drawn in hairline like the page hero.
+            glyph: ['M10 6.6795H42L36 17.0718 44 30.9282 38 41.3205H6L12 30.9282 4 17.0718Z', 'M4 17.0718H36', 'M12 30.9282H44']
         }
     };
 
@@ -208,13 +222,21 @@
     put('foot-end-b', card.footEnd[1]);
     if (card.face === 'display') document.getElementById('wordmark').classList.add('display');
 
-    const VIEW = (2 * 24) / Math.sqrt(3);
     const svg = document.getElementById('mark');
-    svg.setAttribute('viewBox', `0 0 ${VIEW} ${VIEW}`);
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('fill', '#fff');
-    path.setAttribute('d', SILHOUETTE);
-    svg.append(path);
+    const draw = (d) => svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path')).setAttribute('d', d);
+    if (card.glyph) {
+        svg.setAttribute('viewBox', '-2 -2 52 52');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', '#fff');
+        svg.setAttribute('stroke-width', '1');
+        card.glyph.forEach(draw);
+        svg.querySelectorAll('path').forEach((p) => p.setAttribute('vector-effect', 'non-scaling-stroke'));
+    } else {
+        const VIEW = (2 * 24) / Math.sqrt(3);
+        svg.setAttribute('viewBox', `0 0 ${VIEW} ${VIEW}`);
+        svg.setAttribute('fill', '#fff');
+        draw(SILHOUETTE);
+    }
 
     const ticks = document.getElementById('ticks');
     for (let i = 0; i < 12; i++) ticks.append(document.createElement('span'));

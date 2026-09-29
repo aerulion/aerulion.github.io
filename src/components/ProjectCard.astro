@@ -1,4 +1,5 @@
 ---
+import Button from './Button.astro';
 import type {Project} from '../data/projects';
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
 }
 
 const {project, position} = Astro.props;
-const {title, tagline, description, iconUrl, meta, capabilities} = project;
+const {title, tagline, description, iconUrl, meta, capabilities, href} = project;
 const index = String(position).padStart(2, '0');
 ---
 
@@ -50,6 +51,13 @@ const index = String(position).padStart(2, '0');
                 <li>{capability}</li>
             ))}
         </ul>
+        {href && (
+            <div class="project-link">
+                <Button href={href} glyph="east">
+                    Read how {title} works
+                </Button>
+            </div>
+        )}
     </div>
 </article>
 
@@ -189,6 +197,10 @@ const index = String(position).padStart(2, '0');
         flex-wrap: wrap;
         gap: var(--spacing-2xs);
         list-style: none;
+    }
+
+    .project-link {
+        padding-top: var(--spacing-sm);
     }
 
     .capability-list li {

@@ -17,7 +17,8 @@ jobs='[
   {"page":"icon.html","query":"?box=0.86","width":512,"height":512,"scale":1,"out":".icons/android-chrome-512x512.png"},
   {"page":"icon.html","query":"?box=0.56","width":512,"height":512,"scale":1,"out":".icons/maskable-512x512.png"},
   {"page":"og.html","width":1200,"height":630,"scale":1,"out":".icons/og.png"},
-  {"page":"og.html","query":"?variant=design","width":1200,"height":630,"scale":1,"out":".icons/og-design.png"}
+  {"page":"og.html","query":"?variant=design","width":1200,"height":630,"scale":1,"out":".icons/og-design.png"},
+  {"page":"og.html","query":"?variant=taerra","width":1200,"height":630,"scale":1,"out":".icons/og-taerra.png"}
 ]'
 
 rm -rf "$TMP"
@@ -33,9 +34,10 @@ cp -f "$TMP/favicon-16x16.png" "$TMP/favicon-32x32.png" "$TMP/favicon.ico" \
 cp -f "$TMP/apple-touch-icon.png" "$PUB/apple-touch-icon-precomposed.png"
 cp -f "$TMP/og.png" "$PUB/assets/images/og.png"
 cp -f "$TMP/og-design.png" "$PUB/assets/images/og-design.png"
+cp -f "$TMP/og-taerra.png" "$PUB/assets/images/og-taerra.png"
 
 bun "$HERE/favicon-svg.mjs" > "$PUB/favicon.svg"
 
 rm -rf "$TMP"
 echo "== icons done =="
-ls -lh "$PUB"/*.png "$PUB"/*.ico "$PUB"/favicon.svg "$PUB/assets/images/og.png" "$PUB/assets/images/og-design.png"
+ls -lh "$PUB"/*.png "$PUB"/*.ico "$PUB"/favicon.svg "$PUB/assets/images/og.png" "$PUB/assets/images/og-design.png" "$PUB/assets/images/og-taerra.png"

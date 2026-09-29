@@ -13,11 +13,11 @@ import {projects} from '../data/projects';
                     03 / 06
                 </p>
             </div>
-            <h2 class="section-title">Two systems, end to end.</h2>
+            <h2 class="section-title">Three systems, end to end.</h2>
             <div class="section-lede">
                 <p class="section-subtitle">
-                    Large-scale builds shaped around progression, storage and control, designed for live gameplay, long
-                    sessions and server-side reliability.
+                    Large-scale builds shaped around progression, storage and the map of the world they run in, designed
+                    for live gameplay, long sessions and server-side reliability.
                 </p>
                 <div class="section-line" aria-hidden="true"></div>
             </div>
@@ -36,10 +36,19 @@ import {projects} from '../data/projects';
         padding-bottom: var(--spacing-5xl);
     }
 
+    /* Two columns at most, collapsing where a card drops under 30rem. The
+       newest system leads across the full width. */
     .projects-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(max(min(100%, 30rem), calc((100% - var(--spacing-xl)) / 2)), 1fr)
+        );
         grid-template-rows: auto auto auto 1fr auto;
         gap: var(--spacing-xl);
+    }
+
+    .projects-grid > :global(:first-child) {
+        grid-column: 1 / -1;
     }
 </style>

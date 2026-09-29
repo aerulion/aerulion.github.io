@@ -1,0 +1,47 @@
+---
+import type {Chapter} from '../data/taerra';
+
+interface Props {
+    chapter: Chapter;
+    station: string;
+    last?: boolean;
+}
+
+const {chapter, station, last = false} = Astro.props;
+---
+
+<section class:list={['page-section', last && 'page-section-last']} id={chapter.id} data-station={station}>
+    <div class="container">
+        <div class="section-header" data-reveal>
+            <div class="section-rail">
+                <p class="section-eyebrow">{chapter.eyebrow}</p>
+                <span class="section-rule" aria-hidden="true"></span>
+                <p class="section-count" data-roll>
+                    {station}
+                </p>
+            </div>
+            <h2 class="section-title">{chapter.title}</h2>
+            <div class="section-lede">
+                <p class="section-subtitle">{chapter.subtitle}</p>
+                <div class="section-line" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <div class="chapter-body">
+            <slot />
+        </div>
+    </div>
+</section>
+
+<style>
+    /* One gap between blocks, so no block has to know what follows it. */
+    .chapter-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--spacing-3xl);
+    }
+
+    .chapter-body > :global(*) {
+        margin-block: 0;
+    }
+</style>

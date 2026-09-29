@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="1" xmlns="http://www.w3.org/2000/svg">
+    <g vector-effect="non-scaling-stroke">
+        <path d="M10 6.6795H42L36 17.0718 44 30.9282 38 41.3205H6L12 30.9282 4 17.0718Z" vector-effect="non-scaling-stroke"/>
+        <path d="M4 17.0718H36" vector-effect="non-scaling-stroke"/>
+        <path d="M12 30.9282H44" vector-effect="non-scaling-stroke"/>
+    </g>
+</svg>

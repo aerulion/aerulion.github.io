@@ -63,6 +63,12 @@ export const timeline: Milestone[] = [
         track: 'Corpium'
     },
     {
+        year: '2026',
+        title: 'Taerra',
+        note: 'A web map that renders Corpium’s main world in under three minutes, now in testing on the live server.',
+        track: 'Taerra'
+    },
+    {
         year: 'Today',
         title: '140.000+ lines',
         note: 'Corplexium alone, still under active development.',

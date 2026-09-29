@@ -24,9 +24,9 @@ The site is a true-monochrome technical plate and the rules are load-bearing, no
 
 ## Architecture
 
-**Astro static site, zero UI framework.** Each block is one `.astro` component in `src/components/` with its markup, scoped `<style>`, and (when it needs behaviour) a `<script>` that imports a `mount*()` function from `src/scripts/`. `src/pages/index.astro` composes the sections; `src/pages/404.astro` reuses the same shell. `src/layouts/Layout.astro` owns head, SEO/OG metadata, JSON-LD, font preloads, and mounts the page-wide behaviours (`mountReveals`, `mountMorphingMarks`, `mountGauge`, `mountRoll`, `mountFigureText`).
+**Astro static site, zero UI framework.** Each block is one `.astro` component in `src/components/` with its markup, scoped `<style>`, and (when it needs behaviour) a `<script>` that imports a `mount*()` function from `src/scripts/`. `src/pages/index.astro` composes the sections; `src/pages/404.astro` reuses the same shell. `design.astro` and `taerra.astro` are long-form documents: both import `src/styles/document.css` (hero, contents, law/part lists, spec tables, figures), and `taerra.astro` builds its chapters with `Chapter.astro`. A new page also needs its sources in `PAGE_SOURCES` (`src/utils/lastmod.ts`) for the sitemap `lastmod`. `src/layouts/Layout.astro` owns head, SEO/OG metadata, JSON-LD, font preloads, and mounts the page-wide behaviours (`mountReveals`, `mountMorphingMarks`, `mountGauge`, `mountRoll`, `mountFigureText`).
 
-**Editable content lives in `src/data/`** (`projects.ts`, `timeline.ts`, `stack.ts`, `skills.ts`, `design.ts` for the Nyx guidelines, `glyphs.ts` for the icon paths) as typed exports — copy changes belong there, not in components.
+**Editable content lives in `src/data/`** (`projects.ts`, `timeline.ts`, `stack.ts`, `skills.ts`, `design.ts` for the Nyx guidelines, `taerra.ts` for the Taerra write-up, `glyphs.ts` for the icon paths) as typed exports — copy changes belong there, not in components.
 
 **Split of testable logic vs. DOM code.** `src/scripts/` modules are pure where they can be and are unit-tested beside the source as `*.test.ts`; anything that touches the DOM lives in the mount function or the component and is covered by `astro check` + ESLint instead. Keep new geometry/planning logic on the pure side so it stays testable.
 

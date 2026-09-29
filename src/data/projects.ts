@@ -10,9 +10,34 @@ export interface Project {
     meta: ProjectMeta[];
     description: string[];
     capabilities: string[];
+    /** A page of its own, linked from the card. */
+    href?: string;
 }
 
 export const projects: Project[] = [
+    {
+        title: 'Taerra',
+        tagline: 'A live web map that renders the whole world in minutes.',
+        iconUrl: '/assets/images/taerra-icon.svg',
+        meta: [
+            {label: 'Type', value: 'Web map plugin'},
+            {label: 'Scale', value: '6,000-block radius in 2 min 46 s'},
+            {label: 'Platform', value: 'Paper / Java 25'}
+        ],
+        description: [
+            'Taerra renders a Paper server’s worlds as a pixel-art web map: a top-down view for finding the way and an isometric view, turnable to all four corners, for showing off what people built. It reads the region files directly from its own threads, so the server never loads a chunk for it.',
+            'Corpium’s main world renders completely in under three minutes, where an established map plugin needed more than sixteen hours on the same machine for less. Changes are recorded as they happen and redrawn on an interval, what each viewer may see follows their permissions even while they are offline, and logging in takes one command in chat.'
+        ],
+        capabilities: [
+            'Top-down & isometric',
+            'Four rotations',
+            'Live tile updates',
+            'Players & markers',
+            'Passwordless login',
+            'Permission snapshots'
+        ],
+        href: '/taerra/'
+    },
     {
         title: 'Corplexium',
         tagline: 'The platform the rest of Corpium is built on.',

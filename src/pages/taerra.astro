@@ -1,0 +1,1523 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Plate from '../components/Plate.astro';
+import LatticeField from '../components/LatticeField.astro';
+import Curtain from '../components/Curtain.astro';
+import Footer from '../components/Footer.astro';
+import Button from '../components/Button.astro';
+import Chapter from '../components/Chapter.astro';
+import '../styles/document.css';
+import {
+    actions,
+    benchmark,
+    chapters,
+    collectFields,
+    colourCounts,
+    colours,
+    column,
+    compositing,
+    culling,
+    cutoff,
+    dropped,
+    explored,
+    features,
+    figures,
+    frontToBack,
+    goals,
+    grants,
+    headerScan,
+    headline,
+    heightIndex,
+    iso,
+    key,
+    lanes,
+    layout,
+    lightKey,
+    live,
+    liveSteps,
+    login,
+    motto,
+    noPanel,
+    nothingLost,
+    openQuestions,
+    order,
+    paint,
+    parity,
+    passes,
+    pending,
+    planes,
+    players,
+    privacy,
+    project,
+    queue,
+    reading,
+    ready,
+    refusals,
+    runs,
+    scheduling,
+    sections,
+    skyline as skylineNote,
+    shading,
+    shortcuts,
+    stack,
+    sun,
+    swallow,
+    terrace,
+    thin,
+    writes,
+    writesFromWeb,
+    writing
+} from '../data/taerra';
+import {collide} from '../scripts/figure-collide';
+import {uid} from '../utils/uid';
+
+const title = 'Taerra - rendering a Minecraft world in under three minutes';
+const description =
+    'Taerra: a web map plugin for Paper servers. How it renders a 6,000-block world top-down and isometric from all four corners in under three minutes.';
+const socialImage = '/assets/images/og-taerra.png';
+const socialImageAlt =
+    'Taerra, a web map for Paper: its icon in white hairline on black beside the word TAERRA, with a full render time of 2:46 for a 6,000-block radius listed below.';
+const breadcrumb = [
+    {name: 'Home', path: '/'},
+    {name: project.name, path: '/taerra/'}
+];
+const entity = {
+    type: 'CreativeWork',
+    name: project.name,
+    alternateName: `${project.name} Web Map`,
+    description: `${project.name} is a web map plugin for Paper servers: one renderer, two projections, four rotations.`,
+    keywords: [
+        'Minecraft web map',
+        'Paper plugin',
+        'isometric rendering',
+        'tile rendering',
+        'Leaflet',
+        'Java',
+        'performance'
+    ]
+};
+
+const pad = (n: number): string => String(n).padStart(2, '0');
+const total = pad(chapters.length);
+const contents = chapters.map((chapter, i) => ({...chapter, number: pad(i + 1)}));
+const station = (id: string): string => `${pad(chapters.findIndex((chapter) => chapter.id === id) + 1)} / ${total}`;
+const chapter = (id: string) => ({
+    chapter: chapters.find((c) => c.id === id)!,
+    station: station(id),
+    last: id === chapters[chapters.length - 1].id
+});
+
+const n = (v: number): string => String(Number(v.toFixed(3)));
+
+/** Parallel lines at `angle` covering a box, to be clipped to the shape they shade. */
+const hatch = (x0: number, y0: number, x1: number, y1: number, angle: number, gap: number): string => {
+    const a = (angle * Math.PI) / 180;
+    const [dx, dy] = [Math.cos(a), -Math.sin(a)];
+    const [cx, cy] = [(x0 + x1) / 2, (y0 + y1) / 2];
+    const r = Math.hypot(x1 - x0, y1 - y0) / 2;
+    let d = '';
+    for (let t = -r + gap / 2; t <= r; t += gap) {
+        const [px, py] = [cx - dy * t, cy + dx * t];
+        d += `M${n(px - dx * r)} ${n(py - dy * r)} ${n(px + dx * r)} ${n(py + dy * r)}`;
+    }
+    return d;
+};
+
+const ICON_BOX = '-2 -2 52 52';
+
+/* The column: one rect per run, shaded by density, never by tone. */
+const COLUMN_BOX = '0 0 200 136';
+const COL_X = 64;
+const COL_W = 24;
+const TEXTURE: Record<string, {angle: number; gap: number} | 'solid'> = {
+    oak_leaves: {angle: 60, gap: 4},
+    grass_block: 'solid',
+    dirt: {angle: 30, gap: 2.5},
+    stone: {angle: 120, gap: 4}
+};
+const columnRows = column.reduce<
+    {material: string | null; top: number; bottom: number; y0: number; y1: number; label: string; clip: string}[]
+>((rows, row) => {
+    const y0 = rows.length ? rows[rows.length - 1].y1 : 12;
+    const range = row.top === row.bottom ? `${row.top}` : `${row.top}..${row.bottom}`;
+    const run = rows.filter((r) => r.material).length;
+    const label = row.material ? `RUN ${run} / ${row.material} / ${range}` : 'air';
+    return [...rows, {...row, y0, y1: y0 + row.span, label, clip: uid('run-clip')}];
+}, []);
+const columnFloor = columnRows[columnRows.length - 1].y1;
+const rect = (y0: number, y1: number): string => `M${COL_X} ${y0}H${COL_X + COL_W}V${y1}H${COL_X}Z`;
+const stone = columnRows[columnRows.length - 1];
+const BREAK = stone.y0 + 26;
+const RISE = (COL_W + 4) * Math.tan(Math.PI / 6);
+const breakBand = `M${COL_X - 2} ${n(BREAK)} ${COL_X + COL_W + 2} ${n(BREAK - RISE)}V${n(BREAK - RISE + 4)}L${COL_X - 2} ${n(BREAK + 4)}Z`;
+const columnLines = columnRows.map((row) => rect(row.y0, row.y1));
+const runTable = column.filter((row) => row.material);
+
+/* One block, drawn on the lattice: the renderer's 2:1 pixel projection is the
+   one angle in this story that is not 30°, so the figure does not pretend. */
+const WIDE = '0 0 200 118';
+const cube = {
+    top: 'M100 14 134.641 34 100 54 65.359 34Z',
+    left: 'M65.359 34 100 54V94L65.359 74Z',
+    right: 'M100 54 134.641 34V74L100 94Z'
+};
+const cubeClips = {top: uid('cube-top'), left: uid('cube-left'), right: uid('cube-right')};
+
+/* The skyline: everything below it is already painted. */
+const tile = 'M20 8H180V100H20Z';
+const skyline = 'M20 62H52V50H84V58H120V44H150V56H180';
+const painted = `${skyline}V100H20Z`;
+const hidden = 'M70 72 87.321 82 70 92 52.679 82Z';
+const tower = 'M140 24 150.392 30V64L140 70 129.608 64V30ZM129.608 30 140 36 150.392 30M140 36V70';
+const paintedClip = uid('painted');
+const aboveClip = uid('above');
+
+/* Candidates: the lattice points a tile can see form a diamond. */
+const CELL = 10;
+const ROW = CELL * Math.sin(Math.PI / 3);
+const diamond = 'M100 21.359 160 56 100 90.641 40 56Z';
+const candidates = Array.from({length: 11}, (_, r) => r).flatMap((r) => {
+    const y = 12 + r * ROW;
+    const start = r % 2 ? CELL / 2 : 0;
+    return Array.from({length: 21}, (_, c) => ({x: start + c * CELL, y})).filter((p) => p.x <= 200);
+});
+const inside = (p: {x: number; y: number}): boolean => Math.abs(p.x - 100) / 60 + Math.abs(p.y - 56) / 34.641 <= 1.001;
+const dot = (p: {x: number; y: number}, size: number): string =>
+    `M${n(p.x - size / 2)} ${n(p.y - size / 2)}h${size}v${size}h${-size}z`;
+const nearDots = candidates
+    .filter(inside)
+    .map((p) => dot(p, 2.4))
+    .join('');
+const farDots = candidates
+    .filter((p) => !inside(p))
+    .map((p) => dot(p, 0.8))
+    .join('');
+
+const keyBits = key.reduce((sum, field) => sum + field.bits, 0);
+const keyFields = key.map((field, i) => {
+    const from = key.slice(0, i).reduce((sum, f) => sum + f.bits, 0);
+    const to = from + field.bits - 1;
+    return {...field, range: from === to ? `${from}` : `${from}–${to}`};
+});
+---
+
+<Layout
+    title={title}
+    description={description}
+    image={socialImage}
+    imageAlt={socialImageAlt}
+    breadcrumb={breadcrumb}
+    entity={entity}
+>
+    <a href="#main" class="skip-link mono-label">
+        Skip to content
+    </a>
+    <Plate stations={chapters.length} />
+    <LatticeField />
+
+    <main class="main-content" id="main" tabindex="-1">
+        <header class="page-hero" data-station={`00 / ${total}`}>
+            <div class="container">
+                <div class="page-rail">
+                    <p class="mono-label">aerulion / {project.name}</p>
+                    <p class="mono-label">Status / In testing</p>
+                </div>
+                <div class="page-hero-body">
+                    <div class="page-hero-copy">
+                        <p class="page-kicker mono-label">{project.kicker}</p>
+                        <h1 class="page-title">{project.name}</h1>
+                        <p class="page-standfirst">{project.standfirst}</p>
+                        <p class="page-lede">{project.lede}</p>
+                        <div class="hero-actions">
+                            <Button href={project.mapUrl} variant="solid">
+                                Open the live map
+                            </Button>
+                            <Button href="/" glyph="west">
+                                Back to the site
+                            </Button>
+                        </div>
+                        <p class="hero-status">{project.status}</p>
+                    </div>
+                    <div class="page-hero-mark" data-reveal>
+                        <svg
+                            class="hero-icon"
+                            viewBox={ICON_BOX}
+                            role="img"
+                            aria-label={`The ${project.name} icon`}
+                            data-collide="lines"
+                            data-segments={collide(ICON_BOX, project.icon)}
+                        >
+                            {project.icon.map((d) => (
+                                <path class="fig-line" d={d} />
+                            ))}
+                        </svg>
+                    </div>
+                </div>
+
+                <nav class="contents" aria-labelledby="contents-caption" data-reveal>
+                    <p class="mono-label contents-caption" id="contents-caption">
+                        Contents / {total} sections
+                    </p>
+                    <ol class="contents-list" role="list">
+                        {contents.map((entry) => (
+                            <li>
+                                <a class="contents-link" href={`#${entry.id}`}>
+                                    <span class="mono-label">{entry.number}</span>
+                                    <span class="contents-name">{entry.eyebrow}</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ol>
+                </nav>
+            </div>
+        </header>
+
+        <Chapter {...chapter('benchmark')}>
+            <dl class="readouts readouts-lead" data-reveal>
+                {headline.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="table-wrap" data-reveal>
+                <table class="spec-table">
+                    <caption class="mono-label">Same machine, same world</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Measure</th>
+                            <th scope="col">{project.name}</th>
+                            <th scope="col">Established plugin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {benchmark.map((row) => (
+                            <tr>
+                                <td data-col="Measure">{row.measure}</td>
+                                <td data-col={project.name}>{row.taerra}</td>
+                                <td data-col="Established plugin">{row.other}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-wrap" data-reveal>
+                <table class="spec-table">
+                    <caption class="mono-label">More figures</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Measure</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {figures.map((row) => (
+                            <tr>
+                                <td data-col="Measure">{row.measure}</td>
+                                <td class="cell-code" data-col="Value">
+                                    {row.value ?? <span class="pending">Pending</span>}
+                                </td>
+                                <td data-col="Note">{row.note}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <nav class="motto" aria-labelledby="motto-caption" data-reveal>
+                <p class="mono-label" id="motto-caption">
+                    No single trick / four verbs, one direction
+                </p>
+                <ol class="motto-list" role="list">
+                    {motto.map((item) => (
+                        <li>
+                            <a class="motto-link" href={`#${item.chapter}`}>
+                                <span class="mono-label">{station(item.chapter)}</span>
+                                <span class="motto-verb">{item.verb}</span>
+                            </a>
+                        </li>
+                    ))}
+                </ol>
+            </nav>
+        </Chapter>
+
+        <Chapter {...chapter('principles')}>
+            <div class="block" data-reveal>
+                <p class="mono-label">Goals / {pad(goals.length)}</p>
+                <ol class="law-list">
+                    {goals.map((goal, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{goal.name}</h3>
+                                <p class="law-rule prose">{goal.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Refusals / {pad(refusals.length)}</p>
+                <dl class="part-list">
+                    {refusals.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('pipeline')}>
+            <div class="lanes" data-reveal>
+                {lanes.map((lane, l) => (
+                    <div class="lane">
+                        <p class="lane-head">
+                            <span class="mono-label">Lane {pad(l + 1)}</span>
+                            <span class="lane-name">{lane.name}</span>
+                            <span class="mono-label">{pad(lane.stages.length)} stages</span>
+                        </p>
+                        <ol class="stages" role="list">
+                            {lane.stages.map((stage, i) => (
+                                <li class="stage">
+                                    <span class="mono-label">{pad(i + 1)}</span>
+                                    <span class="stage-body">
+                                        <span class="stage-name">{stage.name}</span>
+                                        <span class="stage-note">{stage.note}</span>
+                                    </span>
+                                    <span class="mono-label stage-measure">{stage.measure}</span>
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                ))}
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('reading')}>
+            <dl class="readouts" data-reveal>
+                {reading.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">The header scan</h3>
+                <p>
+                    A region file stores 32 × 32 chunks, and its first 4 KiB is a table of 1,024 sector offsets. A zero
+                    offset means the chunk was never generated. Planning a full render reads only those tables: for
+                    Corpium’s main world, some 550 to 600 files and about 2.3 MB. Before a single chunk is decoded, the
+                    plugin knows exactly which tiles exist, and it never touches the ones that do not.
+                </p>
+            </div>
+
+            <figure class="code" data-reveal>
+                <figcaption class="mono-label">{headerScan.caption}</figcaption>
+                <pre><code>{headerScan.code}</code></pre>
+            </figure>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Only the bytes that matter</h3>
+                <p>
+                    A chunk’s NBT carries entities, block entities, heightmaps, light, structure references, ticking
+                    lists and POI data, and none of it changes how the map looks. Each chunk is read with one positional
+                    read and parsed through Minecraft’s own streaming visitor, set to collect four fields and skip the
+                    rest without building an object for any of it.
+                </p>
+                <p>
+                    Chunks still at a proto stage are dropped, so half-generated terrain at the edge of the world never
+                    reaches the map. Oversized chunks stored beside the region and every compression scheme the game
+                    supports go through the game’s own code, and a read that collides with the server writing the file
+                    reopens the region and tries once more.
+                </p>
+            </div>
+
+            <figure class="code" data-reveal>
+                <figcaption class="mono-label">{collectFields.caption}</figcaption>
+                <pre><code>{collectFields.code}</code></pre>
+            </figure>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Sections, decoded lazily</p>
+                <dl class="part-list">
+                    {sections.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('runs')}>
+            <dl class="readouts" data-reveal>
+                {runs.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="runs-row" data-reveal>
+                <figure class="figure panel-cut">
+                    <svg
+                        viewBox={COLUMN_BOX}
+                        role="img"
+                        aria-label="One column sampled from the top down into four runs: leaves, grass, dirt, and a long stone run that has swallowed everything hidden below it"
+                        data-collide="lines"
+                        data-segments={collide(COLUMN_BOX, [...columnLines, breakBand])}
+                    >
+                        <defs>
+                            {columnRows.map((row) => (
+                                <clipPath id={row.clip}>
+                                    <path d={rect(row.y0, row.y1)} />
+                                </clipPath>
+                            ))}
+                        </defs>
+                        {columnRows.map((row) => {
+                            const texture = row.material ? TEXTURE[row.material] : undefined;
+                            return (
+                                <>
+                                    {texture === 'solid' && <path class="fig-fill" d={rect(row.y0, row.y1)} />}
+                                    {texture && texture !== 'solid' && (
+                                        <path
+                                            class="fig-hatch"
+                                            clip-path={`url(#${row.clip})`}
+                                            d={hatch(COL_X, row.y0, COL_X + COL_W, row.y1, texture.angle, texture.gap)}
+                                        />
+                                    )}
+                                    <path class={row.material ? 'fig-line' : 'fig-dash'} d={rect(row.y0, row.y1)} />
+                                    <text
+                                        class="fig-text fig-text-small"
+                                        x={COL_X - 6}
+                                        y={row.y0 + 1.5}
+                                        text-anchor="end"
+                                    >
+                                        {row.top}
+                                    </text>
+                                    <text
+                                        class="fig-text fig-text-small"
+                                        x={COL_X + COL_W + 8}
+                                        y={(row.y0 + row.y1) / 2 + 1.5}
+                                    >
+                                        {row.label}
+                                    </text>
+                                </>
+                            );
+                        })}
+                        <path class="fig-ground" d={breakBand} />
+                        <text class="fig-text fig-text-small" x={COL_X - 6} y={columnFloor + 1.5} text-anchor="end">
+                            {stone.bottom}
+                        </text>
+                    </svg>
+                    <figcaption class="mono-label">One column, four runs</figcaption>
+                    <p class="figure-note">
+                        Ore veins and caves nobody can see have been folded into the stone. Drawn heights are schematic.
+                    </p>
+                </figure>
+
+                <div class="table-wrap runs-table">
+                    <table class="spec-table">
+                        <caption class="mono-label">Stored runs</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Material</th>
+                                <th scope="col">Top</th>
+                                <th scope="col">Bottom</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {runTable.map((row) => (
+                                <tr>
+                                    <td class="cell-code" data-col="Material">
+                                        {row.material}
+                                    </td>
+                                    <td class="cell-code" data-col="Top">
+                                        {row.top}
+                                    </td>
+                                    <td class="cell-code" data-col="Bottom">
+                                        {row.bottom}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-wrap" data-reveal>
+                <table class="spec-table">
+                    <caption class="mono-label">Structure of arrays, no object per run</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Field</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Holds</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {layout.map((row) => (
+                            <tr>
+                                <td class="cell-code" data-col="Field">
+                                    {row.field}
+                                </td>
+                                <td class="cell-code" data-col="Type">
+                                    {row.type}
+                                </td>
+                                <td data-col="Holds">{row.holds}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Three shortcuts</p>
+                <ol class="law-list">
+                    {shortcuts.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <figure class="code" data-reveal>
+                <figcaption class="mono-label">{swallow.caption}</figcaption>
+                <pre><code>{swallow.code}</code></pre>
+            </figure>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Thin things and ground cover</p>
+                <dl class="part-list">
+                    {thin.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">The height index</h3>
+                {heightIndex.map((paragraph) => (
+                    <p>{paragraph}</p>
+                ))}
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('topdown')}>
+            <div class="block" data-reveal>
+                <p class="mono-label">Four passes</p>
+                <dl class="part-list">
+                    {passes.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="code-row" data-reveal>
+                {[terrace, sun].map((snippet) => (
+                    <figure class="code">
+                        <figcaption class="mono-label">{snippet.caption}</figcaption>
+                        <pre><code>{snippet.code}</code></pre>
+                    </figure>
+                ))}
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('isometric')}>
+            <div class="figure-row" data-reveal>
+                <figure class="figure panel-cut">
+                    <svg
+                        viewBox={WIDE}
+                        role="img"
+                        aria-label="One block as three flat faces: the top, the +X face lit by sun and sky, and the +Z face lit by sky alone"
+                        data-collide="lines"
+                        data-segments={collide(WIDE, [cube.top, cube.left, cube.right])}
+                    >
+                        <defs>
+                            <clipPath id={cubeClips.top}>
+                                <path d={cube.top} />
+                            </clipPath>
+                            <clipPath id={cubeClips.left}>
+                                <path d={cube.left} />
+                            </clipPath>
+                            <clipPath id={cubeClips.right}>
+                                <path d={cube.right} />
+                            </clipPath>
+                        </defs>
+                        <path class="fig-hatch" clip-path={`url(#${cubeClips.top})`} d={hatch(60, 10, 140, 58, 0, 2)} />
+                        <path
+                            class="fig-hatch"
+                            clip-path={`url(#${cubeClips.right})`}
+                            d={hatch(96, 30, 140, 98, 0, 3.5)}
+                        />
+                        <path
+                            class="fig-hatch"
+                            clip-path={`url(#${cubeClips.left})`}
+                            d={hatch(60, 30, 104, 98, 0, 6)}
+                        />
+                        <g class="fig-line">
+                            <path d={cube.top} />
+                            <path d={cube.left} />
+                            <path d={cube.right} />
+                        </g>
+                        <text class="fig-text fig-text-small" x="100" y="8" text-anchor="middle">
+                            TOP
+                        </text>
+                        <text class="fig-text fig-text-small" x="58" y="66" text-anchor="end">
+                            +Z / SKY
+                        </text>
+                        <text class="fig-text fig-text-small" x="142" y="66">
+                            +X / SUN, SKY
+                        </text>
+                    </svg>
+                    <figcaption class="mono-label">Three faces</figcaption>
+                    <p class="figure-note">
+                        More light, more ink. Drawn at 30° to stay on the lattice; the renderer’s projection is 2:1.
+                    </p>
+                </figure>
+
+                <figure class="figure panel-cut">
+                    <svg
+                        viewBox={WIDE}
+                        role="img"
+                        aria-label="A tile painted from the bottom up to a skyline. A chunk whose footprint sits wholly under the skyline is skipped; a tower that rises above it is drawn only where it shows."
+                        data-collide="lines"
+                        data-segments={collide(WIDE, [tile, skyline, hidden, tower])}
+                    >
+                        <defs>
+                            <clipPath id={paintedClip}>
+                                <path d={painted} />
+                            </clipPath>
+                            <clipPath id={aboveClip}>
+                                <rect x="0" y="0" width="200" height="44" />
+                            </clipPath>
+                        </defs>
+                        <path class="fig-hatch" clip-path={`url(#${paintedClip})`} d={hatch(20, 8, 180, 100, 30, 3)} />
+                        <path class="fig-line" d={tile} />
+                        <path class="fig-line" d={skyline} />
+                        <path class="fig-ground fig-dash" d={hidden} />
+                        <path class="fig-dash" d={tower} />
+                        <path class="fig-ground fig-line" clip-path={`url(#${aboveClip})`} d={tower} />
+                        <text class="fig-text fig-text-small" x="24" y="58">
+                            SKYLINE
+                        </text>
+                        <text class="fig-text fig-text-small" x="70" y="83.5" text-anchor="middle">
+                            SKIPPED
+                        </text>
+                        <text class="fig-text fig-text-small" x="155" y="28">
+                            DRAWN
+                        </text>
+                    </svg>
+                    <figcaption class="mono-label">The skyline</figcaption>
+                    <p class="figure-note">
+                        Below the line every pixel is painted. Whatever falls wholly under it is never loaded.
+                    </p>
+                </figure>
+
+                <figure class="figure panel-cut">
+                    <svg
+                        viewBox={WIDE}
+                        role="img"
+                        aria-label="Chunk positions as lattice points; the ones that can land on a tile fill a diamond, found by solving for them rather than testing a box"
+                        data-collide="lines"
+                        data-segments={collide(WIDE, [diamond])}
+                    >
+                        <path class="fig-dot" d={farDots} />
+                        <path class="fig-dot" d={nearDots} />
+                        <path class="fig-dash" d={diamond} />
+                        <text class="fig-text fig-text-small" x="100" y="112" text-anchor="middle">
+                            SUM / DIFFERENCE
+                        </text>
+                    </svg>
+                    <figcaption class="mono-label">Candidates</figcaption>
+                    <p class="figure-note">
+                        Solved from the tile’s bounds, not searched for. No chunk outside is ever tested.
+                    </p>
+                </figure>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Front to back, write once</h3>
+                {frontToBack.map((paragraph) => (
+                    <p>{paragraph}</p>
+                ))}
+            </div>
+
+            <figure class="code" data-reveal>
+                <figcaption class="mono-label">{paint.caption}</figcaption>
+                <pre><code>{paint.code}</code></pre>
+            </figure>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">The skyline</h3>
+                <p>{skylineNote}</p>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Culled at three levels</p>
+                <ol class="law-list">
+                    {culling.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">The rest of the renderer</p>
+                <dl class="part-list">
+                    {iso.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('light')}>
+            <div class="prose-block prose" data-reveal>
+                {lightKey.map((paragraph) => (
+                    <p>{paragraph}</p>
+                ))}
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Cache key / {keyBits} bits of one long</p>
+                <ol class="key" role="list">
+                    {keyFields.map((field) => (
+                        <li class="key-field" style={`--bits:${field.bits}`}>
+                            <span class="key-bits">{field.bits}</span>
+                            <span class="mono-label">{field.name}</span>
+                            <span class="key-note">{field.note}</span>
+                            <span class="mono-label key-range">Bit {field.range}</span>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Occlusion and shadows</p>
+                <dl class="part-list">
+                    {shading.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">One cut-off for every ray</h3>
+                <p>{cutoff}</p>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('scheduling')}>
+            <dl class="readouts" data-reveal>
+                {scheduling.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Five decisions</p>
+                <ol class="law-list">
+                    {order.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="table-wrap" data-reveal>
+                <table class="spec-table">
+                    <caption class="mono-label">Four queue lanes</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Lane</th>
+                            <th scope="col">Work</th>
+                            <th scope="col">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {queue.map((row) => (
+                            <tr>
+                                <td data-col="Lane">{row.lane}</td>
+                                <td data-col="Work">{row.work}</td>
+                                <td data-col="Note">{row.note}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Nothing lost</h3>
+                <p>{nothingLost}</p>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('live')}>
+            <dl class="readouts" data-reveal>
+                {live.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">From block to tile / {pad(liveSteps.length)} steps</p>
+                <ol class="law-list">
+                    {liveSteps.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('writing')}>
+            <dl class="readouts" data-reveal>
+                {writing.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Where a write stops</p>
+                <dl class="part-list">
+                    {writes.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('picking')}>
+            <div class="prose-block" data-reveal>
+                <p class="mono-label">The trick</p>
+                <p class="pull">{parity}</p>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Two planes, one buffer</p>
+                <dl class="part-list">
+                    {planes.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('frontend')}>
+            <div class="block" data-reveal>
+                <p class="mono-label">In the browser</p>
+                <dl class="part-list">
+                    {features.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Players, and their privacy</h3>
+                <p>{players}</p>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Who shows up</p>
+                <ol class="law-list">
+                    {privacy.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('access')}>
+            <div class="block" data-reveal>
+                <p class="mono-label">Logging in / {pad(login.length)} steps</p>
+                <ol class="law-list">
+                    {login.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Permissions that follow the player</h3>
+                {grants.map((paragraph) => (
+                    <p>{paragraph}</p>
+                ))}
+            </div>
+
+            <div class="table-wrap" data-reveal>
+                <table class="spec-table">
+                    <caption class="mono-label">From the browser</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Action</th>
+                            <th scope="col">Needs</th>
+                            <th scope="col">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {actions.map((row) => (
+                            <tr>
+                                <td data-col="Action">{row.action}</td>
+                                <td class="cell-code" data-col="Needs">
+                                    {row.needs}
+                                </td>
+                                <td data-col="Detail">{row.detail}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Writing from the browser</p>
+                <dl class="part-list">
+                    {writesFromWeb.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">No admin panel</h3>
+                <p>{noPanel}</p>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('colours')}>
+            <dl class="readouts" data-reveal>
+                {colourCounts.map((item) => (
+                    <div class="readout">
+                        <dt class="mono-label">{item.label}</dt>
+                        <dd class="readout-value">{item.value}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Composited, then measured</h3>
+                <p>{compositing}</p>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">How the data is made</p>
+                <dl class="part-list">
+                    {colours.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('log')}>
+            <div class="block" data-reveal>
+                <p class="mono-label">Tried and dropped / {pad(dropped.length)}</p>
+                <ol class="law-list">
+                    {dropped.map((rule, i) => (
+                        <li class="law">
+                            <p class="law-index">{pad(i + 1)}</p>
+                            <div class="law-body">
+                                <h3 class="law-name">{rule.name}</h3>
+                                <p class="law-rule prose">{rule.rule}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Still to improve / {pad(pending.length)}</p>
+                <dl class="part-list">
+                    {pending.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('next')}>
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Explored is not enough</h3>
+                <p>{explored}</p>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">Already in place</p>
+                <dl class="part-list">
+                    {ready.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Still open</h3>
+                <p>{openQuestions}</p>
+            </div>
+        </Chapter>
+
+        <Chapter {...chapter('stack')}>
+            <div class="table-wrap" data-reveal>
+                <table class="spec-table">
+                    <caption class="mono-label">Built with</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Layer</th>
+                            <th scope="col">Built with</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {stack.map((row) => (
+                            <tr>
+                                <td data-col="Layer">{row.layer}</td>
+                                <td data-col="Built with">{row.built}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="closing" data-reveal>
+                <p class="pull">{project.closing}</p>
+                <div class="hero-actions">
+                    <Button href={project.mapUrl} variant="solid">
+                        Open the live map
+                    </Button>
+                    <Button href="/#work" glyph="west">
+                        Back to the work
+                    </Button>
+                </div>
+            </div>
+        </Chapter>
+    </main>
+
+    <Footer />
+    <Curtain />
+</Layout>
+
+<style>
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+
+    .hero-status {
+        font-size: var(--font-size-sm);
+        max-width: 54ch;
+    }
+
+    .hero-icon {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .block {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+
+    .readouts {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--flow-xl);
+    }
+
+    .readout {
+        display: grid;
+        gap: var(--spacing-2xs);
+        align-content: start;
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-sm);
+    }
+
+    .readout-value {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.8rem, 4vw, var(--font-size-3xl));
+        font-weight: 600;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .readouts-lead .readout-value {
+        font-size: clamp(2.3rem, 6vw, 4.4rem);
+        line-height: 0.94;
+    }
+
+    .pending {
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--label-size);
+        letter-spacing: var(--label-tracking);
+        text-transform: uppercase;
+    }
+
+    .motto {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+
+    .motto-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        list-style: none;
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .motto-link {
+        display: grid;
+        gap: var(--spacing-xs);
+        padding: var(--spacing-md) var(--spacing-sm);
+        text-decoration: none;
+        border-bottom: var(--hairline) solid var(--white);
+        transition:
+            background var(--transition-base),
+            color var(--transition-base);
+    }
+
+    .motto-list li + li .motto-link {
+        border-left: var(--hairline) solid var(--white);
+    }
+
+    .motto-link:hover,
+    .motto-link:focus-visible {
+        background: var(--white);
+        color: var(--black);
+    }
+
+    .motto-verb,
+    .lane-name,
+    .stage-name {
+        font-family: var(--font-family-display), sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .motto-verb {
+        font-size: clamp(1.1rem, 1.8vw, var(--font-size-xl));
+    }
+
+    .lanes {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+        align-items: start;
+        gap: var(--flow-2xl);
+    }
+
+    .lane-head {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: var(--spacing-md);
+        padding-bottom: var(--spacing-sm);
+    }
+
+    .lane-name {
+        font-size: clamp(1.1rem, 1.8vw, var(--font-size-xl));
+    }
+
+    .stages {
+        list-style: none;
+        border-top: var(--hairline) solid var(--white);
+    }
+
+    .stage {
+        display: grid;
+        grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm) 0;
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .stage-body {
+        display: grid;
+        gap: var(--spacing-3xs);
+    }
+
+    .stage-name {
+        font-size: var(--font-size-sm);
+    }
+
+    .stage-note {
+        font-size: var(--font-size-sm);
+    }
+
+    .stage-measure {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .code {
+        display: grid;
+        gap: var(--spacing-sm);
+        min-width: 0;
+    }
+
+    .code pre {
+        overflow-x: auto;
+        padding-top: var(--spacing-lg);
+        border-top: var(--hairline) solid var(--white);
+        font-family: var(--font-family-mono), monospace;
+        font-size: var(--font-size-xs);
+        line-height: 1.8;
+    }
+
+    .code-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--flow-xl);
+    }
+
+    .runs-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+        align-items: start;
+        gap: var(--flow-2xl);
+    }
+
+    .runs-table {
+        margin-top: 0;
+    }
+
+    .fig-hatch {
+        fill: none;
+        stroke: var(--white);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .fig-fill,
+    .fig-dot {
+        fill: var(--white);
+    }
+
+    /* Ground over the hatching, so a shape reads as cut out of what is behind it. */
+    .fig-ground {
+        fill: var(--black);
+    }
+
+    .fig-text-small {
+        font-size: 4.2px;
+        letter-spacing: 0.1em;
+    }
+
+    .key {
+        display: flex;
+        list-style: none;
+        border-top: var(--hairline) solid var(--white);
+        border-bottom: var(--hairline) solid var(--white);
+    }
+
+    .key-field {
+        flex: var(--bits) 1 0;
+        min-width: 8.5rem;
+        display: grid;
+        gap: var(--spacing-2xs);
+        align-content: start;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .key-field + .key-field {
+        border-left: var(--hairline) solid var(--white);
+    }
+
+    .key-bits {
+        font-family: var(--font-family-display), sans-serif;
+        font-size: clamp(1.8rem, 4vw, var(--font-size-3xl));
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .key-note {
+        font-size: var(--font-size-sm);
+    }
+
+    .key-range {
+        white-space: nowrap;
+    }
+
+    .pull {
+        font-size: clamp(1rem, 1.25vw, var(--font-size-lg));
+        max-width: 52ch;
+    }
+
+    .closing {
+        display: grid;
+        gap: var(--spacing-lg);
+        justify-items: start;
+        border-top: var(--hairline) solid var(--white);
+        padding-top: var(--spacing-lg);
+    }
+
+    @media (max-width: 900px) {
+        .lanes,
+        .runs-row,
+        .code-row {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .readouts,
+        .motto-list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .motto-list li + li .motto-link {
+            border-left: 0;
+        }
+
+        .motto-list li:nth-child(even) .motto-link {
+            border-left: var(--hairline) solid var(--white);
+        }
+
+        .key {
+            flex-direction: column;
+        }
+
+        .key-field + .key-field {
+            border-left: 0;
+            border-top: var(--hairline) solid var(--white);
+        }
+    }
+
+    @media (max-width: 560px) {
+        .stage {
+            grid-template-columns: 2.4rem minmax(0, 1fr);
+        }
+
+        .stage-measure {
+            grid-column: 2;
+            text-align: left;
+        }
+    }
+</style>
