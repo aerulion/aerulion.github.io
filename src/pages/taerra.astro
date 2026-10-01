@@ -21,6 +21,7 @@ import {
     dropped,
     explored,
     features,
+    client,
     figures,
     frontToBack,
     goals,
@@ -28,6 +29,7 @@ import {
     headerScan,
     headline,
     heightIndex,
+    inGame,
     iso,
     key,
     lanes,
@@ -39,7 +41,6 @@ import {
     motto,
     noPanel,
     nothingLost,
-    openQuestions,
     order,
     paint,
     parity,
@@ -51,7 +52,6 @@ import {
     project,
     queue,
     reading,
-    ready,
     refusals,
     runs,
     scheduling,
@@ -73,7 +73,7 @@ import {uid} from '../utils/uid';
 
 const title = 'Taerra - rendering a Minecraft world in under three minutes';
 const description =
-    'Taerra: a web map plugin for Paper servers. How it renders a 6,000-block world top-down and isometric from all four corners in under three minutes.';
+    'Taerra: a web map plugin for Paper servers, with a Fabric mod that shows the same map in game. How it renders a 6,000-block world top-down and isometric from all four corners in under three minutes.';
 const socialImage = '/assets/images/og-taerra.png';
 const socialImageAlt =
     'Taerra, a web map for Paper: its icon in white hairline on black beside the word TAERRA, with a full render time of 2:46 for a 6,000-block radius listed below.';
@@ -85,13 +85,14 @@ const entity = {
     type: 'CreativeWork',
     name: project.name,
     alternateName: `${project.name} Web Map`,
-    description: `${project.name} is a web map plugin for Paper servers: one renderer, two projections, four rotations.`,
+    description: `${project.name} is a web map plugin for Paper servers and a companion Fabric mod: one renderer, two projections, four rotations, in the browser and in game.`,
     keywords: [
         'Minecraft web map',
         'Paper plugin',
         'isometric rendering',
         'tile rendering',
         'Leaflet',
+        'Fabric mod',
         'Java',
         'performance'
     ]
@@ -232,6 +233,7 @@ const keyFields = key.map((field, i) => {
                             <Button href={project.mapUrl} variant="solid">
                                 Open the live map
                             </Button>
+                            <Button href={project.modrinthUrl}>Get it on Modrinth</Button>
                             <Button href="/" glyph="west">
                                 Back to the site
                             </Button>
@@ -1092,6 +1094,43 @@ const keyFields = key.map((field, i) => {
             </div>
         </Chapter>
 
+        <Chapter {...chapter('ingame')}>
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Explored is not enough</h3>
+                <p>{explored}</p>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">In the client / {pad(inGame.length)}</p>
+                <dl class="part-list">
+                    {inGame.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">A viewer, nothing more / {pad(client.length)}</p>
+                <dl class="part-list">
+                    {client.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
         <Chapter {...chapter('colours')}>
             <dl class="readouts" data-reveal>
                 {colourCounts.map((item) => (
@@ -1155,33 +1194,6 @@ const keyFields = key.map((field, i) => {
             </div>
         </Chapter>
 
-        <Chapter {...chapter('next')}>
-            <div class="prose-block prose" data-reveal>
-                <h3 class="prose-head">Explored is not enough</h3>
-                <p>{explored}</p>
-            </div>
-
-            <div class="block" data-reveal>
-                <p class="mono-label">Already in place</p>
-                <dl class="part-list">
-                    {ready.map((part) => (
-                        <div class="part">
-                            <dt class="part-head">
-                                <span class="part-name">{part.name}</span>
-                                <span class="part-kind mono-label">{part.kind}</span>
-                            </dt>
-                            <dd class="part-note">{part.note}</dd>
-                        </div>
-                    ))}
-                </dl>
-            </div>
-
-            <div class="prose-block prose" data-reveal>
-                <h3 class="prose-head">Still open</h3>
-                <p>{openQuestions}</p>
-            </div>
-        </Chapter>
-
         <Chapter {...chapter('stack')}>
             <div class="table-wrap" data-reveal>
                 <table class="spec-table">
@@ -1209,6 +1221,7 @@ const keyFields = key.map((field, i) => {
                     <Button href={project.mapUrl} variant="solid">
                         Open the live map
                     </Button>
+                    <Button href={project.modrinthUrl}>Get it on Modrinth</Button>
                     <Button href="/#work" glyph="west">
                         Back to the work
                     </Button>

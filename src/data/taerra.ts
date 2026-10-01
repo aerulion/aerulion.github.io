@@ -42,13 +42,14 @@ export interface Field {
 
 export const project = {
     name: 'Taerra',
-    kicker: 'Web map for Paper',
+    kicker: 'Live map for Paper and Fabric',
     standfirst: 'The whole world, in under three minutes.',
-    lede: 'A web map plugin for Paper servers. It reads the world straight from its region files, renders a top-down map and an isometric view from all four corners, and keeps both current while people play, without the server noticing it is there.',
-    status: 'In testing on Corpium. A public release follows once it has held up under real players, real builds and real terrain.',
+    lede: 'A web map plugin for Paper servers, with a companion Fabric mod that brings the same map into the game. It reads the world straight from its region files, renders a top-down map and an isometric view from all four corners, and keeps both current while people play, without the server noticing it is there.',
+    status: 'Public on Modrinth in early access, plugin and mod alike. Still running live on Corpium, where it was proven under real players, real builds and real terrain.',
     closing:
-        'Taerra is running live on Corpium right now. If you play there, open the map and try to break it. A public release follows once it is ready.',
+        'Taerra is on Modrinth, free for any server, and still running live on Corpium. Open the map and try to break it.',
     mapUrl: 'https://map.corpium.net',
+    modrinthUrl: 'https://modrinth.com/project/taerra',
     icon: ['M10 6.6795H42L36 17.0718 44 30.9282 38 41.3205H6L12 30.9282 4 17.0718Z', 'M4 17.0718H36', 'M12 30.9282H44']
 };
 
@@ -152,6 +153,13 @@ export const chapters: Chapter[] = [
             'Some of the map is only for some people, which means knowing who is looking. That takes no accounts, no passwords and no e-mail addresses: a Minecraft account is the identity, and the login starts in game.'
     },
     {
+        id: 'ingame',
+        eyebrow: 'In game',
+        title: 'The map, in the game.',
+        subtitle:
+            'A companion Fabric mod brings the server’s map into the client: a minimap, a full-screen world map and waypoints standing in the world. It renders nothing itself. It draws the tiles the server already made, through the same API the browser uses.'
+    },
+    {
         id: 'colours',
         eyebrow: 'Colours',
         title: 'Taken from the game itself.',
@@ -165,18 +173,11 @@ export const chapters: Chapter[] = [
         subtitle: 'Honest notes from the development log, and the four things still on the list.'
     },
     {
-        id: 'next',
-        eyebrow: 'What is next',
-        title: 'The map, in the game.',
-        subtitle:
-            'The largest item on the roadmap is not a rendering feature. It is a companion Fabric mod that brings the server’s map into the client: a full-screen world map and a minimap, drawn natively from tiles the server has already rendered.'
-    },
-    {
         id: 'stack',
         eyebrow: 'Stack',
         title: 'One jar.',
         subtitle:
-            'Everything below ships as a single plugin with an embedded web server. The tiles are plain files on disk, and nothing else has to be running.'
+            'The server side ships as a single plugin with an embedded web server. The tiles are plain files on disk, nothing else has to be running, and the mod is optional.'
     }
 ];
 
@@ -720,7 +721,7 @@ export const planes: Part[] = [
     {
         name: 'Decoding',
         kind: 'Native',
-        note: 'The browser inflates them with DecompressionStream, with no JavaScript inflate library. They drive the block tooltip, the coordinate readout and click-to-teleport.'
+        note: 'The browser inflates them with DecompressionStream, with no JavaScript inflate library. They drive the block tooltip, the coordinate readout and click-to-teleport, and the mod reads the very same buffers.'
     }
 ];
 
@@ -750,7 +751,7 @@ export const features: Part[] = [
     {
         name: 'Markers and layers',
         kind: 'Marker API',
-        note: 'WorldGuard regions, vanilla and ChunkyBorder borders, grouped waypoints and spawn, each a layer a viewer can switch. Other plugins add their own through a small API, drawn on the ground they belong to, and markers from another web map can be imported.'
+        note: 'WorldGuard regions, vanilla and ChunkyBorder borders, grouped waypoints and spawn, each a layer a viewer can switch. Other plugins add their own through a small public API, published to Maven Central with every release, drawn on the ground they belong to, and markers from dynmap can be imported as waypoint groups.'
     },
     {
         name: 'Self-hosted',
@@ -798,7 +799,11 @@ export const login: Rule[] = [
     },
     {
         name: 'Hashes only',
-        rule: 'Only SHA-256 hashes of codes and tokens are stored, so a copy of the sessions file logs nobody in. The login goes to the command’s sender, not its executor, so it cannot be minted on someone else’s behalf. /taerra logout ends a player’s sessions, and staff can end anyone’s.'
+        rule: 'Only SHA-256 hashes of codes and tokens are stored, so a copy of the sessions file logs nobody in. The login goes to the command’s sender, not its executor, so it cannot be minted on someone else’s behalf. /taerra logout ends a player’s sessions, staff can end anyone’s, and a banned player’s sessions end on their own.'
+    },
+    {
+        name: 'No link for the mod',
+        rule: 'A connected client is already authenticated, so the mod needs no login. On join the server sends it a session over a plugin channel. That session lives in memory only, is never written to disk, and ends the moment the player leaves.'
     }
 ];
 
@@ -832,12 +837,68 @@ export const writesFromWeb: Part[] = [
     {
         name: 'Every write',
         kind: 'Same origin',
-        note: 'Guarded by Fetch Metadata. A browser too old to send it is refused, and only a client with no Origin at all gets through without it. Names are validated and nothing can be placed outside the border, so no request can make the server load or generate a chunk it should not.'
+        note: 'Guarded by Fetch Metadata. A browser too old to send it is refused, and only a client with no Origin at all gets through without it. Editing or deleting a waypoint needs sight of the group it is in, so a private group cannot be touched blind. Names are normalised and limited to 32 letters, digits and common punctuation, and nothing can be placed outside the border, so no request can make the server load or generate a chunk it should not.'
     }
 ];
 
 export const noPanel =
     'What the browser cannot do is administer the plugin, and that is deliberate. Enabling worlds, making worlds and layers private, limiting the rendered area and starting renders all happen in game, through /taerra config, /taerra limit and /taerra render, with tab completion. The same render command also exports a world as one PNG per view and rotation, stitched from the tiles on disk and streamed a row of tiles at a time, so even a whole world never has to fit in memory. A web admin panel would be another login surface to secure, for settings changed once.';
+
+/* ---- In game ------------------------------------------------------------- */
+
+export const explored =
+    'Client-side map mods only show what the player has explored, chunk by chunk, as they walk past it. On a server with years of history that is a small fraction of the world, and it is out of date the moment someone else builds. The server already knows the whole world and keeps it current, so the client should not have to rediscover it.';
+
+export const inGame: Part[] = [
+    {
+        name: 'Minimap',
+        kind: 'HUD',
+        note: 'Sized, zoomed and placed on either side, north-up or turning with the player. It moves down out of the way of status effects and steps aside for the debug screen.'
+    },
+    {
+        name: 'World map',
+        kind: 'Full screen',
+        note: 'Both views and all four rotations, layers, the player list with follow, spawn, and a right-click menu to copy coordinates or a link, teleport, or drop a waypoint. Pans glide and zooms ease, and every action has a rebindable key.'
+    },
+    {
+        name: 'Waypoints in the world',
+        kind: 'Labels',
+        note: 'Each waypoint stands where it is, with its name, its distance and the vanilla banner icon closest to its colour. Past ten blocks it holds a constant size on screen, out to the render distance.'
+    }
+];
+
+export const client: Part[] = [
+    {
+        name: 'Handshake',
+        kind: 'taerra:web',
+        note: 'On join the plugin sends the map’s address and a session over a plugin channel. No link in chat, no setup. The message carries a protocol number, and a mod and plugin that disagree say which side needs the update instead of misreading each other.'
+    },
+    {
+        name: 'Tiles',
+        kind: 'ETag, LRU',
+        note: 'The same indexed PNGs, revalidated with If-None-Match, so an unchanged tile costs a 304. Uploaded as textures sampled nearest-neighbour, so the pixel art stays sharp at every GUI scale. Until a tile arrives, the closest loaded ancestor up to four levels up stands in for it.'
+    },
+    {
+        name: 'Updates',
+        kind: 'Same socket',
+        note: 'The WebSocket the browser listens to keeps the in-game map current. Player positions arrive once a second and glide between updates; a jump of more than 32 blocks snaps instead.'
+    },
+    {
+        name: 'Heights',
+        kind: 'Pick buffers',
+        note: 'The cursor readout, waypoint placement and teleport targets come from the same buffers the browser decodes. An area marker drawn in isometric samples them along its edges, median-smoothed, so a region’s floor drapes over the hills beneath it.'
+    },
+    {
+        name: 'Markers',
+        kind: 'Rasterised',
+        note: 'Regions, borders and paths are drawn into 256 px overlay tiles off the render thread, four at a time and nearest the centre first, then cached like map tiles. In isometric a region stands up as walls from its ground outline.'
+    },
+    {
+        name: 'Same rules',
+        kind: 'Permissions',
+        note: 'Every request is an ordinary API call under the player’s own permissions. A private world stays private in game too, and the mod can do nothing the browser could not.'
+    }
+];
 
 /* ---- Colours ------------------------------------------------------------- */
 
@@ -876,6 +937,11 @@ export const colours: Part[] = [
         name: 'Tints',
         kind: 'Baked or flagged',
         note: 'Constant tints are baked in. Only biome-dependent faces keep a flag, resolved per biome at runtime, the swamp’s grass noise included.'
+    },
+    {
+        name: 'Biome colormaps',
+        kind: '6 coefficients',
+        note: 'The grass, foliage and dry-foliage gradients live in the client jar, which the server does not ship. Each is smooth, so the tool fits a quadratic surface per channel instead of bundling the image. It reproduces the original to within three levels of 255, and the plugin rebuilds the tables at startup and hands them to the game, so custom biomes are tinted correctly too.'
     },
     {
         name: 'Fail loudly',
@@ -928,42 +994,6 @@ export const pending: Part[] = [
     }
 ];
 
-/* ---- What is next -------------------------------------------------------- */
-
-export const explored =
-    'Client-side map mods only show what the player has explored, chunk by chunk, as they walk past it. On a server with years of history that is a small fraction of the world, and it is out of date the moment someone else builds. The server already knows the whole world and keeps it current, so the client should not have to rediscover it.';
-
-export const ready: Part[] = [
-    {
-        name: 'Tiles, ready to go',
-        kind: 'Cached across sessions',
-        note: 'Small indexed PNGs with content-hash ETags. The first join after a long break costs a few conditional requests, not a re-download of the world.'
-    },
-    {
-        name: 'Updates, pushed',
-        kind: 'Same stream',
-        note: 'The stream the browser already listens to keeps the in-game map current, including the ground underfoot.'
-    },
-    {
-        name: 'Heights for free',
-        kind: 'Pick buffers',
-        note: 'Coordinates on hover, correct waypoint placement and the block under the cursor in the minimap, without the client reading terrain itself.'
-    },
-    {
-        name: 'Players and markers',
-        kind: 'Same rules',
-        note: 'Positions, regions, borders and shared waypoints arrive as JSON under the same permissions. A private world stays private in game too.'
-    },
-    {
-        name: 'Both views',
-        kind: 'Four rotations',
-        note: 'Top-down is the natural minimap. The full-screen map can offer the isometric view with all four rotations, as the web does.'
-    }
-];
-
-export const openQuestions =
-    'The open questions are on the client: tiles as textures that stay sharp at every GUI scale, when the minimap follows the server’s tiles and when it overlays what the client can see live, and a handshake that needs no link in chat, since a connected mod already knows who you are. As everywhere else, the server will do nothing for the mod that the browser could not also do.';
-
 /* ---- Stack --------------------------------------------------------------- */
 
 export const stack = [
@@ -980,11 +1010,15 @@ export const stack = [
         built: 'Leaflet with CRS.Simple, plain ES modules and no build step; BroadcastChannel, DecompressionStream and the Popover API'
     },
     {
+        layer: 'Mod',
+        built: 'Fabric with Loom and Fabric API; the JDK’s own HTTP and WebSocket client, so the mod adds no networking library; Mod Menu optional, for the settings screen'
+    },
+    {
         layer: 'Tooling',
-        built: 'Python and NumPy for the block data; JUnit for the geometry, sampling, projection and pick-buffer maths'
+        built: 'Python and NumPy for the block data and colormaps; Python and headless Chrome for the branding images, rendered from real tiles; JUnit for the geometry, sampling, projection, overlay and pick-buffer maths'
     },
     {
         layer: 'Integrations',
-        built: 'WorldGuard regions, vanilla and ChunkyBorder borders, Chunky pre-generation, marker import from other web maps, and a public marker API'
+        built: 'WorldGuard regions, vanilla and ChunkyBorder borders, Chunky pre-generation, marker import from other web maps, and a public marker API on Maven Central'
     }
 ];
