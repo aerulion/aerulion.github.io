@@ -6,6 +6,7 @@ jobs='[
   {"page":"banner.html","width":600,"height":240,"scale":1,"out":"../discord-banner-600x240.png"},
   {"page":"banner.html","width":600,"height":240,"scale":2,"out":"../discord-banner-1200x480.png"},
   {"page":"banner.html","width":600,"height":240,"scale":4,"out":"../discord-banner-2400x960.png"},
+  {"page":"youtube-banner.html","width":1280,"height":720,"scale":2,"out":"../youtube-banner-2560x1440.png"},
   {"page":"avatar.html","width":128,"height":128,"scale":1,"out":"../discord-avatar-128.png"},
   {"page":"avatar.html","width":128,"height":128,"scale":2,"out":"../discord-avatar-256.png"},
   {"page":"avatar.html","width":128,"height":128,"scale":4,"out":"../discord-avatar-512.png"},

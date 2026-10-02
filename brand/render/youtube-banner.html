@@ -1,0 +1,85 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>youtube banner</title>
+<link rel="stylesheet" href="./fonts-inline.css" />
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        background: #000;
+    }
+    body {
+        width: 1280px;
+        height: 720px;
+        overflow: hidden;
+    }
+    #stage {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        background: #000;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+    }
+    canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+    /* Desktop shows only the middle 1280x211.5 strip, so the wordmark is sized for that, not for the plate. */
+    #wordmark {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Tektur', sans-serif;
+        font-weight: 700;
+        font-size: 70px;
+        line-height: 1;
+        letter-spacing: -0.005em;
+    }
+</style>
+<div id="stage">
+    <canvas id="lattice"></canvas>
+    <h1 id="wordmark"><span>aerulion</span></h1>
+</div>
+<script type="module">
+    import {drawLattice} from './lattice.js';
+
+    const W = 1280;
+    const H = 720;
+
+    await document.fonts.ready;
+
+    const canvas = document.getElementById('lattice');
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const glyphs = document.querySelector('#wordmark span').getBoundingClientRect();
+    const obstacles = [{x: glyphs.left, y: glyphs.top + 6, w: glyphs.width, h: glyphs.height - 12, band: 200, clear: 28}];
+
+    const q = new URLSearchParams(location.search);
+
+    window.render = () => {
+        ctx.clearRect(0, 0, W, H);
+        drawLattice(ctx, {
+            width: W,
+            height: H,
+            cell: 34,
+            density: Number(q.get('d') ?? 0.52),
+            obstacles
+        });
+    };
+
+    window.render();
+    document.documentElement.dataset.ready = '1';
+</script>
