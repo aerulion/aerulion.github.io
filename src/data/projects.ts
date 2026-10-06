@@ -37,7 +37,7 @@ export const projects: Project[] = [
             'Passwordless login',
             'Permission snapshots'
         ],
-        href: '/taerra/'
+        href: '/work/taerra/'
     },
     {
         title: 'Corplexium',

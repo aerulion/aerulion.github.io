@@ -1,6 +1,6 @@
 /* The long-form document: the hero, the contents and the blocks a chaptered
    page is built from. Imported by the pages that read as a document (/design,
-   /taerra) rather than by the shell, so the index never carries it. */
+   /work/taerra) rather than by the shell, so the index never carries it. */
 
 .page-hero {
     padding: var(--flow-4xl) 0 var(--spacing-4xl);

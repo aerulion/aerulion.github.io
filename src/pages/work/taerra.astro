@@ -1,12 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Plate from '../components/Plate.astro';
-import LatticeField from '../components/LatticeField.astro';
-import Curtain from '../components/Curtain.astro';
-import Footer from '../components/Footer.astro';
-import Button from '../components/Button.astro';
-import Chapter from '../components/Chapter.astro';
-import '../styles/document.css';
+import Layout from '../../layouts/Layout.astro';
+import Plate from '../../components/Plate.astro';
+import LatticeField from '../../components/LatticeField.astro';
+import Curtain from '../../components/Curtain.astro';
+import Footer from '../../components/Footer.astro';
+import Button from '../../components/Button.astro';
+import Chapter from '../../components/Chapter.astro';
+import '../../styles/document.css';
 import {
     actions,
     benchmark,
@@ -67,9 +67,9 @@ import {
     writes,
     writesFromWeb,
     writing
-} from '../data/taerra';
-import {collide} from '../scripts/figure-collide';
-import {uid} from '../utils/uid';
+} from '../../data/taerra';
+import {collide} from '../../scripts/figure-collide';
+import {uid} from '../../utils/uid';
 
 const title = 'Taerra - rendering a Minecraft world in under three minutes';
 const description =
@@ -79,7 +79,7 @@ const socialImageAlt =
     'Taerra, a web map for Paper: its icon in white hairline on black beside the word TAERRA, with a full render time of 2:46 for a 6,000-block radius listed below.';
 const breadcrumb = [
     {name: 'Home', path: '/'},
-    {name: project.name, path: '/taerra/'}
+    {name: project.name, path: '/work/taerra/'}
 ];
 const entity = {
     type: 'CreativeWork',

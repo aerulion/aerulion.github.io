@@ -15,7 +15,7 @@ const SHELL = ['src/layouts', 'src/components', 'src/styles', 'src/scripts'];
 export const PAGE_SOURCES: Record<string, string[]> = {
     '/': [...SHELL, 'src/pages/index.astro', 'src/data'],
     '/design/': [...SHELL, 'src/pages/design.astro', 'src/data/design.ts'],
-    '/taerra/': [...SHELL, 'src/pages/taerra.astro', 'src/data/taerra.ts']
+    '/work/taerra/': [...SHELL, 'src/pages/work/taerra.astro', 'src/data/taerra.ts']
 };
 
 /** The sources behind `url`, or `undefined` for a page nothing has claimed. */
