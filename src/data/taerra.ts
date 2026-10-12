@@ -404,7 +404,7 @@ export const layout = [
     {field: 'runOffsets', type: 'int[257]', holds: 'Column i owns runs off[i] up to off[i + 1]'},
     {field: 'runTopY', type: 'short[]', holds: 'Top of each run'},
     {field: 'runBottomY', type: 'short[]', holds: 'Bottom of each run'},
-    {field: 'runBlockId', type: 'int[]', holds: 'One block id per run'},
+    {field: 'runBlockId', type: 'int[]', holds: 'One block id per run, an index straight into the colour table'},
     {field: 'capBlockId', type: 'int[]', holds: 'Per column: the flower, grass or snow painted on top'},
     {field: 'columnBiome', type: 'Biome[]', holds: 'Per column'},
     {field: 'minTopY, maxTopY', type: 'int, int', holds: 'Packed into one long for the height index'}
@@ -479,7 +479,7 @@ export const passes: Part[] = [
     {
         name: 'Sun shadows',
         kind: '45°, 32 steps',
-        note: 'Traced through the height field in fixed point: two multiply-shifts and a lookup per step, no floating point and no trigonometry.'
+        note: 'Traced through the tile’s own surface grid, sampled with a margin as wide as the sun’s reach, so no step has to look up a chunk. Fixed point throughout: two multiply-shifts and a lookup per step, no floating point and no trigonometry.'
     },
     {
         name: 'Water depth',
@@ -560,7 +560,7 @@ export const iso: Part[] = [
 
 export const lightKey: string[] = [
     'The inputs, though, are tiny and discrete: a colour, one of five faces (top, the two sides, a glowing face and a water surface), up to eight taller neighbours or blocked rays, shadowed or not, and one of three contact levels. All of them pack into a single long, and a hash map per thread remembers the answer.',
-    'After the first few tiles the hit rate is effectively 100%, and lighting costs one lookup per face. Zero doubles as the missing sentinel for free, because a lit opaque colour always carries full alpha.'
+    'After the first few tiles the hit rate is effectively 100%, and lighting costs one lookup per face. Zero doubles as the missing sentinel for free, because a lit opaque colour always carries full alpha. Bounce light gets a cache of its own, keyed by the lit colour, the ground in front and the contact level.'
 ];
 
 export const key: Field[] = [
@@ -580,7 +580,7 @@ export const shading: Part[] = [
     {
         name: 'Enclosure',
         kind: '8 rays, 12 blocks',
-        note: 'Side faces cast eight short rays from the air in front of them and count the hits. Alleys and courtyards darken on their own.'
+        note: 'Side faces cast eight short rays from the air in front of them, climbing a block with every step, and count the hits. Each ray stops at the highest terrain along its path. Alleys and courtyards darken on their own.'
     },
     {
         name: 'Contact',
@@ -615,7 +615,7 @@ export const shading: Part[] = [
 ];
 
 export const cutoff =
-    'Before a ray is marched, the renderer looks up the highest terrain along its path, and the ray stops as soon as it rises above it. In open terrain, which is most of any world, a shadow ray gives up after a step or two instead of marching all sixty-four.';
+    'Every ray first learns how high it could possibly hit. A top-down tile is split into 16 × 16 cells, each holding the highest ground in it and in the strip toward the sun; an isometric ray takes the highest known top of every chunk along its path from the height index. A ray stops as soon as it rises above that line. In open terrain, which is most of any world, it gives up after a step or two instead of marching all thirty-two, or sixty-four.';
 
 /* ---- Scheduling ---------------------------------------------------------- */
 
