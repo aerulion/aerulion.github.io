@@ -16,17 +16,17 @@ export interface Project {
 
 export const projects: Project[] = [
     {
-        title: 'Taerra',
+        title: 'TAERRA',
         tagline: 'A live web map that renders the whole world in minutes.',
         iconUrl: '/assets/images/taerra-icon.svg',
         meta: [
             {label: 'Type', value: 'Web map plugin & Fabric mod'},
-            {label: 'Scale', value: '6,000-block radius in 2 min 46 s'},
+            {label: 'Scale', value: '6,000-block radius in 2 min 21 s'},
             {label: 'Platform', value: 'Paper / Java 25'}
         ],
         description: [
-            'Taerra renders a Paper server’s worlds as a pixel-art web map: a top-down view for finding the way and an isometric view, turnable to all four corners, for showing off what people built. It reads the region files directly from its own threads, so the server never loads a chunk for it, and a companion Fabric mod shows the same map in game as a minimap and a full world map.',
-            'Corpium’s main world renders completely in under three minutes, where an established map plugin needed more than sixteen hours on the same machine for less. Changes are recorded as they happen and redrawn on an interval, what each viewer may see follows their permissions even while they are offline, and logging in takes one command in chat. It is public on Modrinth and still running live on Corpium.'
+            'TAERRA renders a Paper server’s worlds as a pixel-art web map: a top-down view for finding the way and an isometric view, turnable to all four corners, for showing off what people built. It reads the region files directly from its own threads, so the server never loads a chunk for it, and a companion Fabric mod shows the same map in game as a minimap and a full world map.',
+            'Corpium’s main world renders completely in under three minutes, where an established map plugin needed more than sixteen hours on the same machine for less. Changes are recorded as they happen and redrawn on an interval, what each viewer may see follows their permissions even while they are offline, and logging in takes one command in chat. It is out in early access, with every build on taerra.dev, and still running live on Corpium.'
         ],
         capabilities: [
             'Top-down & isometric',

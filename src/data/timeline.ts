@@ -64,9 +64,9 @@ export const timeline: Milestone[] = [
     },
     {
         year: '2026',
-        title: 'Taerra',
-        note: 'A web map that renders Corpium’s main world in under three minutes, now public on Modrinth with a Fabric mod for the map in game.',
-        track: 'Taerra'
+        title: 'TAERRA',
+        note: 'A web map that renders Corpium’s main world in under three minutes, now in early access with a Fabric mod for the map in game.',
+        track: 'TAERRA'
     },
     {
         year: 'Today',

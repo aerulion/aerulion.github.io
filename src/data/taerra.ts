@@ -41,15 +41,15 @@ export interface Field {
 }
 
 export const project = {
-    name: 'Taerra',
+    name: 'TAERRA',
     kicker: 'Live map for Paper and Fabric',
     standfirst: 'The whole world, in under three minutes.',
     lede: 'A web map plugin for Paper servers, with a companion Fabric mod that brings the same map into the game. It reads the world straight from its region files, renders a top-down map and an isometric view from all four corners, and keeps both current while people play, without the server noticing it is there.',
-    status: 'Public on Modrinth in early access, plugin and mod alike. Still running live on Corpium, where it was proven under real players, real builds and real terrain.',
+    status: 'Released in early access, plugin and mod alike, with every build on taerra.dev while the Modrinth listing is in review. Still running live on Corpium, where it was proven under real players, real builds and real terrain.',
     closing:
-        'Taerra is on Modrinth, free for any server, and still running live on Corpium. Open the map and try to break it.',
+        'TAERRA is free for any server, every build is on taerra.dev, and it is still running live on Corpium. Open the map and try to break it.',
     mapUrl: 'https://map.corpium.net',
-    modrinthUrl: 'https://modrinth.com/project/taerra',
+    downloadUrl: 'https://taerra.dev/download/',
     icon: ['M10 6.6795H42L36 17.0718 44 30.9282 38 41.3205H6L12 30.9282 4 17.0718Z', 'M4 17.0718H36', 'M12 30.9282H44']
 };
 
@@ -57,16 +57,16 @@ export const chapters: Chapter[] = [
     {
         id: 'benchmark',
         eyebrow: 'The number',
-        title: 'All of it, in 2:46.',
+        title: 'All of it, in 2:21.',
         subtitle:
-            'Corpium’s main world has a 6,000-block radius. Taerra renders all of it, top-down and isometric from all four corners, at every zoom level. On the same machine, one of the most widely used map plugins needed more than sixteen hours for the same world, and drew less.'
+            'Corpium’s main world has a 6,000-block radius. TAERRA renders all of it, top-down and isometric from all four corners, at every zoom level. On the same machine, one of the most widely used map plugins needed more than sixteen hours for the same world, and drew less.'
     },
     {
         id: 'principles',
         eyebrow: 'Principles',
         title: 'Five goals, eight refusals.',
         subtitle:
-            'The goals have barely changed since the first line was written. What Taerra refuses to do matters as much: every refusal bought the renderer room to be fast.'
+            'The goals have barely changed since the first line was written. What TAERRA refuses to do matters as much: every refusal bought the renderer room to be fast.'
     },
     {
         id: 'pipeline',
@@ -80,7 +80,7 @@ export const chapters: Chapter[] = [
         eyebrow: 'Reading the world',
         title: 'Read the disk, not the server.',
         subtitle:
-            'Most map plugins either ask the server for chunks, which loads them and competes with players for the main thread, or run a second process with its own copy of the world. Taerra reads the Anvil region files directly, from its own threads, while the server keeps running.'
+            'Most map plugins either ask the server for chunks, which loads them and competes with players for the main thread, or run a second process with its own copy of the world. TAERRA reads the Anvil region files directly, from its own threads, while the server keeps running.'
     },
     {
         id: 'runs',
@@ -184,16 +184,16 @@ export const chapters: Chapter[] = [
 /* ---- The number ---------------------------------------------------------- */
 
 export const headline: Readout[] = [
-    {label: 'Full render', value: '2:46'},
+    {label: 'Full render', value: '2:21'},
     {label: 'Established plugin', value: '16 h+'},
-    {label: 'Faster, wall-clock', value: '>340×'},
-    {label: 'Chunks', value: '~560k'}
+    {label: 'Faster, wall-clock', value: '>400×'},
+    {label: 'Chunks', value: '~440k'}
 ];
 
 export const benchmark = [
     {measure: 'World', taerra: '6,000-block radius, up to 12,000 × 12,000 blocks', other: 'Same'},
     {measure: 'Views', taerra: 'Top-down + isometric × 4 rotations', other: 'Top-down + one 3D view'},
-    {measure: 'Full render', taerra: '2 min 46 s', other: '16 h+'},
+    {measure: 'Full render', taerra: '2 min 21 s', other: '16 h+'},
     {measure: 'Hardware', taerra: 'Intel Core Ultra 7 265, 64 GB RAM', other: 'Same'}
 ];
 
@@ -258,7 +258,7 @@ export const refusals: Part[] = [
     {
         name: 'No per-face shadows',
         kind: 'Per column',
-        note: 'Shadows are decided per column top-down, and per run and face band in isometric, never per pixel. There is no block light either: night mode and torchlight are on the someday list, not the roadmap.'
+        note: 'Shadows are decided per column top-down, and per run and face band in isometric, never per pixel. There is no block light either: light sources glow, but they light nothing around them. Night mode and torchlight are on the someday list, not the roadmap.'
     },
     {
         name: 'No on-demand rendering',
@@ -290,7 +290,7 @@ export const lanes: Lane[] = [
         stages: [
             {name: 'Header scan', measure: '4 KiB / region', note: 'Which chunks exist, without reading one.'},
             {name: 'Z-order plan', measure: 'Morton curve', note: 'Neighbouring regions render close together.'},
-            {name: 'Selective read', measure: '4 NBT fields', note: 'Everything else is skipped in the stream.'},
+            {name: 'Selective read', measure: '5 NBT fields', note: 'Everything else is skipped in the stream.'},
             {name: 'Run sampler', measure: '256 columns', note: 'Surfaces kept, interiors swallowed.'},
             {name: 'Column cache', measure: '~19 KB / chunk', note: 'One structure behind both renderers.'},
             {name: 'Top-down', measure: '64 × 64 blocks', note: 'Measures the heights isometric needs.'},
@@ -307,8 +307,8 @@ export const lanes: Lane[] = [
             {name: 'Change buffer', measure: '15 min', note: 'Deduplicated: many edits, one render.'},
             {
                 name: 'Live lane',
-                measure: 'Token bucket',
-                note: 'Rate-limited, so a crater cannot starve a full render.'
+                measure: '16 tiles / batch',
+                note: 'Small batches, served ahead of any full render.'
             },
             {
                 name: 'Chunk snapshot',
@@ -326,7 +326,7 @@ export const reading: Readout[] = [
     {label: 'Read per region to plan', value: '4 KiB'},
     {label: 'To plan the main world', value: '~2.3 MB'},
     {label: 'Reads per chunk, per view', value: '1'},
-    {label: 'NBT fields kept', value: '4'}
+    {label: 'NBT fields kept', value: '5'}
 ];
 
 export const headerScan: Snippet = {
@@ -345,7 +345,8 @@ export const collectFields: Snippet = {
     new FieldSelector(ListTag.TYPE, "sections"),
     new FieldSelector(IntTag.TYPE, "xPos"),
     new FieldSelector(IntTag.TYPE, "zPos"),
-    new FieldSelector(StringTag.TYPE, "Status"));
+    new FieldSelector(StringTag.TYPE, "Status"),
+    new FieldSelector(IntTag.TYPE, "DataVersion"));
 NbtIo.parse(input, fields, NbtAccounter.create(64L << 20));`
 };
 
@@ -403,8 +404,8 @@ export const layout = [
     {field: 'runOffsets', type: 'int[257]', holds: 'Column i owns runs off[i] up to off[i + 1]'},
     {field: 'runTopY', type: 'short[]', holds: 'Top of each run'},
     {field: 'runBottomY', type: 'short[]', holds: 'Bottom of each run'},
-    {field: 'runMaterial', type: 'Material[]', holds: 'One material per run'},
-    {field: 'capMaterial', type: 'Material[]', holds: 'Per column: the flower, grass or snow painted on top'},
+    {field: 'runBlockId', type: 'int[]', holds: 'One block id per run'},
+    {field: 'capBlockId', type: 'int[]', holds: 'Per column: the flower, grass or snow painted on top'},
     {field: 'columnBiome', type: 'Biome[]', holds: 'Per column'},
     {field: 'minTopY, maxTopY', type: 'int, int', holds: 'Packed into one long for the height index'}
 ];
@@ -426,7 +427,7 @@ export const shortcuts: Rule[] = [
 
 export const swallow: Snippet = {
     caption: 'Java / Sixteen blocks, zero reads',
-    code: `if (interior && (y & 15) == 15 && runMaterial != null && !Fluids.isFluid(runMaterial)
+    code: `if (interior && (y & 15) == 15 && runBlockId != BlockTypes.NONE && !Fluids.isFluid(runBlockId)
     && runBottomY == y + 1 && source.isSectionAllFull(y, shapes)) {
   y &= ~15;
   runBottomY = y;   // absorb 16 blocks, zero reads
@@ -477,13 +478,13 @@ export const passes: Part[] = [
     },
     {
         name: 'Sun shadows',
-        kind: '≈ 26.6°, 32 steps',
+        kind: '45°, 32 steps',
         note: 'Traced through the height field in fixed point: two multiply-shifts and a lookup per step, no floating point and no trigonometry.'
     },
     {
         name: 'Water depth',
         kind: '4-block bands',
-        note: 'Shaded from the bed’s height field rather than the flat surface, then tinted in depth bands that push deep water toward blue.'
+        note: 'Shaded from the bed’s height field rather than the flat surface, then tinted in depth bands that push deep water toward blue. The shallowest water picks up a pale turquoise glint.'
     }
 ];
 
@@ -495,7 +496,8 @@ export const terrace: Snippet = {
 export const sun: Snippet = {
     caption: 'Java / The sun, in fixed point',
     code: `static final int SUN_STEP_X = 809, SUN_STEP_Z = -627;   // ≈ unit vector × 1024
-// step k samples (x + k·809 >> 10, z − k·627 >> 10) at height topY + ⌈k/2⌉`
+// step k samples (x + k·809 >> 10, z − k·627 >> 10) at height topY + k
+// isometric rays climb ⌈k/2⌉ per step instead, for up to 64 steps`
 };
 
 /* ---- Isometric ----------------------------------------------------------- */
@@ -517,7 +519,7 @@ export const culling: Rule[] = [
 
 export const frontToBack: string[] = [
     'The painter’s algorithm draws back to front and lets near things overwrite far ones. In a dense world nearly everything it draws is overwritten, so nearly all of its work is wasted.',
-    'Taerra draws front to back, and a pixel that is set is never written again. In this projection nearer simply means a larger x + z in rotated space, so chunks are sorted by that sum and columns walk the anti-diagonals from 30 down to 0. No depth buffer, and no sort per pixel or per block.'
+    'TAERRA draws front to back, and a pixel that is set is never written again. In this projection nearer simply means a larger x + z in rotated space, so chunks are sorted by that sum and columns walk the anti-diagonals from 30 down to 0. No depth buffer, and no sort per pixel or per block.'
 ];
 
 export const skyline =
@@ -557,13 +559,13 @@ export const iso: Part[] = [
 /* ---- Light --------------------------------------------------------------- */
 
 export const lightKey: string[] = [
-    'The inputs, though, are tiny and discrete: a colour, one of three faces, up to eight taller neighbours or blocked rays, shadowed or not, and one of three contact levels. All of them pack into a single long, and a hash map per thread remembers the answer.',
+    'The inputs, though, are tiny and discrete: a colour, one of five faces (top, the two sides, a glowing face and a water surface), up to eight taller neighbours or blocked rays, shadowed or not, and one of three contact levels. All of them pack into a single long, and a hash map per thread remembers the answer.',
     'After the first few tiles the hit rate is effectively 100%, and lighting costs one lookup per face. Zero doubles as the missing sentinel for free, because a lit opaque colour always carries full alpha.'
 ];
 
 export const key: Field[] = [
     {name: 'Colour', bits: 32, note: 'ARGB'},
-    {name: 'Face', bits: 2, note: 'Top, +X, +Z'},
+    {name: 'Face', bits: 3, note: 'Top, +X, +Z, glow, water'},
     {name: 'Taller', bits: 4, note: '0–8'},
     {name: 'Shadow', bits: 1, note: 'Yes / no'},
     {name: 'Contact', bits: 2, note: '3 levels'}
@@ -588,12 +590,32 @@ export const shading: Part[] = [
     {
         name: 'Sun shadows',
         kind: 'Through the runs',
-        note: 'Marched through the full run data rather than the height field, so overhangs cast their shadows correctly.'
+        note: 'Marched through the full run data rather than the height field, up to 64 steps, so overhangs cast their shadows correctly.'
+    },
+    {
+        name: 'Bounce',
+        kind: 'From the ground',
+        note: 'The lowest rows of a wall pick up light reflected off the ground in front of it, multiplied in linear light, so a wall above sand warms and a wall above grass turns faintly green.'
+    },
+    {
+        name: 'Glow',
+        kind: 'Light level ≥ 3',
+        note: 'Blocks that emit light, from torches to lava and glowstone, are drawn at full brightness on every face and never shadowed.'
+    },
+    {
+        name: 'Water glints',
+        kind: 'Sheen',
+        note: 'Sunlit water surfaces take a faint sheen of sunlight on top of their colour, and shadowed water does not.'
+    },
+    {
+        name: 'Highlights',
+        kind: 'Soft shoulder',
+        note: 'Above 85% of full brightness, each channel rolls off along a curve instead of clipping, so sunlit snow stays white rather than turning cream.'
     }
 ];
 
 export const cutoff =
-    'Before a chunk is rendered, the renderer looks up the highest terrain its rays could reach in the height index, and every ray stops as soon as it rises above it. In open terrain, which is most of any world, a shadow ray gives up after a step or two instead of marching all thirty-two.';
+    'Before a ray is marched, the renderer looks up the highest terrain along its path, and the ray stops as soon as it rises above it. In open terrain, which is most of any world, a shadow ray gives up after a step or two instead of marching all sixty-four.';
 
 /* ---- Scheduling ---------------------------------------------------------- */
 
@@ -601,7 +623,7 @@ export const scheduling: Readout[] = [
     {label: 'Tiles per full-render batch', value: '64'},
     {label: 'Tiles per region', value: '8 × 8'},
     {label: 'Dispatcher tick', value: '20 ms'},
-    {label: 'Live batches / s', value: '10'}
+    {label: 'Tiles per live batch', value: '16'}
 ];
 
 export const order: Rule[] = [
@@ -619,7 +641,7 @@ export const order: Rule[] = [
     },
     {
         name: 'The pyramid is built in memory',
-        rule: 'A finished top-down batch composes its own zoom levels from the images it still holds, 64 to 16 to 4 to 1, and queues only the top. Isometric and live tiles queue their parents one by one. Point sampling keeps the pixel art crisp and never invents a colour that was not in the source.'
+        rule: 'A finished top-down batch composes its own zoom levels from the images it still holds, 64 to 16 to 4 to 1, and queues only the top. Isometric and live tiles queue their parents one by one. Each parent pixel averages the four beneath it in linear light, weighted by alpha, so zoomed-out terrain keeps its true brightness instead of whichever block a point sample happened to land on.'
     },
     {
         name: 'Two pools that share',
@@ -628,7 +650,7 @@ export const order: Rule[] = [
 ];
 
 export const queue = [
-    {lane: 'Live, zoom 0', work: 'Tiles a change touched', note: 'Token bucket: 10 batches / s, 2 s burst'},
+    {lane: 'Live, zoom 0', work: 'Tiles a change touched', note: 'Batches of up to 16, ahead of everything else'},
     {lane: 'Full render, zoom 0', work: 'Every tile that exists', note: 'Region batches on the Z-order curve'},
     {lane: 'Live, parent', work: 'Zoom levels above a change', note: 'Recomposed from the tiles below'},
     {lane: 'Full render, parent', work: 'Above each pyramid top', note: 'One zoom task per finished batch'}
@@ -661,7 +683,7 @@ export const liveSteps: Rule[] = [
     },
     {
         name: 'Wait out pre-generation',
-        rule: 'Freshly populated chunks are marked for rendering, unless a Chunky pre-generation run is in progress. Then Taerra leaves them alone rather than chasing thousands of chunks a second, and when Chunky stops it offers staff a full render in chat.'
+        rule: 'Freshly populated chunks are marked for rendering, unless a Chunky pre-generation run is in progress. Then TAERRA leaves them alone rather than chasing thousands of chunks a second, and when Chunky stops it offers staff a full render in chat.'
     }
 ];
 
@@ -736,7 +758,7 @@ export const features: Part[] = [
     {
         name: 'Context menu',
         kind: 'Keyboard too',
-        note: 'Copy the coordinates or a link, centre the map, teleport or drop a waypoint. In isometric the coordinates are exact, height included. Arrow keys move through it and Escape closes it.'
+        note: 'Copy the coordinates or a link, centre the map, teleport, navigate there in game or drop a waypoint. In isometric the coordinates are exact, height included. Arrow keys move through it and Escape closes it.'
     },
     {
         name: 'Grey style',
@@ -751,7 +773,27 @@ export const features: Part[] = [
     {
         name: 'Markers and layers',
         kind: 'Marker API',
-        note: 'WorldGuard regions, vanilla and ChunkyBorder borders, grouped waypoints and spawn, each a layer a viewer can switch. Other plugins add their own through a small public API, published to Maven Central with every release, drawn on the ground they belong to, and markers from dynmap can be imported as waypoint groups.'
+        note: 'WorldGuard regions, vanilla and ChunkyBorder borders, spawn, and waypoints, areas and lines in named groups, each a layer a viewer can switch. Other plugins add their own through a small public API, published to Maven Central with every release, drawn on the ground they belong to, and markers from dynmap can be imported as waypoint groups.'
+    },
+    {
+        name: 'Drawn on the map',
+        kind: 'Areas and lines',
+        note: 'Waypoints, areas and lines in named groups and colours, each with an optional description. Areas are traced from selected chunks or clicked point by point, and lines run straight or smooth.'
+    },
+    {
+        name: 'Markers of your own',
+        kind: 'Up to 100',
+        note: 'Every logged-in player can keep up to a hundred waypoints, areas and lines only they see, drawn as gems and dashed lines so they never pass for the server’s. A list sorts, filters and exports them to JSON, and a Last Death waypoint marks where they last died.'
+    },
+    {
+        name: 'Search',
+        kind: 'Press /',
+        note: 'Players, markers, worlds and coordinates across every world, decimals included, and the map jumps there.'
+    },
+    {
+        name: 'Chunk selection',
+        kind: 'Render or hide',
+        note: 'Select chunks to render them again, or hide them behind caution stripes while staff build there. Players inside a hidden area are hidden too.'
     },
     {
         name: 'Self-hosted',
@@ -766,7 +808,7 @@ export const players =
 export const privacy: Rule[] = [
     {
         name: 'Hidden',
-        rule: 'Players in spectator mode, invisible or vanished players, and anyone with taerra.hide do not appear at all.'
+        rule: 'Players in spectator mode, invisible or vanished players, anyone inside a hidden area and anyone with taerra.hide do not appear at all.'
     },
     {
         name: 'Anonymous',
@@ -782,8 +824,8 @@ export const privacy: Rule[] = [
 
 export const login: Rule[] = [
     {
-        name: 'A link in chat',
-        rule: '/taerra login answers with a clickable link carrying a one-time code: 32 random bytes, valid for five minutes, usable once. A link that leaks after it has been clicked is worthless.'
+        name: 'A code or a link',
+        rule: 'The map’s login menu shows a six-character code, and /taerra login <code> in game logs that browser in by itself. /taerra login on its own answers with a clickable link instead, carrying a one-time code of 32 random bytes. Either is valid for five minutes and usable once, so one that leaks after use is worthless.'
     },
     {
         name: 'Carried in the fragment',
@@ -794,12 +836,16 @@ export const login: Rule[] = [
         rule: 'The code is exchanged for a 30-day session cookie: HttpOnly, SameSite=Strict, and Secure over HTTPS, including behind a reverse proxy.'
     },
     {
+        name: 'A phone by QR code',
+        rule: 'A browser that is logged in shows a QR code that logs in a phone. After five wrong codes in a minute, a player’s next tries are refused until that minute is up, so a short code cannot be guessed.'
+    },
+    {
         name: 'Told in game',
         rule: 'The player is told a browser has just logged in as them. Other open tabs hear about it over a BroadcastChannel and never need a reload.'
     },
     {
         name: 'Hashes only',
-        rule: 'Only SHA-256 hashes of codes and tokens are stored, so a copy of the sessions file logs nobody in. The login goes to the command’s sender, not its executor, so it cannot be minted on someone else’s behalf. /taerra logout ends a player’s sessions, staff can end anyone’s, and a banned player’s sessions end on their own.'
+        rule: 'Only SHA-256 hashes of codes and tokens are stored, so a copy of the sessions file logs nobody in. The login goes to the command’s sender, not its executor, so it cannot be minted on someone else’s behalf. /taerra devices, the map’s account menu and the mod list every logged-in device and log out any one of them, at most ten per player. /taerra logout ends them all, staff can end anyone’s, and a banned player’s sessions end on their own.'
     },
     {
         name: 'No link for the mod',
@@ -808,7 +854,7 @@ export const login: Rule[] = [
 ];
 
 export const grants: string[] = [
-    'Permission plugins cannot reliably say what an offline player may do, and people browse the map offline all the time. So while a player with a web session is online, Taerra checks the handful of permissions the map cares about once a second and keeps the result beside the session. Offline, their browser goes by that snapshot.',
+    'Permission plugins cannot reliably say what an offline player may do, and people browse the map offline all the time. So while a player with a web session is online, TAERRA checks the handful of permissions the map cares about once a second and keeps the result beside the session. Offline, their browser goes by that snapshot.',
     'When a snapshot changes, every open connection that player has is re-checked at once. Remove a staff rank in LuckPerms and within about a second their open tab loses the staff world and the private layers, without a reload.',
     'Every world-specific endpoint, from tiles and pick buffers to markers, players and avatars, passes the same check, and a private world answers exactly like one that does not exist: a plain 404.'
 ];
@@ -819,8 +865,11 @@ export const actions = [
     {action: 'See a private layer', needs: 'taerra.web.layer.<layer>', detail: 'e.g. worldguard'},
     {action: 'See hidden players', needs: 'taerra.web.see-hidden', detail: 'Marked as hidden'},
     {action: 'Teleport from the map', needs: 'taerra.web.teleport', detail: 'Online, onto the exact block shown'},
-    {action: 'Edit waypoints', needs: 'taerra.command.waypoint', detail: 'Works while offline'},
-    {action: 'Private waypoint groups', needs: 'taerra.command.config', detail: 'Private before the first waypoint'}
+    {action: 'Keep personal markers', needs: 'taerra.web.markers.personal', detail: 'Everyone, by default'},
+    {action: 'Edit markers', needs: 'taerra.web.markers', detail: 'Works while offline'},
+    {action: 'Private marker groups', needs: 'taerra.web.markers.private', detail: 'Private before the first marker'},
+    {action: 'Render selected chunks', needs: 'taerra.web.render', detail: 'Again, from the map'},
+    {action: 'Hide selected chunks', needs: 'taerra.web.hide', detail: 'Behind caution stripes'}
 ];
 
 export const writesFromWeb: Part[] = [
@@ -842,7 +891,7 @@ export const writesFromWeb: Part[] = [
 ];
 
 export const noPanel =
-    'What the browser cannot do is administer the plugin, and that is deliberate. Enabling worlds, making worlds and layers private, limiting the rendered area and starting renders all happen in game, through /taerra config, /taerra limit and /taerra render, with tab completion. The same render command also exports a world as one PNG per view and rotation, stitched from the tiles on disk and streamed a row of tiles at a time, so even a whole world never has to fit in memory. A web admin panel would be another login surface to secure, for settings changed once.';
+    'What the browser cannot do is administer the plugin, and that is deliberate. It can render selected chunks again or hide them, for those allowed to, but enabling worlds, making worlds and layers private, limiting the rendered area and starting full renders all happen in game, through /taerra config, /taerra limit and /taerra render, with tab completion. The same render command also exports a world as one PNG per view and rotation, stitched from the tiles on disk and streamed a row of tiles at a time, so even a whole world never has to fit in memory. A web admin panel would be another login surface to secure, for settings changed once.';
 
 /* ---- In game ------------------------------------------------------------- */
 
@@ -853,17 +902,22 @@ export const inGame: Part[] = [
     {
         name: 'Minimap',
         kind: 'HUD',
-        note: 'Sized, zoomed and placed on either side, north-up or turning with the player. It moves down out of the way of status effects and steps aside for the debug screen.'
+        note: 'Sized, zoomed and placed on either side, north-up or turning with the player, with the info lines a player picks below it, from coordinates and biome to light level and FPS. Markers beyond its edge stick to the rim or point the way to walk. Status effects move down out of its way, and it steps aside for the debug screen.'
     },
     {
         name: 'World map',
         kind: 'Full screen',
-        note: 'Both views and all four rotations, layers, the player list with follow, spawn, and a right-click menu to copy coordinates or a link, teleport, or drop a waypoint. Pans glide and zooms ease, and every action has a rebindable key.'
+        note: 'Both views and all four rotations, layers, the player list with follow, search, chunk selection, render progress, and a right-click menu to navigate, copy coordinates or a link, teleport, or drop a waypoint. Pans glide and zooms ease, and every action has a rebindable key.'
     },
     {
         name: 'Waypoints in the world',
         kind: 'Labels',
-        note: 'Each waypoint stands where it is, with its name, its distance and the vanilla banner icon closest to its colour. Past ten blocks it holds a constant size on screen, out to the render distance.'
+        note: 'Each waypoint stands where it is, with its name, its distance and the vanilla banner icon closest to its colour. Past ten blocks it holds a constant size on screen, out to the render distance. A key sets one where the player stands, and their own list filters, sorts, exports and imports them.'
+    },
+    {
+        name: 'Navigation',
+        kind: 'Beam and arrow',
+        note: 'To a waypoint, a player or any spot, started in game or from the web map while playing: a beacon beam where it is, and an arrow with the distance at the top of the screen, through the Nether too.'
     }
 ];
 
@@ -876,7 +930,7 @@ export const client: Part[] = [
     {
         name: 'Tiles',
         kind: 'ETag, LRU',
-        note: 'The same indexed PNGs, revalidated with If-None-Match, so an unchanged tile costs a 304. Uploaded as textures sampled nearest-neighbour, so the pixel art stays sharp at every GUI scale. Until a tile arrives, the closest loaded ancestor up to four levels up stands in for it.'
+        note: 'The same indexed PNGs, revalidated with If-None-Match, so an unchanged tile costs a 304. Uploaded as textures sampled nearest-neighbour, so the pixel art stays sharp at every GUI scale. Until a tile arrives, the closest loaded ancestor up to four levels up stands in for it, and zooming in stops where the tiles run out of pixels.'
     },
     {
         name: 'Updates',
@@ -903,8 +957,8 @@ export const client: Part[] = [
 /* ---- Colours ------------------------------------------------------------- */
 
 export const colourCounts: Readout[] = [
-    {label: 'Blocks in the data', value: '1,187'},
-    {label: 'Side unlike the top', value: '532'},
+    {label: 'Blocks in the data', value: '1,286'},
+    {label: 'Side unlike the top', value: '569'},
     {label: 'Voxel grid per model', value: '16³'},
     {label: 'Shape threshold', value: '0.25'}
 ];
@@ -920,7 +974,7 @@ export const colours: Part[] = [
     },
     {
         name: 'Top and side',
-        kind: '532 of 1,187',
+        kind: '569 of 1,286',
         note: 'Kept apart. Derive the side by darkening the top and a grass block renders as green dirt.'
     },
     {
@@ -936,7 +990,7 @@ export const colours: Part[] = [
     {
         name: 'Tints',
         kind: 'Baked or flagged',
-        note: 'Constant tints are baked in. Only biome-dependent faces keep a flag, resolved per biome at runtime, the swamp’s grass noise included.'
+        note: 'Constant tints are baked in. Only biome-dependent faces keep a flag, resolved per biome at runtime, the swamp’s grass noise included, then averaged over five by five blocks, so grass, leaves and water fade across a biome border instead of changing in a hard line.'
     },
     {
         name: 'Biome colormaps',
@@ -990,7 +1044,7 @@ export const pending: Part[] = [
     {
         name: 'Night',
         kind: 'Block light',
-        note: 'Torches, lava and glowstone are already in the data, waiting for a night mode.'
+        note: 'Torches, lava and glowstone already glow, but light nothing around them. Casting their light waits for a night mode.'
     }
 ];
 
@@ -999,7 +1053,7 @@ export const pending: Part[] = [
 export const stack = [
     {
         layer: 'Plugin',
-        built: 'Java 25 and Paper 26.2, with paperweight userdev for the NBT and region-file internals; fastutil primitive collections, Caffeine for the tile and chunk caches, Jackson'
+        built: 'Java 25 and Paper 26.3, with paperweight userdev for the NBT and region-file internals; fastutil primitive collections, Caffeine for the tile and chunk caches, Jackson'
     },
     {
         layer: 'Web',

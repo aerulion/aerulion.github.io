@@ -71,12 +71,12 @@ import {
 import {collide} from '../../scripts/figure-collide';
 import {uid} from '../../utils/uid';
 
-const title = 'Taerra - rendering a Minecraft world in under three minutes';
+const title = 'TAERRA - rendering a Minecraft world in under three minutes';
 const description =
-    'Taerra: a web map plugin for Paper servers, with a Fabric mod that shows the same map in game. How it renders a 6,000-block world top-down and isometric from all four corners in under three minutes.';
+    'TAERRA: a web map plugin for Paper servers, with a Fabric mod that shows the same map in game. How it renders a 6,000-block world top-down and isometric from all four corners in under three minutes.';
 const socialImage = '/assets/images/og-taerra.png';
 const socialImageAlt =
-    'Taerra, a web map for Paper: its icon in white hairline on black beside the word TAERRA, with a full render time of 2:46 for a 6,000-block radius listed below.';
+    'TAERRA, a web map for Paper: its icon in white hairline on black beside the word TAERRA, with a full render time of 2:21 for a 6,000-block radius listed below.';
 const breadcrumb = [
     {name: 'Home', path: '/'},
     {name: project.name, path: '/work/taerra/'}
@@ -233,7 +233,7 @@ const keyFields = key.map((field, i) => {
                             <Button href={project.mapUrl} variant="solid">
                                 Open the live map
                             </Button>
-                            <Button href={project.modrinthUrl}>Get it on Modrinth</Button>
+                            <Button href={project.downloadUrl}>Download</Button>
                             <Button href="/" glyph="west">
                                 Back to the site
                             </Button>
@@ -435,14 +435,15 @@ const keyFields = key.map((field, i) => {
                 <p>
                     A chunk’s NBT carries entities, block entities, heightmaps, light, structure references, ticking
                     lists and POI data, and none of it changes how the map looks. Each chunk is read with one positional
-                    read and parsed through Minecraft’s own streaming visitor, set to collect four fields and skip the
+                    read and parsed through Minecraft’s own streaming visitor, set to collect five fields and skip the
                     rest without building an object for any of it.
                 </p>
                 <p>
                     Chunks still at a proto stage are dropped, so half-generated terrain at the edge of the world never
-                    reaches the map. Oversized chunks stored beside the region and every compression scheme the game
-                    supports go through the game’s own code, and a read that collides with the server writing the file
-                    reopens the region and tries once more.
+                    reaches the map. Each chunk’s DataVersion picks the reader for its format, back to Minecraft 26.2,
+                    so a world upgraded in place renders without the game’s data fixers. Oversized chunks stored beside
+                    the region and every compression scheme the game supports go through the game’s own code, and a read
+                    that collides with the server writing the file reopens the region and tries once more.
                 </p>
             </div>
 
@@ -1221,7 +1222,7 @@ const keyFields = key.map((field, i) => {
                     <Button href={project.mapUrl} variant="solid">
                         Open the live map
                     </Button>
-                    <Button href={project.modrinthUrl}>Get it on Modrinth</Button>
+                    <Button href={project.downloadUrl}>Download</Button>
                     <Button href="/#work" glyph="west">
                         Back to the work
                     </Button>

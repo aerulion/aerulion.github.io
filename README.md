@@ -62,9 +62,9 @@ src/
 │   ├── Glyph.astro           one icon, drawn on the lattice at hairline weight
 │   ├── Mark.astro            the static mark, drawn then inked (404)
 │   └── MorphingMark.astro    the same mark, wired for the unfold loop (hero)
-├── data/         projects, timeline, stack, skills, the Nyx guidelines and the Taerra write-up: the content edited most often
+├── data/         projects, timeline, stack, skills, the Nyx guidelines and the TAERRA write-up: the content edited most often
 ├── layouts/      the document shell: head, metadata, structured data
-├── pages/        index, the Nyx guidelines (/design), the Taerra write-up (/work/taerra) and 404
+├── pages/        index, the Nyx guidelines (/design), the TAERRA write-up (/work/taerra) and 404
 ├── scripts/      client-side behaviour, imported by the components that need it
 │   ├── geometry.ts           allocation-light 2D primitives
 │   ├── distance-field.ts     the sampled clearance field the lattice reads
