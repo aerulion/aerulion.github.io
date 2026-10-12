@@ -845,7 +845,11 @@ export const login: Rule[] = [
     },
     {
         name: 'Hashes only',
-        rule: 'Only SHA-256 hashes of codes and tokens are stored, so a copy of the sessions file logs nobody in. The login goes to the command’s sender, not its executor, so it cannot be minted on someone else’s behalf. /taerra devices, the map’s account menu and the mod list every logged-in device and log out any one of them, at most ten per player. /taerra logout ends them all, staff can end anyone’s, and a banned player’s sessions end on their own.'
+        rule: 'Only SHA-256 hashes of codes and tokens are stored, so a copy of the sessions file logs nobody in. The login goes to the command’s sender, not its executor, so it cannot be minted on someone else’s behalf. /taerra logout ends a player’s sessions, staff can end anyone’s, and a banned player’s sessions end on their own.'
+    },
+    {
+        name: 'Every device listed',
+        rule: '/taerra devices, the map’s account menu and the mod list every browser that is logged in, up to ten per player, and log out any one of them.'
     },
     {
         name: 'No link for the mod',
