@@ -305,7 +305,7 @@ export const lanes: Lane[] = [
             {name: 'Fog layers', measure: 'Per region', note: 'Only the pixels a discovery would change.'},
             {name: 'Zoom pyramid', measure: '64 → 1', note: 'Top-down composed in memory from tiles still held.'},
             {name: 'Indexed PNG', measure: 'FNV-1a hash', note: 'Unchanged bytes stop here.'},
-            {name: 'Disk and socket', measure: 'LRU / Javalin', note: 'Served to Leaflet, pushed as tile_updated.'}
+            {name: 'Disk and socket', measure: 'Caffeine / Javalin', note: 'Served to Leaflet, pushed as tile_updated.'}
         ]
     },
     {
@@ -348,7 +348,7 @@ export const headerScan: Snippet = {
 };
 
 export const collectFields: Snippet = {
-    caption: 'Java / Four fields, the rest skipped',
+    caption: 'Java / Five fields, the rest skipped',
     code: `CollectFields fields = new CollectFields(
     new FieldSelector(ListTag.TYPE, "sections"),
     new FieldSelector(IntTag.TYPE, "xPos"),
@@ -415,7 +415,8 @@ export const layout = [
     {field: 'runBlockId', type: 'int[]', holds: 'One block id per run, an index straight into the colour table'},
     {field: 'capBlockId', type: 'int[]', holds: 'Per column: the flower, grass or snow painted on top'},
     {field: 'columnBiome', type: 'Biome[]', holds: 'Per column'},
-    {field: 'minTopY, maxTopY', type: 'int, int', holds: 'Packed into one long for the height index'}
+    {field: 'minTopY, maxTopY', type: 'int, int', holds: 'Packed into one long for the height index'},
+    {field: 'mist', type: 'int[] or null', holds: 'Per column: fog height, density and veil, only near fog'}
 ];
 
 export const shortcuts: Rule[] = [
@@ -623,7 +624,7 @@ export const shading: Part[] = [
 ];
 
 export const cutoff =
-    'Every ray first learns how high it could possibly hit. A top-down tile is split into 16 × 16 cells, each holding the highest ground in it and in the strip toward the sun; an isometric ray takes the highest known top of every chunk along its path from the height index. A ray stops as soon as it rises above that line. In open terrain, which is most of any world, it gives up after a step or two instead of marching all thirty-two, or sixty-four.';
+    'Every ray first learns how high it could possibly hit. A top-down tile is split into 16 × 16 cells, each holding the highest ground in it and in the strip toward the sun; an isometric ray takes the highest top of every chunk in the box its path spans, capped by the highest top the height index knows within reach of the chunk being drawn. A ray stops as soon as it rises above that line. In open terrain, which is most of any world, it gives up after a step or two instead of marching all thirty-two, or sixty-four.';
 
 /* ---- Scheduling ---------------------------------------------------------- */
 
@@ -637,7 +638,7 @@ export const scheduling: Readout[] = [
 export const order: Rule[] = [
     {
         name: 'Batches follow region files',
-        rule: 'A batch is a seed tile and up to 63 more of the same priority, world, view and rotation in the same region; live batches stop at 16. A region is 512 × 512 blocks, exactly 8 × 8 tiles: one open file, one hot set of chunks, one worker.'
+        rule: 'A batch is a seed tile and up to 63 more of the same priority, world, view and rotation in the same region; live batches stop at 16, and when the queue runs short, batches shrink to as few as four so that every thread has work. A region is 512 × 512 blocks, exactly 8 × 8 tiles: one open file, one hot set of chunks, one worker.'
     },
     {
         name: 'The world walks a Z-order curve',
@@ -810,7 +811,7 @@ export const features: Part[] = [
     {
         name: 'The URL is the state',
         kind: 'Shareable',
-        note: 'World, position, zoom, view, rotation, panels, colour style, language and layers all live in the fragment, debounced so the back button is not flooded. Paste a link in Discord and the other person sees exactly what you see.'
+        note: 'World, position, zoom, view, rotation, panels, colour style, language and layers all live in the fragment, rewritten in place and debounced, so the back button is never flooded. Paste a link in Discord and the other person sees exactly what you see.'
     },
     {
         name: 'Context menu',
@@ -825,7 +826,7 @@ export const features: Part[] = [
     {
         name: 'Live, when it changed',
         kind: 'One socket',
-        note: 'One WebSocket per tab carries player positions, sampled once a second and sent only when something changed, plus tile updates, marker changes and render progress. An empty server at night sends nothing, and a client that stops reading loses updates rather than growing the server’s buffers.'
+        note: 'One WebSocket per tab carries player positions, sampled once a second and sent only when something changed, plus tile updates, marker changes, render progress, the time and weather, and discoveries. An empty server at night sends nothing, and a client that stops reading loses updates rather than growing the server’s buffers.'
     },
     {
         name: 'Markers and layers',
@@ -1025,7 +1026,7 @@ export const client: Part[] = [
     {
         name: 'Heights',
         kind: 'Pick buffers',
-        note: 'The cursor readout, waypoint placement and teleport targets come from the same buffers the browser decodes. An area marker drawn in isometric samples them along its edges, median-smoothed, so a region’s floor drapes over the hills beneath it.'
+        note: 'The cursor readout, waypoint placement and teleport targets come from the same buffers the browser decodes. In isometric, each point of an area or region outline takes its height from the chunks around it, each chunk reduced to the median of sixteen samples, so the outline drapes over the hills beneath it.'
     },
     {
         name: 'Markers',
@@ -1065,7 +1066,7 @@ export const colours: Part[] = [
     {
         name: 'Shapes, measured',
         kind: 'Flood fill',
-        note: 'Each model is voxelised with the union of its rotated placements, and a sheet thinner than one unit counts only if it encloses a volume. Mature wheat stays thin, a hopper is full, and powder snow comes out solid, with no per-block exceptions. The line itself, 0.25, is exactly a wall post, so walls count and fence posts, at 0.0625, do not.'
+        note: 'Each model is voxelised with the union of its rotated placements, and a sheet thinner than one unit counts only if it encloses a volume. Mature wheat stays thin, a hopper is full, and powder snow comes out solid. A short override list covers what the models cannot say: fluids, chests, shulker boxes, decorated pots and conduits count as full, banners and heads as thin. The line itself, 0.25, is exactly a wall post, so walls count and fence posts, at 0.0625, do not.'
     },
     {
         name: 'Panels as walls',
@@ -1149,7 +1150,7 @@ export const stack = [
     },
     {
         layer: 'Tooling',
-        built: 'Python and NumPy for the block data and colormaps; Python and headless Chrome for the branding images, rendered from real tiles; JUnit for the geometry, sampling, projection, overlay and pick-buffer maths'
+        built: 'Python and NumPy for the block data and colormaps; Python and headless Chrome for the branding images, rendered from real tiles; JUnit for the geometry, sampling, projection, overlay, pick-buffer, fog, region and settings logic'
     },
     {
         layer: 'Integrations',
