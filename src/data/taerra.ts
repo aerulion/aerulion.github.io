@@ -45,11 +45,11 @@ export const project = {
     kicker: 'Live map for Paper and Fabric',
     standfirst: 'The whole world, in under three minutes.',
     lede: 'A web map plugin for Paper servers, with a companion Fabric mod that brings the same map into the game. It reads the world straight from its region files, renders a top-down map and an isometric view from all four corners, and keeps both current while people play, without the server noticing it is there.',
-    status: 'Released in early access, plugin and mod alike, with every build on taerra.dev while the Modrinth listing is in review. Still running live on Corpium, where it was proven under real players, real builds and real terrain.',
+    status: 'Released in early access on Modrinth, plugin and mod alike, with the source public on GitHub. Still running live on Corpium, where it was proven under real players, real builds and real terrain.',
     closing:
-        'TAERRA is free for any server, every build is on taerra.dev, and it is still running live on Corpium. Open the map and try to break it.',
+        'TAERRA is free for any server, it is on Modrinth, and it is still running live on Corpium. Open the map and try to break it.',
     mapUrl: 'https://map.corpium.net',
-    downloadUrl: 'https://taerra.dev/download/',
+    downloadUrl: 'https://modrinth.com/project/taerra',
     icon: ['M10 6.6795H42L36 17.0718 44 30.9282 38 41.3205H6L12 30.9282 4 17.0718Z', 'M4 17.0718H36', 'M12 30.9282H44']
 };
 
@@ -139,6 +139,13 @@ export const chapters: Chapter[] = [
             'Top-down, a cursor maps straight to world coordinates. In isometric a screen point is a line through the world, and guessing sea level is right on flat ground and wrong everywhere else. The renderer knows the answer, because it wrote every pixel.'
     },
     {
+        id: 'fog',
+        eyebrow: 'Fog of war',
+        title: 'Hidden on the server.',
+        subtitle:
+            'Staff can draw regions over the map and keep them under cloud until a player walks in. Hiding them in the browser would be easy and useless, because the terrain would still be in the tile, one devtools panel away. Terrain under full cover never leaves the server.'
+    },
+    {
         id: 'frontend',
         eyebrow: 'The frontend',
         title: 'A map people leave open.',
@@ -148,7 +155,7 @@ export const chapters: Chapter[] = [
     {
         id: 'access',
         eyebrow: 'Access',
-        title: 'No passwords, no admin panel.',
+        title: 'No passwords, no second login.',
         subtitle:
             'Some of the map is only for some people, which means knowing who is looking. That takes no accounts, no passwords and no e-mail addresses: a Minecraft account is the identity, and the login starts in game.'
     },
@@ -170,7 +177,7 @@ export const chapters: Chapter[] = [
         id: 'log',
         eyebrow: 'The log',
         title: 'What did not pay off.',
-        subtitle: 'Honest notes from the development log, and the four things still on the list.'
+        subtitle: 'Honest notes from the development log, and the three things still on the list.'
     },
     {
         id: 'stack',
@@ -273,7 +280,7 @@ export const refusals: Part[] = [
     {
         name: 'No accounts',
         kind: 'In game',
-        note: 'No passwords and no web admin panel. A Minecraft account is the identity, and the server is configured from inside the game.'
+        note: 'No passwords and no separate admin login. A Minecraft account is the identity, and settings change in game or on a settings page behind that same identity.'
     },
     {
         name: 'No outside services',
@@ -295,6 +302,7 @@ export const lanes: Lane[] = [
             {name: 'Column cache', measure: '~19 KB / chunk', note: 'One structure behind both renderers.'},
             {name: 'Top-down', measure: '64 × 64 blocks', note: 'Measures the heights isometric needs.'},
             {name: 'Isometric', measure: '4 rotations', note: 'Queued from those heights, right behind.'},
+            {name: 'Fog layers', measure: 'Per region', note: 'Only the pixels a discovery would change.'},
             {name: 'Zoom pyramid', measure: '64 → 1', note: 'Top-down composed in memory from tiles still held.'},
             {name: 'Indexed PNG', measure: 'FNV-1a hash', note: 'Unchanged bytes stop here.'},
             {name: 'Disk and socket', measure: 'LRU / Javalin', note: 'Served to Leaflet, pushed as tile_updated.'}
@@ -674,6 +682,10 @@ export const liveSteps: Rule[] = [
         rule: 'Top-down: the column’s tile, a one-block halo for occlusion and terracing, and 32 blocks toward the sun, because a new tower casts its shadow that way. Isometric: the chunk’s footprint in each rotation, bounded by the height index and the changed range, extended by the shadow’s reach.'
     },
     {
+        name: 'Catch what events miss',
+        rule: 'WorldEdit writes blocks without firing Bukkit events, so TAERRA wraps each edit session and records every column it touches with the lowest and highest y changed, handing them over once on the next tick. Plugins that write chunks directly report changes through the API, block by block or as a box, from any thread.'
+    },
+    {
         name: 'Buffer and deduplicate',
         rule: 'Tile coordinates collect in a set that flushes into the live lane once per interval. However often a tile changes in that window, it renders once.'
     },
@@ -700,7 +712,7 @@ export const writes: Part[] = [
     {
         name: 'Indexed PNG',
         kind: 'Hand-rolled',
-        note: 'A flat-shaded tile rarely has more than a few hundred colours. The encoder builds its palette on the fly, writes transparency only when it is needed and deflates 8-bit scanlines: a quarter of the raw data before compression even starts. Past 256 colours it falls back to ImageIO.'
+        note: 'A flat-shaded tile rarely has more than a few hundred colours. The encoder builds its palette on the fly, writes transparency only when it is needed and deflates 8-bit scanlines: a quarter of the raw data before compression even starts. Past 256 colours, which cloud cover can push a tile over, the same encoder writes truecolour instead.'
     },
     {
         name: 'Content hash',
@@ -737,13 +749,58 @@ export const planes: Part[] = [
     },
     {
         name: 'Storage',
-        kind: '16-bit, planar',
-        note: 'Offsets from each plane’s minimum, at half resolution for isometric tiles, deflated. A depth plane is a smooth gradient and a height plane is a height map, so both compress well.'
+        kind: 'Predicted, planar',
+        note: 'Each depth is stored as its difference from the cell above, each height as its difference from the cell to its left, in one byte per value when the tile’s range allows and two when it does not. In isometric the depth is stored net of twice the height, which leaves little more than the screen row. Empty cells go in a bitmask instead of a sentinel, isometric buffers are half resolution, and the result is deflated to about a quarter of the tile it belongs to. Buffers in the old format are rewritten the first time they are read.'
     },
     {
         name: 'Decoding',
         kind: 'Native',
         note: 'The browser inflates them with DecompressionStream, with no JavaScript inflate library. They drive the block tooltip, the coordinate readout and click-to-teleport, and the mod reads the very same buffers.'
+    }
+];
+
+/* ---- Fog of war ---------------------------------------------------------- */
+
+export const discovery: string[] = [
+    'A region is a set of chunks drawn from a chunk selection, in the browser or in the mod, with a name, a colour and one of three fogs: none, a veil the ground shows through, or full cover. Twice a second the server checks which region each online player is standing in. The first visit is a discovery: it is written to that player’s file, plays the advancement chime, shows a toast in the mod or a line in chat, and from then on the region is clear for them on every device they are logged in on.',
+    'Resetting a region moves its reset time forward, and a discovery only counts if it is newer than that. Every earlier discovery is retired at once, without opening a single player file.'
+];
+
+export const fogParts: Part[] = [
+    {
+        name: 'Hidden',
+        kind: 'Stone, not terrain',
+        note: 'A hidden chunk is never drawn into the base tile. It is replaced by flat stone at the median of its real surface heights, blended between neighbouring chunks, under full cover. The cloud bank follows the lie of the land, and a viewer without the discovery receives nothing of what is underneath.'
+    },
+    {
+        name: 'Veiled',
+        kind: 'Thinner cloud',
+        note: 'A veiled region is rendered as it is, under thinner, broken cloud with a grey wash, so a viewer can tell something is there before they have been.'
+    },
+    {
+        name: 'The cloud',
+        kind: '4 octaves, 6 steps',
+        note: 'The cover sits 32 blocks above the ground and fades in over 16 blocks, so tall builds rise through it. Its body is four octaves of value noise quantised to six opacity steps and two tones, lit from the sun’s side and casting a shadow, which keeps it pixel art rather than a blur. Around it, separate clouds at y = 192 drift out over open ground and cast shadows of their own.'
+    },
+    {
+        name: 'Spill',
+        kind: '8–60 blocks',
+        note: 'Cloud does not stop at a chunk border. It spills out along noise-driven lobes, with the distance field itself warped by up to 40 blocks, then fades over another 32 to 60 and ends within eight chunks. Spill lies over open ground, so it lives in an overlay of its own.'
+    },
+    {
+        name: 'Difference layers',
+        kind: 'Per region',
+        note: 'The base tile carries the fog everyone sees. For each fogged region on a tile, a render without that region’s fog is compared with it, and only the pixels that differ are stored, with a reserved value for pixels that turn transparent and a pick buffer masked to the same pixels. A veil needs no second render at all: the renderer keeps an unveiled copy before applying the cloud.'
+    },
+    {
+        name: 'Served per viewer',
+        kind: 'One header',
+        note: 'A tile response lists the layers stored for it in a header, and its ETag carries a hash of that list. The client fetches the difference layers of regions it has discovered and the spill of those it has not, and composes them on a canvas; the mod does the same. An undiscovered region’s layer answers 404, and a viewer who has discovered everything on a tile gets one precomposed clear tile instead of the pieces.'
+    },
+    {
+        name: 'Variants, not re-reads',
+        kind: 'Column cache',
+        note: 'The cache keeps several variants of each chunk, plain, fogged, sky only and one per neighbouring region’s spill, all derived from one sample instead of read again. When an edit moves the median ground under a cloud, the chunks whose fog depends on it are redrawn.'
     }
 ];
 
@@ -773,7 +830,7 @@ export const features: Part[] = [
     {
         name: 'Markers and layers',
         kind: 'Marker API',
-        note: 'WorldGuard regions, vanilla and ChunkyBorder borders, spawn, and waypoints, areas and lines in named groups, each a layer a viewer can switch. Other plugins add their own through a small public API, published to Maven Central with every release, drawn on the ground they belong to, and markers from dynmap can be imported as waypoint groups.'
+        note: 'WorldGuard regions, Towny towns, GriefPrevention claims, PlotSquared plots, vanilla and ChunkyBorder borders, spawn points, loaded chunks by load level, and waypoints, areas and lines in named groups: each a layer a viewer can switch, remembered per player in the browser and the mod alike. Other plugins add their own through a small public API, published to Maven Central with every Modrinth release, drawn on the ground they belong to, and markers from dynmap can be imported as waypoint groups.'
     },
     {
         name: 'Drawn on the map',
@@ -792,8 +849,13 @@ export const features: Part[] = [
     },
     {
         name: 'Chunk selection',
-        kind: 'Render or hide',
-        note: 'Select chunks to render them again, or hide them behind caution stripes while staff build there. Players inside a hidden area are hidden too.'
+        kind: 'Render or fog',
+        note: 'Select chunks to render them again, or draw them into a region with a name, a colour and a fog, its outline traced from the chunks, holes included.'
+    },
+    {
+        name: 'Time and weather',
+        kind: 'Per world',
+        note: 'Each world shows its time of day, its day count and whether it is raining or thundering, pushed over the socket when any of it changes.'
     },
     {
         name: 'Self-hosted',
@@ -808,15 +870,19 @@ export const players =
 export const privacy: Rule[] = [
     {
         name: 'Hidden',
-        rule: 'Players in spectator mode, invisible or vanished players, anyone inside a hidden area and anyone with taerra.hide do not appear at all.'
+        rule: 'Players in spectator mode, invisible or vanished players and anyone with taerra.hide do not appear at all, and neither does anyone inside fog the viewer has not lifted.'
     },
     {
         name: 'Anonymous',
-        rule: 'Players who turned off server listings in their client appear as a grey dot: no name, no head, and an id salted afresh on every server start, so they cannot be followed across restarts.'
+        rule: 'Players who turned off server listings in their client appear as a grey dot: no name, no head, and an id hashed from a salt drawn at server start and their last login, so it changes every time they join and cannot be followed from one session to the next.'
+    },
+    {
+        name: 'Listed, not placed',
+        rule: 'A world can keep its players private: everyone sees who is in it, but only viewers with taerra.players.<world> see where.'
     },
     {
         name: 'Staff',
-        rule: 'Staff with taerra.web.see-hidden do see hidden players, clearly marked as hidden.'
+        rule: 'Staff with taerra.see.hidden-players see hidden and anonymous players, clearly marked as hidden, and taerra.see.fog sees through every region and the players in it.'
     }
 ];
 
@@ -858,22 +924,34 @@ export const login: Rule[] = [
 ];
 
 export const grants: string[] = [
-    'Permission plugins cannot reliably say what an offline player may do, and people browse the map offline all the time. So while a player with a web session is online, TAERRA checks the handful of permissions the map cares about once a second and keeps the result beside the session. Offline, their browser goes by that snapshot.',
-    'When a snapshot changes, every open connection that player has is re-checked at once. Remove a staff rank in LuckPerms and within about a second their open tab loses the staff world and the private layers, without a reload.',
-    'Every world-specific endpoint, from tiles and pick buffers to markers, players and avatars, passes the same check, and a private world answers exactly like one that does not exist: a plain 404.'
+    'Bukkit cannot say what an offline player may do, and people browse the map offline all the time. So while a player with a web session is online, TAERRA checks the handful of permissions the map cares about once a second and keeps the result beside the session. Offline, their browser goes by that snapshot.',
+    'With LuckPerms installed the snapshot keeps up while they are offline too. A rank change for someone who is not online, including one synced from another server, is picked up from LuckPerms’ own events, collected for a second and loaded in one batch.',
+    'When a snapshot changes, every open connection that player has is re-checked at once. Remove a staff rank and within about a second their open tab loses the private worlds and layers, without a reload.',
+    'Every world-specific endpoint, from tiles, fog layers and pick buffers to markers, players and avatars, passes the same check, and a private world answers exactly like one that does not exist: a plain 404.'
 ];
 
 export const actions = [
     {action: 'Browse public worlds and layers', needs: 'Nothing', detail: 'No login needed'},
-    {action: 'See a private world', needs: 'taerra.web.world.<ns>.<world>', detail: 'e.g. minecraft.the_end'},
-    {action: 'See a private layer', needs: 'taerra.web.layer.<layer>', detail: 'e.g. worldguard'},
-    {action: 'See hidden players', needs: 'taerra.web.see-hidden', detail: 'Marked as hidden'},
-    {action: 'Teleport from the map', needs: 'taerra.web.teleport', detail: 'Online, onto the exact block shown'},
-    {action: 'Keep personal markers', needs: 'taerra.web.markers.personal', detail: 'Everyone, by default'},
-    {action: 'Edit markers', needs: 'taerra.web.markers', detail: 'Works while offline'},
-    {action: 'Private marker groups', needs: 'taerra.web.markers.private', detail: 'Private before the first marker'},
-    {action: 'Render selected chunks', needs: 'taerra.web.render', detail: 'Again, from the map'},
-    {action: 'Hide selected chunks', needs: 'taerra.web.hide', detail: 'Behind caution stripes'}
+    {action: 'See a private world', needs: 'taerra.world.<ns>.<world>', detail: 'e.g. minecraft.the_end'},
+    {
+        action: 'See where its players are',
+        needs: 'taerra.players.<ns>.<world>',
+        detail: 'In a world with private players'
+    },
+    {action: 'See a private layer', needs: 'taerra.layer.<layer>', detail: 'e.g. worldguard'},
+    {action: 'See hidden players', needs: 'taerra.see.hidden-players', detail: 'Anonymous ones too, marked'},
+    {action: 'See through fog', needs: 'taerra.see.fog', detail: 'Every region, and who is in it'},
+    {action: 'Teleport from the map', needs: 'taerra.teleport', detail: 'Online, onto the exact block shown'},
+    {action: 'Keep personal markers', needs: 'taerra.waypoint.personal', detail: 'Everyone, by default'},
+    {action: 'Edit markers', needs: 'taerra.waypoint.edit', detail: 'Works while offline'},
+    {
+        action: 'Private marker groups',
+        needs: 'taerra.waypoint.private-groups',
+        detail: 'Private before the first marker'
+    },
+    {action: 'Draw and fog regions', needs: 'taerra.region.edit', detail: 'Resetting discoveries: region.reset'},
+    {action: 'Render chunks again', needs: 'taerra.render.area', detail: 'A whole world: render.world'},
+    {action: 'Change settings', needs: 'taerra.config', detail: 'Live, for everyone at once'}
 ];
 
 export const writesFromWeb: Part[] = [
@@ -890,12 +968,15 @@ export const writesFromWeb: Part[] = [
     {
         name: 'Every write',
         kind: 'Same origin',
-        note: 'Guarded by Fetch Metadata. A browser too old to send it is refused, and only a client with no Origin at all gets through without it. Editing or deleting a waypoint needs sight of the group it is in, so a private group cannot be touched blind. Names are normalised and limited to 32 letters, digits and common punctuation, and nothing can be placed outside the border, so no request can make the server load or generate a chunk it should not.'
+        note: 'Guarded by Fetch Metadata. A browser too old to send it must carry an Origin that matches the host, the proxy’s forwarded host or the public URL, and the WebSocket handshake is checked the same way. Editing or deleting a waypoint needs sight of the group it is in, so a private group cannot be touched blind. Names are normalised and limited to 32 letters, digits and common punctuation, and nothing can be placed outside the border, so no request can make the server load or generate a chunk it should not.'
     }
 ];
 
-export const noPanel =
-    'What the browser cannot do is administer the plugin, and that is deliberate. It can render selected chunks again or hide them, for those allowed to, but enabling worlds, making worlds and layers private, limiting the rendered area and starting full renders all happen in game, through /taerra config, /taerra limit and /taerra render, with tab completion. The same render command also exports a world as one PNG per view and rotation, stitched from the tiles on disk and streamed a row of tiles at a time, so even a whole world never has to fit in memory. A web admin panel would be another login surface to secure, for settings changed once.';
+export const noPanel: string[] = [
+    'Every setting can be changed in game through /taerra config, with tab completion, or on a settings page in the web map and the mod, for players with taerra.config. It is not a second login surface: it sits behind the same Minecraft identity and permission snapshot as everything else and writes the same config file the command does. Changes, from enabling a world to limiting the rendered area, apply at once and without a restart.',
+    'Each field carries its own revision. Two people editing at the same time only collide when they touch the same field, and then the second save comes back as a conflict instead of overwriting the first. The page shows who else has it open and who last changed what.',
+    'Full renders start from the map or with /taerra render. The same command also exports a world as one PNG per view and rotation, stitched from the tiles on disk and streamed a row of tiles at a time, so even a whole world never has to fit in memory.'
+];
 
 /* ---- In game ------------------------------------------------------------- */
 
@@ -911,7 +992,7 @@ export const inGame: Part[] = [
     {
         name: 'World map',
         kind: 'Full screen',
-        note: 'Both views and all four rotations, layers, the player list with follow, search, chunk selection, render progress, and a right-click menu to navigate, copy coordinates or a link, teleport, or drop a waypoint. Pans glide and zooms ease, and every action has a rebindable key.'
+        note: 'Both views and all four rotations, layers, the player list with follow, search, chunk selection, regions, the settings page, render progress, and a right-click menu to navigate, copy coordinates or a link, teleport, or drop a waypoint. Pans glide and zooms ease, and every action has a rebindable key.'
     },
     {
         name: 'Waypoints in the world',
@@ -921,7 +1002,7 @@ export const inGame: Part[] = [
     {
         name: 'Navigation',
         kind: 'Beam and arrow',
-        note: 'To a waypoint, a player or any spot, started in game or from the web map while playing: a beacon beam where it is, and an arrow with the distance at the top of the screen, through the Nether too.'
+        note: 'To a waypoint, a player or any spot, started in game or from the web map while playing: a beacon beam where it is, and an arrow with the distance at the top of the screen, through the Nether too. The target is saved with the player, so it survives a relog.'
     }
 ];
 
@@ -1041,11 +1122,6 @@ export const pending: Part[] = [
         note: 'Measured to the bed, not through the water: a ledge halfway down a lake reads as open water to the bottom.'
     },
     {
-        name: 'Pick buffer size',
-        kind: '≈ the tiles',
-        note: 'It costs about as much disk as the tiles themselves. A coarser buffer would keep most of the precision.'
-    },
-    {
         name: 'Night',
         kind: 'Block light',
         note: 'Torches, lava and glowstone already glow, but light nothing around them. Casting their light waits for a night mode.'
@@ -1065,7 +1141,7 @@ export const stack = [
     },
     {
         layer: 'Frontend',
-        built: 'Leaflet with CRS.Simple, plain ES modules and no build step; BroadcastChannel, DecompressionStream and the Popover API'
+        built: 'Leaflet with CRS.Simple, plain ES modules and no build step; BroadcastChannel, DecompressionStream, OffscreenCanvas and the Popover API'
     },
     {
         layer: 'Mod',
@@ -1077,6 +1153,6 @@ export const stack = [
     },
     {
         layer: 'Integrations',
-        built: 'WorldGuard regions, vanilla and ChunkyBorder borders, Chunky pre-generation, marker import from other web maps, and a public marker API on Maven Central'
+        built: 'WorldGuard, Towny, GriefPrevention and PlotSquared as layers; vanilla and ChunkyBorder borders; Chunky pre-generation; WorldEdit edits and LuckPerms rank changes as they happen; marker import from dynmap; and a public API on Maven Central for markers, layers and block changes'
     }
 ];

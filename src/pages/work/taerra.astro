@@ -18,9 +18,11 @@ import {
     compositing,
     culling,
     cutoff,
+    discovery,
     dropped,
     explored,
     features,
+    fogParts,
     client,
     figures,
     frontToBack,
@@ -990,6 +992,30 @@ const keyFields = key.map((field, i) => {
             </div>
         </Chapter>
 
+        <Chapter {...chapter('fog')}>
+            <div class="prose-block prose" data-reveal>
+                <h3 class="prose-head">Regions, discovered</h3>
+                {discovery.map((paragraph) => (
+                    <p>{paragraph}</p>
+                ))}
+            </div>
+
+            <div class="block" data-reveal>
+                <p class="mono-label">How the cover is built</p>
+                <dl class="part-list">
+                    {fogParts.map((part) => (
+                        <div class="part">
+                            <dt class="part-head">
+                                <span class="part-name">{part.name}</span>
+                                <span class="part-kind mono-label">{part.kind}</span>
+                            </dt>
+                            <dd class="part-note">{part.note}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+        </Chapter>
+
         <Chapter {...chapter('frontend')}>
             <div class="block" data-reveal>
                 <p class="mono-label">In the browser</p>
@@ -1090,8 +1116,10 @@ const keyFields = key.map((field, i) => {
             </div>
 
             <div class="prose-block prose" data-reveal>
-                <h3 class="prose-head">No admin panel</h3>
-                <p>{noPanel}</p>
+                <h3 class="prose-head">A settings page, not an admin panel</h3>
+                {noPanel.map((paragraph) => (
+                    <p>{paragraph}</p>
+                ))}
             </div>
         </Chapter>
 
